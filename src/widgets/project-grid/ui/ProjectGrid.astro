@@ -11,20 +11,22 @@ import ProjectCard from './ProjectCard.astro';
   .project-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 80px;
+    /* 40px — Figma project-grid's real itemSpacing (row and column both),
+       re-pulled after Max's update. Not on the token scale. */
+    gap: 40px;
   }
 
   @media (max-width: 1023px) {
     .project-grid {
       grid-template-columns: repeat(2, 1fr);
-      gap: 48px;
+      gap: var(--spacing-lg);
     }
   }
 
   @media (max-width: 767px) {
     .project-grid {
       grid-template-columns: 1fr;
-      gap: 32px;
+      gap: var(--spacing-md);
     }
   }
 </style>
