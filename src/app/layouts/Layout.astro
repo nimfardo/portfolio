@@ -1,4 +1,6 @@
 ---
+import '@fontsource-variable/manrope';
+import '@app/styles/tokens.css';
 import '@app/styles/global.css';
 
 interface Props {
@@ -16,6 +18,14 @@ const { title } = Astro.props;
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
+    <script is:inline>
+      // Runs before paint to avoid a flash of the wrong theme.
+      // Dark is the default (dark-first design); light is opt-in and persisted.
+      const stored = localStorage.getItem('theme');
+      if (stored === 'light') {
+        document.documentElement.dataset.theme = 'light';
+      }
+    </script>
   </head>
   <body>
     <slot />

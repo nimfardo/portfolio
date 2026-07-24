@@ -1,0 +1,124 @@
+/**
+ * Design tokens — generated from the Figma Sandbox file (Tk5IaCtVCnYarMwEOEWB0D),
+ * `primitive` + `semantic` variable collections, pulled 2026-07-24 (feat-004).
+ * Source of truth is Figma. Don't hand-edit values here — re-pull instead.
+ */
+
+:root {
+  /* Primitive: obsidian-amber ramp */
+  --color-obsidian-amber-50: #faeee1;
+  --color-obsidian-amber-100: #f5dcc4;
+  --color-obsidian-amber-200: #efcba6;
+  --color-obsidian-amber-300: #e0964d;
+  --color-obsidian-amber-400: #da852f;
+  --color-obsidian-amber-500: #a6621d;
+  --color-obsidian-amber-600: #885018;
+  --color-obsidian-amber-700: #4d2d0e;
+  --color-obsidian-amber-800: #2f1c08;
+  --color-obsidian-amber-900: #1a0f05;
+  --color-obsidian-amber-950: #110a03;
+  --color-white: #ffffff;
+  --color-black: #000000;
+
+  /* Semantic: dark is the default theme (no [data-theme] attribute needed) */
+  --color-bg-default: #110a03;
+  --color-bg-subtle: #1a0f05;
+  --color-bg-muted: #2f1c08;
+  --color-bg-accent: #e0964d;
+  --color-bg-accent-hover: #efcba6;
+  --color-bg-inverse: #faeee1;
+  --color-bg-elevated: #4d2d0e;
+  --color-text-emphasis: #faeee1;
+  --color-text-primary: #efcba6;
+  --color-text-secondary: #da852f;
+  --color-text-muted: #a6621d;
+  --color-text-accent: #e0964d;
+  --color-text-on-accent: #110a03;
+  --color-border-default: #2f1c08;
+  --color-border-strong: #efcba6;
+  --color-border-accent: #e0964d;
+  --color-border-emphasis: #faeee1;
+  --color-icon-default: #efcba6;
+  --color-icon-muted: #a6621d;
+  --color-icon-accent: #e0964d;
+  --color-icon-on-accent: #110a03;
+  --color-icon-emphasis: #faeee1;
+
+  /* Spacing — identical across themes */
+  --spacing-xxs: 2px;
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-2xl: 48px;
+  --spacing-3xl: 64px;
+  --spacing-4xl: 96px;
+  --spacing-5xl: 128px;
+
+  /* Radius */
+  --radius-none: 0px;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 16px;
+  --radius-full: 9999px;
+
+  /* Typography — Manrope only, self-hosted via @fontsource-variable/manrope */
+  --font-family-body: 'Manrope Variable', Manrope, sans-serif;
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-bold: 700;
+
+  --font-size-xs: 12px;
+  --font-size-sm: 14px;
+  --font-size-base: 16px;
+  --font-size-lg: 18px;
+  --font-size-xl: 20px;
+  --font-size-2xl: 24px;
+  --font-size-3xl: 32px;
+  --font-size-4xl: 40px;
+  --font-size-5xl: 48px;
+  --font-size-6xl: 64px;
+  --font-size-7xl: 80px;
+  --font-size-8xl: 96px;
+  --font-size-9xl: 128px;
+
+  --font-line-height-xs: 16px;
+  --font-line-height-sm: 20px;
+  --font-line-height-base: 24px;
+  --font-line-height-lg: 28px;
+  --font-line-height-xl: 28px;
+  --font-line-height-2xl: 32px;
+  --font-line-height-3xl: 40px;
+  --font-line-height-4xl: 48px;
+  --font-line-height-5xl: 56px;
+  --font-line-height-6xl: 72px;
+  --font-line-height-7xl: 88px;
+  --font-line-height-8xl: 104px;
+  --font-line-height-9xl: 136px;
+}
+
+[data-theme='light'] {
+  --color-bg-default: #faeee1;
+  --color-bg-subtle: #f5dcc4;
+  --color-bg-muted: #efcba6;
+  --color-bg-accent: #885018;
+  --color-bg-accent-hover: #4d2d0e;
+  --color-bg-inverse: #110a03;
+  --color-bg-elevated: #e0964d;
+  --color-text-emphasis: #110a03;
+  --color-text-primary: #2f1c08;
+  --color-text-secondary: #885018;
+  --color-text-muted: #885018;
+  --color-text-accent: #885018;
+  --color-text-on-accent: #faeee1;
+  --color-border-default: #efcba6;
+  --color-border-strong: #2f1c08;
+  --color-border-accent: #885018;
+  --color-border-emphasis: #110a03;
+  --color-icon-default: #2f1c08;
+  --color-icon-muted: #885018;
+  --color-icon-accent: #885018;
+  --color-icon-on-accent: #faeee1;
+  --color-icon-emphasis: #110a03;
+}
