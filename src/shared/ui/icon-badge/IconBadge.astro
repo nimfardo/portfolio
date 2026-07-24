@@ -1,0 +1,47 @@
+---
+import Icon from '../icon/Icon.astro';
+import type { IconName } from '../icon/Icon.astro';
+
+interface Props {
+  icon: IconName;
+  class?: string;
+}
+
+const { icon, class: className } = Astro.props;
+---
+
+<span class:list={['icon-badge', className]}>
+  <Icon name={icon} size={48} />
+</span>
+
+<style>
+  .icon-badge {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 80px;
+    height: 80px;
+    background: var(--color-bg-subtle);
+    border: 1px solid var(--color-border-default);
+  }
+  .icon-badge::before,
+  .icon-badge::after {
+    content: '';
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: var(--color-bg-accent);
+  }
+  .icon-badge::before {
+    top: -1px;
+    left: -1px;
+    box-shadow: 82px 0 var(--color-bg-accent);
+  }
+  .icon-badge::after {
+    bottom: -1px;
+    left: -1px;
+    box-shadow: 82px 0 var(--color-bg-accent);
+  }
+</style>

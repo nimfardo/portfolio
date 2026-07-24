@@ -1,0 +1,164 @@
+---
+// Native <details>/<summary> for free, zero-JS expand/collapse — matches
+// Figma's Accordion component (open=true|false variants) exactly, first
+// step open by default. icon/plus <-> icon/minus swap via CSS on [open].
+import { Icon, IconBadge } from '@shared/ui';
+import type { ProcessStep } from '../model/types';
+
+interface Props {
+  steps: ProcessStep[];
+}
+
+const { steps } = Astro.props;
+---
+
+<div class="process-accordion">
+  {
+    steps.map((step, index) => (
+      <details class="process-step" open={index === 0}>
+        <summary class="process-step__summary">
+          <span class="process-step__number">{step.number}</span>
+          <span class="process-step__title">{step.title}</span>
+          <Icon name="plus" size={48} class="process-step__icon process-step__icon--closed" />
+          <Icon name="minus" size={48} class="process-step__icon process-step__icon--open" />
+        </summary>
+        <div class="process-step__content">
+          {step.blocks.map((block) => (
+            <div class="process-block">
+              <div class="process-block__heading">
+                <IconBadge icon={block.icon} />
+                <p class="process-block__heading-text">{block.heading}</p>
+              </div>
+              {block.image && (
+                <img
+                  class="process-block__image"
+                  src={block.image}
+                  alt={block.imageAlt ?? ''}
+                  loading="lazy"
+                />
+              )}
+              {Array.isArray(block.body) ? (
+                <ul class="process-block__list">
+                  {block.body.map((item) => (
+                    <li>{item}</li>
+                  ))}
+                </ul>
+              ) : (
+                <p class="process-block__text">{block.body}</p>
+              )}
+            </div>
+          ))}
+        </div>
+      </details>
+    ))
+  }
+</div>
+
+<style>
+  .process-accordion {
+    display: flex;
+    flex-direction: column;
+  }
+  .process-step {
+    border-bottom: 1px solid var(--color-border-default);
+  }
+  .process-step:first-child {
+    border-top: 1px solid var(--color-border-default);
+  }
+
+  .process-step__summary {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-4xl);
+    padding: var(--spacing-xl) 0;
+    cursor: pointer;
+    list-style: none;
+  }
+  .process-step__summary::-webkit-details-marker {
+    display: none;
+  }
+  .process-step__number {
+    flex-shrink: 0;
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-2xl);
+    line-height: var(--font-line-height-2xl);
+    color: var(--color-text-primary);
+  }
+  .process-step__title {
+    flex: 1;
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-3xl);
+    line-height: var(--font-line-height-3xl);
+    font-weight: var(--font-weight-bold);
+    letter-spacing: -0.01em;
+    color: var(--color-text-primary);
+  }
+  .process-step :global(.process-step__icon) {
+    flex-shrink: 0;
+    color: var(--color-icon-default);
+  }
+  .process-step:not([open]) :global(.process-step__icon--open) {
+    display: none;
+  }
+  .process-step[open] :global(.process-step__icon--closed) {
+    display: none;
+  }
+
+  .process-step__content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-4xl);
+    padding-bottom: var(--spacing-4xl);
+  }
+
+  .process-block {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xl);
+  }
+  .process-block__heading {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-lg);
+  }
+  .process-block__heading-text {
+    flex: 1;
+    margin: 0;
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-2xl);
+    line-height: var(--font-line-height-2xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-text-primary);
+  }
+  .process-block__image {
+    width: 100%;
+    aspect-ratio: 1071 / 560;
+    object-fit: cover;
+  }
+  .process-block__text {
+    margin: 0;
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-xl);
+    line-height: 2;
+    color: var(--color-text-primary);
+  }
+  .process-block__list {
+    margin: 0;
+    padding-left: 30px;
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-xl);
+    line-height: 2;
+    color: var(--color-text-primary);
+  }
+
+  @media (max-width: 767px) {
+    .process-step__summary {
+      gap: var(--spacing-lg);
+      align-items: flex-start;
+    }
+    .process-step__title {
+      font-size: var(--font-size-xl);
+      line-height: var(--font-line-height-xl);
+    }
+  }
+</style>

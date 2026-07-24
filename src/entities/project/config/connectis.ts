@@ -1,0 +1,145 @@
+import type { ProcessStep } from '../model/types';
+
+// Content pulled from the live Figma canvas (Project Page/CONNECTIS
+// (Revised), node 2165:2), not reference/content/copy-deck.md — the two
+// have drifted (see STATE.md Known Issues); canvas is the source of truth.
+
+const M = '/media/connectis';
+
+export const connectis = {
+  slug: 'connectis',
+  name: 'CONNECTIS',
+  hero: {
+    tags: ['2026', 'Logistics', 'brand · ux', 'Solo designer'],
+    eyebrow: 'Challenge',
+    headline: ['Transform fragmented data into', 'prioritized actions to prevent downtime'],
+    image: `${M}/hero.jpg`,
+    imageAlt: 'CONNECTIS — dashboard viewed from inside a fleet vehicle',
+  },
+  overview: {
+    heading: 'Project Overview',
+    image: `${M}/overview.jpg`,
+    imageAlt: 'CONNECTIS product overview',
+    text: 'A cloud-based SaaS platform designed for the dynamic, centralized management of large rental vehicle fleets. Enterprise B2B SaaS — subscription-based, built for fleet operations teams managing 500+ assets.',
+  },
+  process: [
+    {
+      number: '01',
+      title: 'AI-driven Product Strategy and Framing',
+      blocks: [
+        {
+          heading: 'What we did:',
+          icon: 'list',
+          image: `${M}/process/step1-what.jpg`,
+          imageAlt:
+            'Research deliverables: market research, user personas, journey mapping, problem framing',
+          body: [
+            'Accelerated market research',
+            'User personas',
+            'Journey mapping',
+            'Problem framing using AI',
+          ],
+        },
+        {
+          heading: 'The Value:',
+          icon: 'check',
+          image: `${M}/process/step1-value.jpg`,
+          imageAlt: 'A user persona — Carlos Silva, Senior Fleet Operations Manager',
+          body: 'Compressed the discovery and scoping phase from months to days without sacrificing depth.',
+        },
+      ],
+    },
+    {
+      number: '02',
+      title: 'Tokenized Design System and Architecture',
+      blocks: [
+        {
+          heading: 'What we did:',
+          icon: 'list',
+          image: `${M}/process/step2-what.jpg`,
+          imageAlt:
+            'A hybrid analog-digital workflow across Pencil & Paper, FigJam, Figma, Claude, and UX Pilot',
+          body: 'Developed sitemaps, user stories, lo-fi wireframes, and a high-fidelity Figma component library with a Level-II token architecture (light/dark modes).',
+        },
+        {
+          heading: 'The Value:',
+          icon: 'check',
+          image: `${M}/process/step2-value.jpg`,
+          imageAlt:
+            'The token architecture, organized by color scale, spacing and shape, and reference vs semantic layers',
+          body: 'Created a structured, systematic design foundation tailored for efficient AI translation.',
+        },
+      ],
+    },
+    {
+      number: '03',
+      title: 'Figma-to-Claude Integration and Documentation',
+      blocks: [
+        {
+          heading: 'What we did:',
+          icon: 'list',
+          image: `${M}/process/step3-what.jpg`,
+          imageAlt: 'Figma layouts translated into a structured data graph for Claude',
+          body: 'Used Claude to directly parse our Figma layouts, design tokens, and visual direction.',
+        },
+        {
+          heading: 'The Value:',
+          icon: 'check',
+          body: 'Automated the generation of comprehensive PRDs, user flows, and precise UI reference specs.',
+        },
+      ],
+    },
+    {
+      number: '04',
+      title: 'AI-assisted Build and PoC Delivery',
+      blocks: [
+        {
+          heading: 'What we did:',
+          icon: 'list',
+          image: `${M}/process/step4-what.jpg`,
+          imageAlt:
+            'Claude Code building the CONNECTIS dashboard, live preview alongside the terminal session',
+          body: 'Fed design data into code generation pipelines for an instant iteration loop, followed by immediate usability testing on the output.',
+        },
+        {
+          heading: 'The Value:',
+          icon: 'check',
+          body: 'Replaced slow, traditional handoffs to build and validate a working PoC in record time.',
+        },
+      ],
+    },
+  ] satisfies ProcessStep[],
+  interstitial: {
+    eyebrow: 'Deliverables',
+    headline: ['A design system, shipped as a working product.'],
+    image: `${M}/interstitial.jpg`,
+    imageAlt: 'CONNECTIS design system documentation',
+  },
+  brandDevelopment: {
+    heading: 'Brand Development',
+    image: `${M}/brand-development.jpg`,
+    imageAlt: 'CONNECTIS brand identity — Michroma wordmark and network mark',
+    text: 'The identity is built on geometric precision: a Michroma wordmark, zero decoration, and a network mark where every dot connects to the next — one connected fleet, not a scattered list of vehicles.',
+  },
+  designSystem: {
+    heading: 'Design System',
+    image: `${M}/design-system.jpg`,
+    imageAlt: 'CONNECTIS two-tiered design token architecture',
+    text: 'A streamlined adaptation of classic Material Design principles utilizing a strict 2-tiered architecture. The system organizes design primitives into two core collections: a foundational reference layer and a semantic layer.',
+  },
+  build: {
+    sitemapImage: `${M}/sitemap.png`,
+    caption:
+      'Three dependency vulnerabilities patched. Full auth and role-based access, sign-in to sign-out.',
+    stats: [
+      { value: '394', label: 'Commits, One Month' },
+      { value: '76KB', label: 'Initial JS Bundle' },
+    ],
+  },
+  gallery: [`${M}/gallery-1.jpg`, `${M}/gallery-2.jpg`, `${M}/gallery-3.jpg`, `${M}/gallery-4.jpg`],
+  retrospective: {
+    heading: "What I've Learned",
+    text: 'I learned how fast a working proof of concept comes together when AI carries the handoff. Feeding Figma layouts and tokens straight into Claude Code turned weeks of translation into days, and let me test a real interface instead of a slide deck. The lesson: treat AI as part of the process, not a shortcut around it.',
+    behanceUrl: 'https://www.behance.net/gallery/251016127/',
+  },
+};

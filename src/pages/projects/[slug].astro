@@ -1,0 +1,143 @@
+---
+import Layout from '@app/layouts/Layout.astro';
+import { PageHeader } from '@widgets/page-header';
+import { ProjectHero } from '@widgets/project-hero';
+import { ContentSection } from '@widgets/content-section';
+import { ProcessAccordion } from '@widgets/process-accordion';
+import { BuildSection } from '@widgets/build-section';
+import { Retrospective } from '@widgets/retrospective';
+import { connectis } from '@entities/project';
+
+// Only CONNECTIS exists so far — Arvus and the rest land once Max approves
+// more hi-fi designs in Figma (see planning/specs/site-implementation.md).
+export function getStaticPaths() {
+  return [{ params: { slug: connectis.slug }, props: { project: connectis } }];
+}
+
+const { project } = Astro.props;
+---
+
+<Layout title={`${project.name} — Max Shturma`}>
+  <main class="project-page">
+    <PageHeader title={project.name} showBack backHref="/" />
+
+    <ProjectHero
+      image={project.hero.image}
+      imageAlt={project.hero.imageAlt}
+      eyebrow={project.hero.eyebrow}
+      headline={project.hero.headline}
+      tags={project.hero.tags}
+    />
+
+    <div class="project-page__sections">
+      <ContentSection
+        heading={project.overview.heading}
+        image={project.overview.image}
+        imageAlt={project.overview.imageAlt}
+      >
+        {project.overview.text}
+      </ContentSection>
+
+      <section class="project-page__process">
+        <h2 class="project-page__process-heading">Process</h2>
+        <div class="project-page__process-body">
+          <ProcessAccordion steps={project.process} />
+        </div>
+      </section>
+    </div>
+
+    <ProjectHero
+      image={project.interstitial.image}
+      imageAlt={project.interstitial.imageAlt}
+      eyebrow={project.interstitial.eyebrow}
+      headline={project.interstitial.headline}
+    />
+
+    <div class="project-page__sections">
+      <ContentSection
+        heading={project.brandDevelopment.heading}
+        image={project.brandDevelopment.image}
+        imageAlt={project.brandDevelopment.imageAlt}
+      >
+        {project.brandDevelopment.text}
+      </ContentSection>
+
+      <ContentSection
+        heading={project.designSystem.heading}
+        image={project.designSystem.image}
+        imageAlt={project.designSystem.imageAlt}
+      >
+        {project.designSystem.text}
+      </ContentSection>
+
+      <BuildSection
+        sitemapImage={project.build.sitemapImage}
+        caption={project.build.caption}
+        stats={project.build.stats}
+      />
+
+      <div class="project-page__gallery">
+        {project.gallery.map((src) => <img src={src} alt="" loading="lazy" />)}
+      </div>
+
+      <Retrospective
+        heading={project.retrospective.heading}
+        behanceUrl={project.retrospective.behanceUrl}
+      >
+        {project.retrospective.text}
+      </Retrospective>
+    </div>
+  </main>
+</Layout>
+
+<style>
+  .project-page__sections {
+    display: flex;
+    flex-direction: column;
+    gap: 96px;
+    max-width: 1647px;
+    margin: 0 auto;
+    padding: 96px 40px;
+  }
+  .project-page__process {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--spacing-4xl);
+  }
+  .project-page__process-heading {
+    flex-shrink: 0;
+    width: 496px;
+    margin: 0;
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-4xl);
+    line-height: var(--font-line-height-4xl);
+    font-weight: var(--font-weight-bold);
+    letter-spacing: -0.01em;
+    color: var(--color-text-primary);
+  }
+  .project-page__process-body {
+    flex: 1;
+    min-width: 0;
+    max-width: 1071px;
+  }
+  .project-page__gallery {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+  .project-page__gallery img {
+    width: 100%;
+    height: auto;
+  }
+
+  @media (max-width: 1023px) {
+    .project-page__process {
+      flex-direction: column;
+      gap: var(--spacing-xl);
+    }
+    .project-page__process-heading {
+      width: 100%;
+    }
+  }
+</style>

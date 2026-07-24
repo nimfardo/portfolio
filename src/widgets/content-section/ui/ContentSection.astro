@@ -1,0 +1,70 @@
+---
+// Reused for Project Overview / Brand Development / Design System — every
+// CONNECTIS section that's just a heading + one image + one paragraph.
+interface Props {
+  heading: string;
+  image: string;
+  imageAlt: string;
+  class?: string;
+}
+
+const { heading, image, imageAlt, class: className } = Astro.props;
+---
+
+<section class:list={['content-section', className]}>
+  <h2 class="content-section__heading">{heading}</h2>
+  <div class="content-section__body">
+    <img class="content-section__image" src={image} alt={imageAlt} loading="lazy" />
+    <p class="content-section__text"><slot /></p>
+  </div>
+</section>
+
+<style>
+  .content-section {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--spacing-4xl);
+  }
+  .content-section__heading {
+    flex-shrink: 0;
+    width: 496px;
+    margin: 0;
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-4xl);
+    line-height: var(--font-line-height-4xl);
+    font-weight: var(--font-weight-bold);
+    letter-spacing: -0.01em;
+    color: var(--color-text-primary);
+  }
+  .content-section__body {
+    display: flex;
+    flex: 1;
+    min-width: 0;
+    flex-direction: column;
+    gap: var(--spacing-4xl);
+  }
+  .content-section__image {
+    width: 100%;
+    aspect-ratio: 1071 / 630;
+    object-fit: cover;
+  }
+  .content-section__text {
+    margin: 0;
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-xl);
+    line-height: 2;
+    font-weight: var(--font-weight-regular);
+    color: var(--color-text-primary);
+  }
+
+  @media (max-width: 1023px) {
+    .content-section {
+      flex-direction: column;
+      gap: var(--spacing-xl);
+    }
+    .content-section__heading {
+      width: 100%;
+    }
+  }
+</style>

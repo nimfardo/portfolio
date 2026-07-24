@@ -1,0 +1,42 @@
+---
+import type { Stat } from '../model/types';
+
+interface Props extends Stat {
+  class?: string;
+}
+
+const { value, label, class: className } = Astro.props;
+---
+
+<div class:list={['stat', className]}>
+  <p class="stat__value">{value}</p>
+  <p class="stat__label">{label}</p>
+</div>
+
+<style>
+  .stat {
+    display: flex;
+    flex: 1 0 0;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+    text-transform: uppercase;
+    color: var(--color-text-primary);
+  }
+  .stat__value {
+    margin: 0;
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-5xl);
+    line-height: var(--font-line-height-5xl);
+    font-weight: var(--font-weight-bold);
+    letter-spacing: 0.02em;
+  }
+  .stat__label {
+    margin: 0;
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-xl);
+    line-height: 2;
+    font-weight: var(--font-weight-regular);
+    letter-spacing: 0.03em;
+  }
+</style>

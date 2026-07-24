@@ -1,0 +1,80 @@
+---
+import { Button, IconBadge } from '@shared/ui';
+
+interface Props {
+  heading: string;
+  behanceUrl: string;
+}
+
+const { heading, behanceUrl } = Astro.props;
+---
+
+<section class="retrospective">
+  <h2 class="retrospective__heading">{heading}</h2>
+  <div class="retrospective__body">
+    <p class="retrospective__text"><slot /></p>
+    <Button type="solid" href={behanceUrl} class="retrospective__button">Check on Behance</Button>
+    <div class="retrospective__thanks">
+      <IconBadge icon="thumb" />
+      <p class="retrospective__thanks-text">Thanks for scrolling</p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .retrospective {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--spacing-4xl);
+  }
+  .retrospective__heading {
+    flex-shrink: 0;
+    width: 496px;
+    margin: 0;
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-4xl);
+    line-height: var(--font-line-height-4xl);
+    font-weight: var(--font-weight-bold);
+    letter-spacing: -0.01em;
+    color: var(--color-text-primary);
+  }
+  .retrospective__body {
+    display: flex;
+    flex: 1;
+    min-width: 0;
+    flex-direction: column;
+    gap: var(--spacing-4xl);
+  }
+  .retrospective__text {
+    margin: 0;
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-xl);
+    line-height: 2;
+    color: var(--color-text-primary);
+  }
+  .retrospective__thanks {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+  }
+  .retrospective__thanks-text {
+    margin: 0;
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-3xl);
+    line-height: var(--font-line-height-3xl);
+    font-weight: var(--font-weight-medium);
+    letter-spacing: -0.01em;
+    color: var(--color-text-primary);
+  }
+
+  @media (max-width: 1023px) {
+    .retrospective {
+      flex-direction: column;
+      gap: var(--spacing-xl);
+    }
+    .retrospective__heading {
+      width: 100%;
+    }
+  }
+</style>

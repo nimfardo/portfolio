@@ -1,2 +1,3 @@
 export { PROJECTS } from './config/projects';
-export type { Project, ProjectAccess } from './model/types';
+export { connectis } from './config/connectis';
+export type { Project, ProjectAccess, ProcessStep, ProcessBlock } from './model/types';
