@@ -143,6 +143,9 @@ const currentPath = Astro.url.pathname;
       display: flex;
       gap: var(--spacing-sm);
     }
+    .nav-desktop__links a {
+      color: var(--color-icon-default);
+    }
   }
 
   /* --- Mobile header (below 1024px, Figma: 390x64) --- */
@@ -245,6 +248,9 @@ const currentPath = Astro.url.pathname;
   .nav-mobile-overlay__links {
     display: flex;
     gap: var(--spacing-sm);
+  }
+  .nav-mobile-overlay__links a {
+    color: var(--color-icon-default);
   }
 
   .nav-mobile-overlay__footer {

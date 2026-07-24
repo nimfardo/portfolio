@@ -24,7 +24,9 @@ const { heading, image, imageAlt, class: className } = Astro.props;
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
-    gap: var(--spacing-4xl);
+    /* 80px — Figma: 1647px content width - 496px heading - 1071px body.
+       Not on our token scale; hardcoded like Tag/Button's own paddings. */
+    gap: 80px;
   }
   .content-section__heading {
     flex-shrink: 0;
@@ -42,7 +44,7 @@ const { heading, image, imageAlt, class: className } = Astro.props;
     flex: 1;
     min-width: 0;
     flex-direction: column;
-    gap: var(--spacing-4xl);
+    gap: 80px;
   }
   .content-section__image {
     width: 100%;

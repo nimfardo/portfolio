@@ -94,16 +94,19 @@ const { project } = Astro.props;
   .project-page__sections {
     display: flex;
     flex-direction: column;
-    gap: 96px;
+    /* 160px between every section on this page, top to bottom — measured
+       directly off the Figma frame's child y-positions, consistent across
+       all 8 gaps. Not a token; this page's own established rhythm. */
+    gap: 160px;
     max-width: 1647px;
     margin: 0 auto;
-    padding: 96px 40px;
+    padding: 160px 40px;
   }
   .project-page__process {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
-    gap: var(--spacing-4xl);
+    gap: 80px;
   }
   .project-page__process-heading {
     flex-shrink: 0;
@@ -124,7 +127,7 @@ const { project } = Astro.props;
   .project-page__gallery {
     display: flex;
     flex-direction: column;
-    gap: 24px;
+    gap: 160px;
   }
   .project-page__gallery img {
     width: 100%;

@@ -41,6 +41,16 @@ const icons = {
 
 export type IconName = keyof typeof icons;
 
+// Figma's icon components live in a 28x28 frame with the glyph inset at its
+// own natural size (not stretched to fill it) — e.g. arrow-right's glyph is
+// 14x14 within that 28x28 frame. linkedin/behance are the exception, framed
+// at 32x32. Every exported SVG's width/height already IS that natural glyph
+// size (tight viewBox, not padded to the frame) — see wiki/log.md for how
+// this was diagnosed. So: render each glyph at its own intrinsic size, then
+// scale it by size/nativeFrame to match how Figma scales an icon instance
+// up or down, instead of stretching it to fill an arbitrary box.
+const SOCIAL_ICONS = new Set<IconName>(['linkedin', 'behance']);
+
 interface Props {
   name: IconName;
   size?: number;
@@ -48,23 +58,26 @@ interface Props {
 }
 
 const { name, size = 28, class: className } = Astro.props;
+const nativeFrame = SOCIAL_ICONS.has(name) ? 32 : 28;
+const scale = size / nativeFrame;
 ---
 
-<span
-  class:list={['icon', className]}
-  style={{ width: `${size}px`, height: `${size}px` }}
-  set:html={icons[name]}
-/>
+<span class:list={['icon', className]} style={{ width: `${size}px`, height: `${size}px` }}>
+  <span class="icon__glyph" style={{ transform: `scale(${scale})` }} set:html={icons[name]} />
+</span>
 
 <style>
   .icon {
     display: inline-flex;
+    align-items: center;
+    justify-content: center;
     flex-shrink: 0;
-    color: var(--color-icon-default);
+    color: inherit;
   }
-  .icon :global(svg) {
-    width: 100%;
-    height: 100%;
+  .icon__glyph {
+    display: inline-flex;
+  }
+  .icon__glyph :global(svg) {
     display: block;
   }
 </style>
