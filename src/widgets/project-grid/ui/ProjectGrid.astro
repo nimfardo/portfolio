@@ -1,0 +1,30 @@
+---
+import { PROJECTS } from '@entities/project';
+import ProjectCard from './ProjectCard.astro';
+---
+
+<div class="project-grid">
+  {PROJECTS.map((project) => <ProjectCard project={project} />)}
+</div>
+
+<style>
+  .project-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 80px;
+  }
+
+  @media (max-width: 1023px) {
+    .project-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 48px;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .project-grid {
+      grid-template-columns: 1fr;
+      gap: 32px;
+    }
+  }
+</style>

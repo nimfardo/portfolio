@@ -1,0 +1,64 @@
+---
+// Figma "header" organism (2078:375 / 2118:1602): page-name + theme-toggle,
+// sitting above content on desktop. Desktop-only — mobile's own header
+// (widgets/navigation) is logo+hamburger only, and the mobile overlay
+// already carries the theme-toggle, so this would be redundant below 1024px.
+import { Icon } from '@shared/ui';
+import { ThemeToggle } from '@features/theme-toggle';
+
+interface Props {
+  title: string;
+  showBack?: boolean;
+  backHref?: string;
+}
+
+const { title, showBack = false, backHref = '/' } = Astro.props;
+---
+
+<div class="page-header">
+  <div class="page-header__title-group">
+    {
+      showBack && (
+        <a href={backHref} class="page-header__back" aria-label="Back">
+          <Icon name="arrow-left" size={28} />
+        </a>
+      )
+    }
+    <span class="page-header__title">{title}</span>
+  </div>
+  <ThemeToggle />
+</div>
+
+<style>
+  .page-header {
+    display: none;
+  }
+
+  @media (min-width: 1024px) {
+    .page-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 48px;
+      margin-bottom: var(--spacing-2xl);
+    }
+    .page-header__title-group {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-lg);
+    }
+    .page-header__title {
+      font-family: var(--font-family-body);
+      font-size: var(--font-size-2xl);
+      line-height: var(--font-line-height-2xl);
+      font-weight: var(--font-weight-medium);
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      color: var(--color-text-emphasis);
+    }
+    .page-header__back {
+      display: flex;
+      color: var(--color-icon-default);
+    }
+  }
+</style>
