@@ -1,0 +1,34 @@
+---
+// No markup of its own — wires up open/close behavior for the elements
+// widgets/navigation renders: [data-mobile-nav-trigger] opens
+// [data-mobile-nav-overlay], [data-mobile-nav-close] and a backdrop click
+// or Escape close it. Kept as its own feature slice (the "verb" is
+// toggling the mobile nav) even though it has no visual output.
+---
+
+<script>
+  const overlay = document.querySelector<HTMLElement>('[data-mobile-nav-overlay]');
+  const trigger = document.querySelector<HTMLElement>('[data-mobile-nav-trigger]');
+  const closeButton = document.querySelector<HTMLElement>('[data-mobile-nav-close]');
+
+  function open() {
+    overlay?.setAttribute('data-open', 'true');
+    trigger?.setAttribute('aria-expanded', 'true');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function close() {
+    overlay?.removeAttribute('data-open');
+    trigger?.setAttribute('aria-expanded', 'false');
+    document.body.style.overflow = '';
+  }
+
+  trigger?.addEventListener('click', open);
+  closeButton?.addEventListener('click', close);
+  overlay?.addEventListener('click', (event) => {
+    if (event.target === overlay) close();
+  });
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') close();
+  });
+</script>

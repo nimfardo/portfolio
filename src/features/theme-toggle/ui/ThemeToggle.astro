@@ -1,0 +1,93 @@
+---
+// Reads/writes the same localStorage key the theme-init script in
+// app/layouts/Layout.astro checks before first paint.
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+---
+
+<button
+  type="button"
+  class:list={['theme-toggle', className]}
+  data-theme-toggle
+  aria-label="Toggle color theme"
+>
+  <span class="theme-toggle__label" data-theme-toggle-label>Dark</span>
+  <span class="theme-toggle__track">
+    <span class="theme-toggle__knob"></span>
+  </span>
+</button>
+
+<script>
+  const STORAGE_KEY = 'theme';
+
+  function syncLabel(button: HTMLElement) {
+    const isLight = document.documentElement.dataset.theme === 'light';
+    const label = button.querySelector('[data-theme-toggle-label]');
+    if (label) label.textContent = isLight ? 'Light' : 'Dark';
+    button.setAttribute('aria-pressed', String(isLight));
+  }
+
+  const buttons = document.querySelectorAll<HTMLButtonElement>('[data-theme-toggle]');
+  buttons.forEach((button) => {
+    syncLabel(button);
+    button.addEventListener('click', () => {
+      const isLight = document.documentElement.dataset.theme === 'light';
+      if (isLight) {
+        delete document.documentElement.dataset.theme;
+        localStorage.setItem(STORAGE_KEY, 'dark');
+      } else {
+        document.documentElement.dataset.theme = 'light';
+        localStorage.setItem(STORAGE_KEY, 'light');
+      }
+      buttons.forEach(syncLabel);
+    });
+  });
+</script>
+
+<style>
+  .theme-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-sm);
+    line-height: var(--font-line-height-sm);
+    font-weight: var(--font-weight-medium);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--color-text-primary);
+  }
+
+  .theme-toggle__track {
+    position: relative;
+    width: 44px;
+    height: 24px;
+    border-radius: var(--radius-full);
+    background: var(--color-bg-muted);
+    transition: background 0.2s ease;
+  }
+  :global([data-theme='light']) .theme-toggle__track {
+    background: var(--color-bg-elevated);
+  }
+
+  .theme-toggle__knob {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 20px;
+    height: 20px;
+    border-radius: var(--radius-full);
+    background: var(--color-bg-inverse);
+    transition: left 0.2s ease;
+  }
+  :global([data-theme='light']) .theme-toggle__knob {
+    left: 22px;
+  }
+</style>

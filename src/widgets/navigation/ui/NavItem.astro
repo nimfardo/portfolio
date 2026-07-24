@@ -1,0 +1,47 @@
+---
+interface Props {
+  href: string;
+  active?: boolean;
+  large?: boolean;
+}
+
+const { href, active = false, large = false } = Astro.props;
+---
+
+<a
+  href={href}
+  class:list={['nav-item', { 'nav-item--large': large }]}
+  aria-current={active ? 'page' : undefined}
+>
+  <span class="nav-item__label"><slot /></span>
+  {active && <span class="nav-item__indicator" />}
+</a>
+
+<style>
+  .nav-item {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    text-decoration: none;
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-sm);
+    line-height: var(--font-line-height-sm);
+    font-weight: var(--font-weight-regular);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--color-text-primary);
+  }
+  .nav-item:hover {
+    color: var(--color-text-accent);
+  }
+  .nav-item--large {
+    font-size: var(--font-size-lg);
+    line-height: var(--font-line-height-lg);
+  }
+  .nav-item__indicator {
+    width: 16px;
+    height: 1.5px;
+    background: var(--color-icon-default);
+  }
+</style>

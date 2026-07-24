@@ -3,6 +3,7 @@ import '@fontsource-variable/manrope';
 import '@app/styles/tokens.css';
 import '@app/styles/global.css';
 import { Preloader } from '@widgets/preloader';
+import { Navigation } from '@widgets/navigation';
 
 interface Props {
   title: string;
@@ -30,6 +31,23 @@ const { title } = Astro.props;
   </head>
   <body>
     <Preloader />
-    <slot />
+    <Navigation />
+    <div class="page-content">
+      <slot />
+    </div>
   </body>
 </html>
+
+<style>
+  /* Reserves space for the persistent nav chrome from widgets/navigation:
+     a 153px desktop sidebar, or a 64px mobile header below 1024px. */
+  .page-content {
+    padding-top: 64px;
+  }
+  @media (min-width: 1024px) {
+    .page-content {
+      padding-top: 0;
+      padding-left: 153px;
+    }
+  }
+</style>

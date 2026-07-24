@@ -1,0 +1,257 @@
+---
+// Desktop: persistent 153px left sidebar (Figma node 2006:347), shown at
+// laptop width and up. Below that: a compact header + full-screen overlay
+// (Figma mock, node 2239:387 / 2240:2, signed off 2026-07-24). Both render
+// server-side; CSS media queries pick which is visible — no JS/FOUC needed
+// for the layout switch itself, only for the overlay's open/close state.
+import { Logo, Icon } from '@shared/ui';
+import { ThemeToggle } from '@features/theme-toggle';
+import { MobileNavToggle } from '@features/mobile-nav-toggle';
+import NavItem from './NavItem.astro';
+import { NAV_ITEMS } from '../model/nav-items';
+
+// TODO: real LinkedIn/Behance URLs — copy-deck.md flags these as still
+// pending Max's exact handles, same gap as the GitHub/Unsplash URLs.
+const SOCIAL_LINKS = [
+  { name: 'linkedin' as const, href: '#', label: 'LinkedIn' },
+  { name: 'behance' as const, href: '#', label: 'Behance' },
+];
+
+const currentPath = Astro.url.pathname;
+---
+
+<nav class="nav-desktop" aria-label="Primary">
+  <div class="nav-desktop__top">
+    <a href="/" aria-label="Home">
+      <Logo size={64} />
+    </a>
+    <ul class="nav-desktop__items">
+      {
+        NAV_ITEMS.map((item) => (
+          <li>
+            <NavItem href={item.href} active={currentPath === item.href}>
+              {item.label}
+            </NavItem>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+  <div class="nav-desktop__links">
+    {
+      SOCIAL_LINKS.map((link) => (
+        <a href={link.href} target="_blank" rel="noreferrer" aria-label={link.label}>
+          <Icon name={link.name} size={32} />
+        </a>
+      ))
+    }
+  </div>
+</nav>
+
+<header class="nav-mobile-header">
+  <a href="/" aria-label="Home">
+    <Logo size={40} />
+  </a>
+  <button
+    type="button"
+    class="nav-mobile-header__trigger"
+    data-mobile-nav-trigger
+    aria-expanded="false"
+    aria-controls="mobile-nav-overlay"
+    aria-label="Open menu"
+  >
+    <Icon name="menu" size={28} />
+  </button>
+</header>
+
+<div id="mobile-nav-overlay" class="nav-mobile-overlay" data-mobile-nav-overlay>
+  <div class="nav-mobile-overlay__top">
+    <a href="/" aria-label="Home">
+      <Logo size={40} />
+    </a>
+    <button
+      type="button"
+      class="nav-mobile-overlay__close"
+      data-mobile-nav-close
+      aria-label="Close menu"
+    >
+      <Icon name="close" size={28} />
+    </button>
+  </div>
+
+  <div class="nav-mobile-overlay__content">
+    <ul class="nav-mobile-overlay__items">
+      {
+        NAV_ITEMS.map((item) => (
+          <li>
+            <NavItem href={item.href} active={currentPath === item.href} large>
+              {item.label}
+            </NavItem>
+          </li>
+        ))
+      }
+    </ul>
+    <div class="nav-mobile-overlay__links">
+      {
+        SOCIAL_LINKS.map((link) => (
+          <a href={link.href} target="_blank" rel="noreferrer" aria-label={link.label}>
+            <Icon name={link.name} size={32} />
+          </a>
+        ))
+      }
+    </div>
+  </div>
+
+  <div class="nav-mobile-overlay__footer">
+    <ThemeToggle />
+  </div>
+</div>
+
+<MobileNavToggle />
+
+<style>
+  /* --- Desktop sidebar (Figma: 153x1080, 40px padding all sides) --- */
+  .nav-desktop {
+    display: none;
+  }
+
+  @media (min-width: 1024px) {
+    .nav-desktop {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: fixed;
+      inset: 0 auto 0 0;
+      width: 153px;
+      padding: 40px;
+      background: var(--color-bg-default);
+    }
+    .nav-desktop__top {
+      display: flex;
+      flex-direction: column;
+      gap: 40px;
+    }
+    .nav-desktop__items {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-lg);
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    .nav-desktop__links {
+      display: flex;
+      gap: var(--spacing-sm);
+    }
+  }
+
+  /* --- Mobile header (below 1024px, Figma: 390x64) --- */
+  .nav-mobile-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: fixed;
+    inset: 0 0 auto 0;
+    height: 64px;
+    padding: 12px 20px;
+    background: var(--color-bg-default);
+    border-bottom: 1px solid var(--color-border-default);
+    z-index: 900;
+  }
+  .nav-mobile-header__trigger {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    color: var(--color-icon-default);
+  }
+
+  @media (min-width: 1024px) {
+    .nav-mobile-header {
+      display: none;
+    }
+  }
+
+  /* --- Mobile overlay (Figma mock, signed off 2026-07-24) --- */
+  .nav-mobile-overlay {
+    display: none;
+    flex-direction: column;
+    position: fixed;
+    inset: 0;
+    z-index: 950;
+    padding: 12px 20px 40px;
+    background: var(--color-bg-default);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+  }
+  .nav-mobile-overlay[data-open] {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  @media (min-width: 1024px) {
+    .nav-mobile-overlay {
+      display: none !important;
+    }
+  }
+  @media (max-width: 1023px) {
+    .nav-mobile-overlay {
+      display: flex;
+    }
+  }
+
+  .nav-mobile-overlay__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+  }
+  .nav-mobile-overlay__close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    color: var(--color-icon-default);
+  }
+
+  .nav-mobile-overlay__content {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-xl);
+  }
+  .nav-mobile-overlay__items {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-xl);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .nav-mobile-overlay__links {
+    display: flex;
+    gap: var(--spacing-sm);
+  }
+
+  .nav-mobile-overlay__footer {
+    display: flex;
+    justify-content: center;
+    padding-top: var(--spacing-lg);
+    margin-top: var(--spacing-lg);
+    border-top: 1px solid var(--color-border-default);
+  }
+</style>
