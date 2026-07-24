@@ -1,0 +1,100 @@
+---
+// Header/nav logo — real Lottie animation of the monogram (exported from
+// max-logo.aep, 20 frames / 30fps, raw/max-logo.json → public/media/logo/).
+// Rest state (frame 0) looks identical to the static Logo.astro glyph.
+// Hover plays forward to the last frame and freezes there; unhover plays
+// the same clip in reverse back to frame 0 — a small hover-reveal detail,
+// not a looping/ambient animation.
+//
+// The Lottie's fill colors are baked in at export time (not currentColor —
+// Lottie shape fills don't follow CSS custom properties without runtime
+// theming, which this plain AE export doesn't have set up) and happen to
+// match dark-theme's --color-icon-default exactly. In light theme that
+// baked-in color would be wrong, so this renders the animated version only
+// in dark theme and falls back to the real currentColor-tinted static Logo
+// in light theme, swapped via CSS — no JS theme-detection needed.
+import Logo from './Logo.astro';
+
+interface Props {
+  size?: number;
+  class?: string;
+}
+
+const { size = 64, class: className } = Astro.props;
+---
+
+<span
+  class:list={['animated-logo', className]}
+  style={{ width: `${size}px`, height: `${size}px` }}
+  data-animated-logo
+>
+  <span class="animated-logo__static">
+    <Logo size={size} />
+  </span>
+  <dotlottie-wc
+    class="animated-logo__lottie"
+    src="/media/logo/max-logo.json"
+    mode="forward"
+    aria-hidden="true"></dotlottie-wc>
+</span>
+
+<script>
+  import { setWasmUrl } from '@lottiefiles/dotlottie-wc';
+  setWasmUrl('/wasm/dotlottie-player.wasm');
+</script>
+
+<script>
+  import { prefersReducedMotion } from '@shared/lib';
+
+  type DotLottieElement = HTMLElement & {
+    dotLottie?: {
+      setMode: (mode: 'forward' | 'reverse') => void;
+      play: () => void;
+    };
+  };
+
+  if (!prefersReducedMotion()) {
+    document.querySelectorAll<HTMLElement>('[data-animated-logo]').forEach((wrapper) => {
+      const player = wrapper.querySelector<DotLottieElement>('dotlottie-wc');
+      if (!player) return;
+
+      wrapper.addEventListener('mouseenter', () => {
+        player.dotLottie?.setMode('forward');
+        player.dotLottie?.play();
+      });
+      wrapper.addEventListener('mouseleave', () => {
+        player.dotLottie?.setMode('reverse');
+        player.dotLottie?.play();
+      });
+    });
+  }
+</script>
+
+<style>
+  .animated-logo {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  /* .animated-logo__static wraps <Logo> in a plain span this component owns
+     — Logo itself isn't touched, so there's no specificity race against its
+     own `.logo { display: inline-flex }` rule (the failure mode found while
+     testing this: passing a hide/show class straight into Logo's own
+     class:list ties 1-class-selector specificity with Logo's own rule, and
+     whichever stylesheet loads later in Vite's bundle wins). */
+  .animated-logo__static {
+    display: none;
+  }
+  .animated-logo__lottie {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  :global([data-theme='light']) .animated-logo__lottie {
+    display: none;
+  }
+  :global([data-theme='light']) .animated-logo__static {
+    display: inline-flex;
+  }
+</style>

@@ -4,7 +4,7 @@
 // (Figma mock, node 2239:387 / 2240:2, signed off 2026-07-24). Both render
 // server-side; CSS media queries pick which is visible — no JS/FOUC needed
 // for the layout switch itself, only for the overlay's open/close state.
-import { Logo, Icon } from '@shared/ui';
+import { AnimatedLogo, Icon } from '@shared/ui';
 import { ThemeToggle } from '@features/theme-toggle';
 import { MobileNavToggle } from '@features/mobile-nav-toggle';
 import NavItem from './NavItem.astro';
@@ -23,7 +23,7 @@ const currentPath = Astro.url.pathname;
 <nav class="nav-desktop" aria-label="Primary">
   <div class="nav-desktop__top">
     <a href="/" aria-label="Home">
-      <Logo size={64} />
+      <AnimatedLogo size={64} />
     </a>
     <ul class="nav-desktop__items">
       {
@@ -50,7 +50,7 @@ const currentPath = Astro.url.pathname;
 
 <header class="nav-mobile-header">
   <a href="/" aria-label="Home">
-    <Logo size={40} />
+    <AnimatedLogo size={40} />
   </a>
   <button
     type="button"
@@ -67,7 +67,7 @@ const currentPath = Astro.url.pathname;
 <div id="mobile-nav-overlay" class="nav-mobile-overlay" data-mobile-nav-overlay>
   <div class="nav-mobile-overlay__top">
     <a href="/" aria-label="Home">
-      <Logo size={40} />
+      <AnimatedLogo size={40} />
     </a>
     <button
       type="button"
