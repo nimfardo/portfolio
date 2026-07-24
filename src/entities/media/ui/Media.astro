@@ -1,0 +1,99 @@
+---
+import type { MediaAsset } from '../model/types';
+
+interface Props extends MediaAsset {
+  class?: string;
+  width?: number;
+  height?: number;
+}
+
+const { type, src, poster, alt, class: className, width, height } = Astro.props;
+
+const videoFallbackSrc = type === 'video' ? src.replace(/\.webm$/i, '.mp4') : undefined;
+---
+
+<div
+  class:list={['media', `media--${type}`, className]}
+  style={{ width: width ? `${width}px` : undefined, height: height ? `${height}px` : undefined }}
+>
+  {
+    type === 'lottie' && (
+      <>
+        <dotlottie-wc src={src} autoplay loop aria-label={alt} />
+        <script>
+          import {setWasmUrl} from '@lottiefiles/dotlottie-wc';
+          setWasmUrl('/wasm/dotlottie-player.wasm');
+        </script>
+      </>
+    )
+  }
+
+  {type === 'gif' && <img src={src} alt={alt} loading="lazy" />}
+
+  {
+    type === 'video' && (
+      <video
+        data-media-video
+        poster={poster}
+        muted
+        loop
+        playsinline
+        preload="metadata"
+        aria-label={alt}
+      >
+        <source src={src} type="video/webm" />
+        <source src={videoFallbackSrc} type="video/mp4" />
+      </video>
+    )
+  }
+</div>
+
+<script>
+  import { prefersReducedMotion, isViewportAtLeast } from '@shared/lib';
+
+  // One observer for every Media instance on the page — Astro dedupes this
+  // script per page regardless of how many <Media> components render it.
+  if (!prefersReducedMotion()) {
+    const videos = document.querySelectorAll<HTMLVideoElement>('[data-media-video]');
+    if (videos.length > 0) {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            const video = entry.target as HTMLVideoElement;
+            if (entry.isIntersecting && isViewportAtLeast('tablet')) {
+              video.muted = true;
+              void video.play().catch(() => {
+                // Autoplay can still be blocked by the browser — the poster
+                // frame (or first frame) stays visible, which is an
+                // acceptable fallback.
+              });
+            } else {
+              video.pause();
+            }
+          }
+        },
+        { threshold: 0.25 },
+      );
+      videos.forEach((video) => observer.observe(video));
+    }
+  }
+</script>
+
+<style>
+  .media {
+    position: relative;
+    display: block;
+    overflow: hidden;
+  }
+  .media--lottie dotlottie-wc,
+  .media--video video,
+  .media--gif img {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+  .media--video video,
+  .media--gif img {
+    object-fit: cover;
+  }
+</style>

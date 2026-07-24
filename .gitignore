@@ -45,6 +45,10 @@ coverage/
 .env.production
 .netlify/
 
+# Generated from node_modules by scripts/copy-wasm.mjs (postinstall) — not
+# committed, deterministically reproduced from the pinned dependency version.
+public/wasm/
+
 # Python
 __pycache__/
 *.py[cod]
