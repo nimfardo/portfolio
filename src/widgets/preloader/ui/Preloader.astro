@@ -1,0 +1,92 @@
+---
+// App-level load gate (Figma "Loading screen", node 2006:311): logo
+// centered, loading-indicator pinned near the bottom, animates 0 -> 100%
+// then reveals the page. Shows once per browser session (sessionStorage),
+// not on every internal navigation between static pages.
+//
+// The logo itself is the static SVG mark for now — the animated version
+// (from max-logo.aep) is a follow-up Max will do later; this widget only
+// needs a `logoAnimated` swap-in point when that's ready.
+import { Logo, LoadingIndicator } from '@shared/ui';
+---
+
+<div class="preloader" id="preloader" data-preloader>
+  <Logo size={64} />
+  <LoadingIndicator progress={0} class="preloader__bar" />
+</div>
+
+<script>
+  import { prefersReducedMotion } from '@shared/lib';
+
+  const SESSION_KEY = 'preloader-shown';
+  const MIN_DURATION_MS = 500;
+  const MAX_DURATION_MS = 2500;
+
+  const preloader = document.querySelector<HTMLElement>('[data-preloader]');
+  const bar = preloader?.querySelector<HTMLElement>('.loading-indicator__bar') ?? null;
+
+  function reveal() {
+    if (!preloader) return;
+    sessionStorage.setItem(SESSION_KEY, '1');
+    preloader.classList.add('preloader--done');
+    preloader.addEventListener(
+      'transitionend',
+      () => {
+        preloader.style.display = 'none';
+      },
+      { once: true },
+    );
+  }
+
+  if (!preloader) {
+    // Nothing to gate.
+  } else if (sessionStorage.getItem(SESSION_KEY) === '1') {
+    // Already shown this session — skip instantly, no flash.
+    preloader.style.display = 'none';
+  } else if (prefersReducedMotion()) {
+    reveal();
+  } else {
+    const start = performance.now();
+    let loaded = document.readyState === 'complete';
+    window.addEventListener('load', () => (loaded = true), { once: true });
+
+    const tick = () => {
+      const elapsed = performance.now() - start;
+      const timeFraction = Math.min(elapsed / MAX_DURATION_MS, 1);
+      const done = loaded && elapsed >= MIN_DURATION_MS;
+      const pct = done ? 100 : Math.min(90, timeFraction * 100);
+      if (bar) bar.style.width = `${pct}%`;
+      if (pct >= 100) {
+        reveal();
+      } else {
+        requestAnimationFrame(tick);
+      }
+    };
+    requestAnimationFrame(tick);
+  }
+</script>
+
+<style>
+  .preloader {
+    position: fixed;
+    inset: 0;
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-bg-default);
+    transition: opacity 0.4s ease;
+    opacity: 1;
+  }
+  .preloader--done {
+    opacity: 0;
+    pointer-events: none;
+  }
+  .preloader :global(.preloader__bar) {
+    position: absolute;
+    left: 40px;
+    right: 40px;
+    bottom: 44px;
+    width: auto;
+  }
+</style>
