@@ -18,9 +18,11 @@ const { steps } = Astro.props;
       <details class="process-step" open={index === 0}>
         <summary class="process-step__summary">
           <span class="process-step__number">{step.number}</span>
-          <span class="process-step__title">{step.title}</span>
-          <Icon name="plus" size={48} class="process-step__icon process-step__icon--closed" />
-          <Icon name="minus" size={48} class="process-step__icon process-step__icon--open" />
+          <span class="process-step__title-row">
+            <span class="process-step__title">{step.title}</span>
+            <Icon name="plus" size={48} class="process-step__icon process-step__icon--closed" />
+            <Icon name="minus" size={48} class="process-step__icon process-step__icon--open" />
+          </span>
         </summary>
         <div class="process-step__content">
           {step.blocks.map((block) => (
@@ -79,19 +81,35 @@ const { steps } = Astro.props;
   }
   .process-step__number {
     flex-shrink: 0;
+    /* Figma's number frame is a fixed 40px regardless of digit count. */
+    width: 40px;
     font-family: var(--font-family-body);
     font-size: var(--font-size-2xl);
     line-height: var(--font-line-height-2xl);
-    color: var(--color-text-primary);
+    color: var(--color-text-emphasis);
+  }
+  .process-step__title-row {
+    /* Figma nests title+icon in their own row (951px wide, space-between)
+       rather than making the icon a 3rd item in the outer number/title/icon
+       row — that extra 80px gap was stealing width from the title and
+       forcing long headings onto 2 lines. Matching the real structure gives
+       the title the same ~903px Figma allots it, so real headings fit on
+       one line like they do in Figma. */
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-lg);
   }
   .process-step__title {
-    flex: 1;
+    margin: 0;
     font-family: var(--font-family-body);
     font-size: var(--font-size-3xl);
     line-height: var(--font-line-height-3xl);
     font-weight: var(--font-weight-bold);
     letter-spacing: -0.01em;
-    color: var(--color-text-primary);
+    color: var(--color-text-emphasis);
   }
   .process-step :global(.process-step__icon) {
     flex-shrink: 0;
@@ -109,6 +127,9 @@ const { steps } = Astro.props;
     flex-direction: column;
     gap: 40px;
     padding-bottom: 40px;
+    /* Indented to align with the title-row above, not the number column —
+       matches Figma (content nests under the same 951px-wide title frame). */
+    margin-left: 120px;
   }
 
   .process-block {
@@ -128,7 +149,7 @@ const { steps } = Astro.props;
     font-size: var(--font-size-2xl);
     line-height: var(--font-line-height-2xl);
     font-weight: var(--font-weight-bold);
-    color: var(--color-text-primary);
+    color: var(--color-text-emphasis);
   }
   .process-block__image {
     width: 100%;
@@ -140,7 +161,7 @@ const { steps } = Astro.props;
     font-family: var(--font-family-body);
     font-size: var(--font-size-xl);
     line-height: 2;
-    color: var(--color-text-primary);
+    color: var(--color-text-emphasis);
   }
   .process-block__list {
     margin: 0;
@@ -148,7 +169,7 @@ const { steps } = Astro.props;
     font-family: var(--font-family-body);
     font-size: var(--font-size-xl);
     line-height: 2;
-    color: var(--color-text-primary);
+    color: var(--color-text-emphasis);
   }
 
   @media (max-width: 767px) {
@@ -159,6 +180,9 @@ const { steps } = Astro.props;
     .process-step__title {
       font-size: var(--font-size-xl);
       line-height: var(--font-line-height-xl);
+    }
+    .process-step__content {
+      margin-left: 0;
     }
   }
 </style>

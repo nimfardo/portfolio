@@ -23,25 +23,26 @@ const { heading, behanceUrl } = Astro.props;
 
 <style>
   .retrospective {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 80px;
+    display: grid;
+    /* 33/66 proportional split — see ContentSection.astro for the Figma
+       reference-column rationale. */
+    grid-template-columns: repeat(3, 1fr);
+    column-gap: 80px;
+    align-items: start;
   }
   .retrospective__heading {
-    flex-shrink: 0;
-    width: 496px;
+    grid-column: 1 / 2;
     margin: 0;
     font-family: var(--font-family-body);
     font-size: var(--font-size-4xl);
     line-height: var(--font-line-height-4xl);
     font-weight: var(--font-weight-bold);
     letter-spacing: -0.01em;
-    color: var(--color-text-primary);
+    color: var(--color-text-emphasis);
   }
   .retrospective__body {
+    grid-column: 2 / 4;
     display: flex;
-    flex: 1;
     min-width: 0;
     flex-direction: column;
     gap: 80px;
@@ -51,7 +52,7 @@ const { heading, behanceUrl } = Astro.props;
     font-family: var(--font-family-body);
     font-size: var(--font-size-xl);
     line-height: 2;
-    color: var(--color-text-primary);
+    color: var(--color-text-emphasis);
   }
   .retrospective__thanks {
     display: flex;
@@ -61,20 +62,20 @@ const { heading, behanceUrl } = Astro.props;
   .retrospective__thanks-text {
     margin: 0;
     font-family: var(--font-family-body);
-    font-size: var(--font-size-3xl);
-    line-height: var(--font-line-height-3xl);
+    font-size: var(--font-size-2xl);
+    line-height: var(--font-line-height-2xl);
     font-weight: var(--font-weight-medium);
-    letter-spacing: -0.01em;
-    color: var(--color-text-primary);
+    color: var(--color-text-emphasis);
   }
 
   @media (max-width: 1023px) {
     .retrospective {
-      flex-direction: column;
+      grid-template-columns: 1fr;
       gap: var(--spacing-xl);
     }
-    .retrospective__heading {
-      width: 100%;
+    .retrospective__heading,
+    .retrospective__body {
+      grid-column: 1;
     }
   }
 </style>

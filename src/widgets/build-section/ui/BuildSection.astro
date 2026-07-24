@@ -29,25 +29,26 @@ const { sitemapImage, caption, stats } = Astro.props;
 
 <style>
   .build-section {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 80px;
+    display: grid;
+    /* 33/66 proportional split — see ContentSection.astro for the Figma
+       reference-column rationale. */
+    grid-template-columns: repeat(3, 1fr);
+    column-gap: 80px;
+    align-items: start;
   }
   .build-section__heading {
-    flex-shrink: 0;
-    width: 496px;
+    grid-column: 1 / 2;
     margin: 0;
     font-family: var(--font-family-body);
     font-size: var(--font-size-4xl);
     line-height: var(--font-line-height-4xl);
     font-weight: var(--font-weight-bold);
     letter-spacing: -0.01em;
-    color: var(--color-text-primary);
+    color: var(--color-text-emphasis);
   }
   .build-section__body {
+    grid-column: 2 / 4;
     display: flex;
-    flex: 1;
     min-width: 0;
     flex-direction: column;
     gap: 80px;
@@ -63,7 +64,7 @@ const { sitemapImage, caption, stats } = Astro.props;
     font-size: var(--font-size-2xl);
     line-height: var(--font-line-height-2xl);
     font-weight: var(--font-weight-bold);
-    color: var(--color-text-primary);
+    color: var(--color-text-emphasis);
   }
   .build-section__sitemap-frame {
     display: flex;
@@ -81,7 +82,7 @@ const { sitemapImage, caption, stats } = Astro.props;
     font-family: var(--font-family-body);
     font-size: var(--font-size-xl);
     line-height: 2;
-    color: var(--color-text-primary);
+    color: var(--color-text-emphasis);
   }
   .build-section__stats {
     display: flex;
@@ -90,11 +91,12 @@ const { sitemapImage, caption, stats } = Astro.props;
 
   @media (max-width: 1023px) {
     .build-section {
-      flex-direction: column;
+      grid-template-columns: 1fr;
       gap: var(--spacing-xl);
     }
-    .build-section__heading {
-      width: 100%;
+    .build-section__heading,
+    .build-section__body {
+      grid-column: 1;
     }
   }
   @media (max-width: 480px) {

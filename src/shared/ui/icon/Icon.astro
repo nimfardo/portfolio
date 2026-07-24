@@ -72,7 +72,18 @@ const scale = size / nativeFrame;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    color: inherit;
+    /* No `color` declared here on purpose. `color` inherits by default in
+       CSS with no rule needed — but a consumer passing `class="foo"` merges
+       onto this SAME element (`class:list={['icon', className]}`), so an
+       explicit `color: inherit` here would tie in specificity with the
+       consumer's own `.foo { color: ... }` rule and the winner would depend
+       on arbitrary stylesheet bundling order (this caused project-card's
+       arrow icon to render text-primary instead of its intended
+       icon-emphasis — same failure class bug-002 fixed for Button, still
+       latent here since bug-002's fix only removed Icon's hardcoded color,
+       not this implicit tie). Omitting the property outright means there's
+       only ever one real `color` declaration on the element: the
+       consumer's, when it sets one. */
   }
   .icon__glyph {
     display: inline-flex;

@@ -98,31 +98,39 @@ const { project } = Astro.props;
        directly off the Figma frame's child y-positions, consistent across
        all 8 gaps. Not a token; this page's own established rhythm. */
     gap: 160px;
-    max-width: 1647px;
+    /* 1647px is Figma's real CONTENT width (excluding page margins) — but
+       box-sizing:border-box (global.css) means max-width caps the border
+       box INCLUDING this rule's own 40px+40px horizontal padding. Without
+       adding that back, content was capping 80px short of Figma's true
+       width at full viewport size, which was quietly skewing the 33/66
+       column math below (bug-004c) even before that fix landed. */
+    max-width: 1727px;
     margin: 0 auto;
     padding: 160px 40px;
   }
   .project-page__process {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 80px;
+    display: grid;
+    /* 33/66 proportional split — Max added reference columns in Figma
+       (node 2165:3): 3 equal tracks with 80px gutters, heading spans
+       track 1, content spans tracks 2-3. Same pattern as ContentSection,
+       BuildSection, Retrospective. */
+    grid-template-columns: repeat(3, 1fr);
+    column-gap: 80px;
+    align-items: start;
   }
   .project-page__process-heading {
-    flex-shrink: 0;
-    width: 496px;
+    grid-column: 1 / 2;
     margin: 0;
     font-family: var(--font-family-body);
     font-size: var(--font-size-4xl);
     line-height: var(--font-line-height-4xl);
     font-weight: var(--font-weight-bold);
     letter-spacing: -0.01em;
-    color: var(--color-text-primary);
+    color: var(--color-text-emphasis);
   }
   .project-page__process-body {
-    flex: 1;
+    grid-column: 2 / 4;
     min-width: 0;
-    max-width: 1071px;
   }
   .project-page__gallery {
     display: flex;
@@ -136,11 +144,12 @@ const { project } = Astro.props;
 
   @media (max-width: 1023px) {
     .project-page__process {
-      flex-direction: column;
+      grid-template-columns: 1fr;
       gap: var(--spacing-xl);
     }
-    .project-page__process-heading {
-      width: 100%;
+    .project-page__process-heading,
+    .project-page__process-body {
+      grid-column: 1;
     }
   }
 </style>
