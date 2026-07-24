@@ -1,7 +1,54 @@
 ---
 import Layout from '@app/layouts/Layout.astro';
+import { Button, Tag, Divider, Link, Logo, LoadingIndicator, Icon } from '@shared/ui';
+import type { IconName } from '@shared/ui';
+
+const iconNames: IconName[] = [
+  'linkedin',
+  'behance',
+  'arrow-right',
+  'arrow-left',
+  'check',
+  'list',
+  'thumb',
+  'locker',
+  'minus',
+  'plus',
+  'eye',
+  'eye-off',
+  'tree',
+  'drop',
+  'leaf',
+  'waves',
+];
 ---
 
 <Layout title="Max Shturma — Portfolio">
-  <h1>Scaffold OK — Home lands in feat-010</h1>
+  <main style="padding: 48px; display: flex; flex-direction: column; gap: 32px; max-width: 900px;">
+    <h1>Scaffold OK — feat-005 atom smoke test (Home lands in feat-010)</h1>
+
+    <Logo size={64} />
+
+    <div style="display: flex; gap: 16px; flex-wrap: wrap;">
+      <Button type="solid">Enter</Button>
+      <Button type="solid" disabled>Enter</Button>
+      <Button type="outlined">Go Back</Button>
+      <Button type="outlined" disabled>Go Back</Button>
+    </div>
+
+    <div style="display: flex; gap: 12px;">
+      <Tag>Tag</Tag>
+      <Tag>Design Engineer</Tag>
+    </div>
+
+    <Divider />
+
+    <Link href="#">Link</Link>
+
+    <LoadingIndicator progress={50} />
+
+    <div style="display: flex; gap: 16px; flex-wrap: wrap;">
+      {iconNames.map((name) => <Icon name={name} />)}
+    </div>
+  </main>
 </Layout>

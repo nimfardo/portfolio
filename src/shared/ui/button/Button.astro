@@ -1,0 +1,79 @@
+---
+import Icon from '../icon/Icon.astro';
+
+interface Props {
+  type?: 'solid' | 'outlined';
+  disabled?: boolean;
+  href?: string;
+  class?: string;
+}
+
+const { type = 'solid', disabled = false, href, class: className } = Astro.props;
+const Tag = href ? 'a' : 'button';
+---
+
+<Tag
+  class:list={['button', `button--${type}`, className]}
+  href={href}
+  disabled={!href && disabled ? true : undefined}
+  aria-disabled={href && disabled ? 'true' : undefined}
+>
+  <span class="button__label"><slot /></span>
+  {type === 'solid' && <Icon name="arrow-right" size={28} class="button__icon" />}
+</Tag>
+
+<style>
+  .button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-sm);
+    min-width: 320px;
+    padding: var(--spacing-md) var(--spacing-lg);
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-lg);
+    line-height: var(--font-line-height-lg);
+    font-weight: var(--font-weight-medium);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    text-align: center;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .button--solid {
+    background: var(--color-bg-accent);
+    color: var(--color-text-on-accent);
+  }
+  .button--solid:hover:not(:disabled):not([aria-disabled='true']) {
+    background: var(--color-bg-accent-hover);
+  }
+  .button--solid:disabled,
+  .button--solid[aria-disabled='true'] {
+    background: var(--color-bg-muted);
+    color: var(--color-text-muted);
+    opacity: 0.4;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
+  .button--outlined {
+    border: 1px solid var(--color-border-accent);
+    color: var(--color-text-accent);
+  }
+  .button--outlined:hover:not(:disabled):not([aria-disabled='true']) {
+    border-color: var(--color-border-emphasis);
+    color: var(--color-text-emphasis);
+  }
+  .button--outlined:disabled,
+  .button--outlined[aria-disabled='true'] {
+    border-color: var(--color-border-default);
+    color: var(--color-text-muted);
+    opacity: 0.4;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+</style>

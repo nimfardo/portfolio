@@ -1,0 +1,38 @@
+---
+// Site loading progress line: animates 0 -> 100% on load, then disappears
+// revealing the home page (Figma component description, node 2095:855).
+// This atom just renders a given progress value; feat-007 drives it live.
+interface Props {
+  progress?: number; // 0-100
+  class?: string;
+}
+
+const { progress = 0, class: className } = Astro.props;
+const clamped = Math.max(0, Math.min(100, progress));
+---
+
+<div
+  class:list={['loading-indicator', className]}
+  role="progressbar"
+  aria-valuenow={clamped}
+  aria-valuemin="0"
+  aria-valuemax="100"
+>
+  <div class="loading-indicator__bar" style={{ width: `${clamped}%` }}></div>
+</div>
+
+<style>
+  .loading-indicator {
+    position: relative;
+    width: 100%;
+    height: 2px;
+    background: var(--color-bg-muted);
+  }
+  .loading-indicator__bar {
+    position: absolute;
+    inset: 0 auto 0 0;
+    height: 100%;
+    background: var(--color-icon-default);
+    transition: width 0.3s ease-out;
+  }
+</style>

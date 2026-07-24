@@ -1,0 +1,66 @@
+---
+import iconArrowRight from './svg/arrow-right.svg?raw';
+import iconArrowLeft from './svg/arrow-left.svg?raw';
+import iconBehance from './svg/behance.svg?raw';
+import iconCheck from './svg/check.svg?raw';
+import iconDrop from './svg/drop.svg?raw';
+import iconEye from './svg/eye.svg?raw';
+import iconEyeOff from './svg/eye-off.svg?raw';
+import iconLeaf from './svg/leaf.svg?raw';
+import iconLinkedin from './svg/linkedin.svg?raw';
+import iconList from './svg/list.svg?raw';
+import iconLocker from './svg/locker.svg?raw';
+import iconMinus from './svg/minus.svg?raw';
+import iconPlus from './svg/plus.svg?raw';
+import iconThumb from './svg/thumb.svg?raw';
+import iconTree from './svg/tree.svg?raw';
+import iconWaves from './svg/waves.svg?raw';
+
+const icons = {
+  'arrow-right': iconArrowRight,
+  'arrow-left': iconArrowLeft,
+  behance: iconBehance,
+  check: iconCheck,
+  drop: iconDrop,
+  eye: iconEye,
+  'eye-off': iconEyeOff,
+  leaf: iconLeaf,
+  linkedin: iconLinkedin,
+  list: iconList,
+  locker: iconLocker,
+  minus: iconMinus,
+  plus: iconPlus,
+  thumb: iconThumb,
+  tree: iconTree,
+  waves: iconWaves,
+} as const;
+
+export type IconName = keyof typeof icons;
+
+interface Props {
+  name: IconName;
+  size?: number;
+  class?: string;
+}
+
+const { name, size = 28, class: className } = Astro.props;
+---
+
+<span
+  class:list={['icon', className]}
+  style={{ width: `${size}px`, height: `${size}px` }}
+  set:html={icons[name]}
+/>
+
+<style>
+  .icon {
+    display: inline-flex;
+    flex-shrink: 0;
+    color: var(--color-icon-default);
+  }
+  .icon :global(svg) {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+</style>
