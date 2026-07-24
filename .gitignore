@@ -40,6 +40,11 @@ out/
 .nuxt/
 coverage/
 
+# Astro
+.astro/
+.env.production
+.netlify/
+
 # Python
 __pycache__/
 *.py[cod]
