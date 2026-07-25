@@ -1,9 +1,13 @@
 ---
+// icon prop renders an Icon (default use); omit it to project arbitrary
+// content instead via the slot — used by ProcessAccordion for the step
+// number, which Figma now shows inside this same 80x80 badge shell rather
+// than as plain text.
 import Icon from '../icon/Icon.astro';
 import type { IconName } from '../icon/Icon.astro';
 
 interface Props {
-  icon: IconName;
+  icon?: IconName;
   class?: string;
 }
 
@@ -11,7 +15,7 @@ const { icon, class: className } = Astro.props;
 ---
 
 <span class:list={['icon-badge', className]}>
-  <Icon name={icon} size={48} />
+  {icon ? <Icon name={icon} size={48} /> : <slot />}
 </span>
 
 <style>

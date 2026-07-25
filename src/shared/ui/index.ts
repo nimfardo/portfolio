@@ -8,3 +8,4 @@ export { default as LoadingIndicator } from './loading-indicator/LoadingIndicato
 export { default as Icon } from './icon/Icon.astro';
 export type { IconName } from './icon/Icon.astro';
 export { default as IconBadge } from './icon-badge/IconBadge.astro';
+export { default as Heading } from './heading/Heading.astro';

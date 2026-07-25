@@ -1,5 +1,5 @@
 ---
-import { Button, IconBadge } from '@shared/ui';
+import { Button, IconBadge, Heading } from '@shared/ui';
 
 interface Props {
   heading: string;
@@ -10,7 +10,7 @@ const { heading, behanceUrl } = Astro.props;
 ---
 
 <section class="retrospective">
-  <h2 class="retrospective__heading">{heading}</h2>
+  <Heading class="retrospective__heading">{heading}</Heading>
   <div class="retrospective__body">
     <p class="retrospective__text"><slot /></p>
     <Button type="solid" href={behanceUrl} class="retrospective__button">Check on Behance</Button>
@@ -30,15 +30,8 @@ const { heading, behanceUrl } = Astro.props;
     column-gap: 80px;
     align-items: start;
   }
-  .retrospective__heading {
+  :global(.retrospective__heading) {
     grid-column: 1 / 2;
-    margin: 0;
-    font-family: var(--font-family-body);
-    font-size: var(--font-size-4xl);
-    line-height: var(--font-line-height-4xl);
-    font-weight: var(--font-weight-bold);
-    letter-spacing: -0.01em;
-    color: var(--color-text-emphasis);
   }
   .retrospective__body {
     grid-column: 2 / 4;
@@ -73,7 +66,9 @@ const { heading, behanceUrl } = Astro.props;
       grid-template-columns: 1fr;
       gap: var(--spacing-xl);
     }
-    .retrospective__heading,
+    :global(.retrospective__heading) {
+      grid-column: 1;
+    }
     .retrospective__body {
       grid-column: 1;
     }

@@ -1,6 +1,8 @@
 ---
 // Reused for Project Overview / Brand Development / Design System — every
 // CONNECTIS section that's just a heading + one image + one paragraph.
+import { Heading } from '@shared/ui';
+
 interface Props {
   heading: string;
   image: string;
@@ -12,7 +14,7 @@ const { heading, image, imageAlt, class: className } = Astro.props;
 ---
 
 <section class:list={['content-section', className]}>
-  <h2 class="content-section__heading">{heading}</h2>
+  <Heading class="content-section__heading">{heading}</Heading>
   <div class="content-section__body">
     <img class="content-section__image" src={image} alt={imageAlt} loading="lazy" />
     <p class="content-section__text"><slot /></p>
@@ -30,15 +32,10 @@ const { heading, image, imageAlt, class: className } = Astro.props;
     column-gap: 80px;
     align-items: start;
   }
-  .content-section__heading {
+  /* :global() — class merges onto Heading's own rendered <h2>, which
+     carries Heading.astro's astro-cid, not this component's. */
+  :global(.content-section__heading) {
     grid-column: 1 / 2;
-    margin: 0;
-    font-family: var(--font-family-body);
-    font-size: var(--font-size-4xl);
-    line-height: var(--font-line-height-4xl);
-    font-weight: var(--font-weight-bold);
-    letter-spacing: -0.01em;
-    color: var(--color-text-emphasis);
   }
   .content-section__body {
     grid-column: 2 / 4;
@@ -66,7 +63,9 @@ const { heading, image, imageAlt, class: className } = Astro.props;
       grid-template-columns: 1fr;
       gap: var(--spacing-xl);
     }
-    .content-section__heading,
+    :global(.content-section__heading) {
+      grid-column: 1;
+    }
     .content-section__body {
       grid-column: 1;
     }

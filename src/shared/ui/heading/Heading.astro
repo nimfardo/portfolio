@@ -1,0 +1,30 @@
+---
+// Matches Figma's real "Heading" component (496x48, Manrope/2xl/bold) —
+// Max consolidated every major section title (Project Overview, Process,
+// Brand Development, Design System, Build, Retrospective) onto one shared
+// component instead of separately-styled text, so this mirrors that on the
+// code side rather than keeping the old 4xl/bold styling duplicated across
+// ContentSection/BuildSection/Retrospective/[slug].astro.
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+---
+
+<h2 class:list={['heading', className]}><slot /></h2>
+
+<style>
+  .heading {
+    margin: 0;
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-2xl);
+    /* 48px, not the shared --font-line-height-2xl (32px) — Figma's real
+       Manrope/2xl/bold style diverges from Manrope/2xl/medium at the same
+       font-size (which is still 32px), so this can't be the shared token
+       without breaking the medium-weight usage. */
+    line-height: 48px;
+    font-weight: var(--font-weight-bold);
+    color: var(--color-text-emphasis);
+  }
+</style>

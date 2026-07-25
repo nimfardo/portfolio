@@ -1,5 +1,6 @@
 ---
 import Layout from '@app/layouts/Layout.astro';
+import { Heading } from '@shared/ui';
 import { PageHeader } from '@widgets/page-header';
 import { ProjectHero } from '@widgets/project-hero';
 import { ContentSection } from '@widgets/content-section';
@@ -39,7 +40,7 @@ const { project } = Astro.props;
       </ContentSection>
 
       <section class="project-page__process">
-        <h2 class="project-page__process-heading">Process</h2>
+        <Heading class="project-page__process-heading">Process</Heading>
         <div class="project-page__process-body">
           <ProcessAccordion steps={project.process} />
         </div>
@@ -118,15 +119,8 @@ const { project } = Astro.props;
     column-gap: 80px;
     align-items: start;
   }
-  .project-page__process-heading {
+  :global(.project-page__process-heading) {
     grid-column: 1 / 2;
-    margin: 0;
-    font-family: var(--font-family-body);
-    font-size: var(--font-size-4xl);
-    line-height: var(--font-line-height-4xl);
-    font-weight: var(--font-weight-bold);
-    letter-spacing: -0.01em;
-    color: var(--color-text-emphasis);
   }
   .project-page__process-body {
     grid-column: 2 / 4;
@@ -147,9 +141,32 @@ const { project } = Astro.props;
       grid-template-columns: 1fr;
       gap: var(--spacing-xl);
     }
-    .project-page__process-heading,
+    :global(.project-page__process-heading) {
+      grid-column: 1;
+    }
     .project-page__process-body {
       grid-column: 1;
+    }
+    /* 160px top/bottom rhythm was measured off Figma's desktop frame only
+       (no mobile/tablet mock exists for this page) — left unreduced, it's
+       a huge amount of empty space stacked between every section on a
+       narrower screen. Scaled down at both breakpoints below, judgment
+       call same as the nav's 1024px breakpoint (see STATE.md). */
+    .project-page__sections,
+    .project-page__gallery {
+      gap: var(--spacing-4xl);
+    }
+    .project-page__sections {
+      padding: var(--spacing-4xl) 40px;
+    }
+  }
+  @media (max-width: 767px) {
+    .project-page__sections,
+    .project-page__gallery {
+      gap: var(--spacing-3xl);
+    }
+    .project-page__sections {
+      padding: var(--spacing-3xl) 24px;
     }
   }
 </style>

@@ -2,6 +2,10 @@
 // Native <details>/<summary> for free, zero-JS expand/collapse — matches
 // Figma's Accordion component (open=true|false variants) exactly, first
 // step open by default. icon/plus <-> icon/minus swap via CSS on [open].
+// The step number now renders inside the same 80x80 IconBadge shell used
+// for the process-block icons — Max moved it off plain text onto that
+// component in Figma, so IconBadge's icon prop is optional here and this
+// projects the number through its slot instead.
 import { Icon, IconBadge } from '@shared/ui';
 import type { ProcessStep } from '../model/types';
 
@@ -17,11 +21,13 @@ const { steps } = Astro.props;
     steps.map((step, index) => (
       <details class="process-step" open={index === 0}>
         <summary class="process-step__summary">
-          <span class="process-step__number">{step.number}</span>
+          <IconBadge class="process-step__number-badge">
+            <span class="process-step__number">{step.number}</span>
+          </IconBadge>
           <span class="process-step__title-row">
             <span class="process-step__title">{step.title}</span>
-            <Icon name="plus" size={48} class="process-step__icon process-step__icon--closed" />
-            <Icon name="minus" size={48} class="process-step__icon process-step__icon--open" />
+            <Icon name="plus" size={32} class="process-step__icon process-step__icon--closed" />
+            <Icon name="minus" size={32} class="process-step__icon process-step__icon--open" />
           </span>
         </summary>
         <div class="process-step__content">
@@ -71,7 +77,11 @@ const { steps } = Astro.props;
   .process-step__summary {
     display: flex;
     align-items: center;
-    gap: 80px;
+    /* 40px — was 80px; Figma's number badge grew from a bare 40px-wide
+       number to an 80px IconBadge, and the gap shrank to match (badge
+       80 + gap 40 = same 120px total the title-row/content still indent
+       by, so process-step__content's margin-left stays unchanged). */
+    gap: 40px;
     padding: 40px 0;
     cursor: pointer;
     list-style: none;
@@ -79,14 +89,16 @@ const { steps } = Astro.props;
   .process-step__summary::-webkit-details-marker {
     display: none;
   }
-  .process-step__number {
+  /* :global() — class merges onto IconBadge's own rendered <span>, which
+     carries IconBadge.astro's astro-cid, not this component's. */
+  :global(.process-step__number-badge) {
     flex-shrink: 0;
-    /* Figma's number frame is a fixed 40px regardless of digit count. */
-    width: 40px;
+  }
+  .process-step__number {
     font-family: var(--font-family-body);
-    font-size: var(--font-size-2xl);
-    line-height: var(--font-line-height-2xl);
-    color: var(--color-text-emphasis);
+    font-size: var(--font-size-xl);
+    line-height: var(--font-line-height-xl);
+    color: var(--color-text-primary);
   }
   .process-step__title-row {
     /* Figma nests title+icon in their own row (951px wide, space-between)
@@ -105,10 +117,12 @@ const { steps } = Astro.props;
   .process-step__title {
     margin: 0;
     font-family: var(--font-family-body);
-    font-size: var(--font-size-3xl);
-    line-height: var(--font-line-height-3xl);
+    font-size: var(--font-size-2xl);
+    /* 48px, not the shared 2xl token (32px) — see shared/ui/heading. Was
+       3xl/40px/-1% before Max sized this down to match the new Heading
+       component's scale. */
+    line-height: 48px;
     font-weight: var(--font-weight-bold);
-    letter-spacing: -0.01em;
     color: var(--color-text-emphasis);
   }
   .process-step :global(.process-step__icon) {
@@ -147,7 +161,8 @@ const { steps } = Astro.props;
     margin: 0;
     font-family: var(--font-family-body);
     font-size: var(--font-size-2xl);
-    line-height: var(--font-line-height-2xl);
+    /* 48px, not the shared 2xl token (32px) — see shared/ui/heading. */
+    line-height: 48px;
     font-weight: var(--font-weight-bold);
     color: var(--color-text-emphasis);
   }

@@ -58,11 +58,20 @@ const { project } = Astro.props;
     /* 16px inset both sides — Figma's updated hover master pads the name
        and the NDA-badge+arrow group in from the card edges. */
     padding: 0 var(--spacing-md);
-    opacity: 0;
     transition: opacity 0.2s ease;
   }
-  .project-card:hover .project-card__footer {
-    opacity: 1;
+  /* Hover-to-reveal only on devices that can actually hover with a
+     precise pointer. Gating opacity:0 behind this (rather than applying
+     it unconditionally and un-hiding on :hover) means touch devices —
+     which never fire a real, sustained :hover — see the name/arrow
+     footer always, instead of it being permanently invisible until tap. */
+  @media (hover: hover) and (pointer: fine) {
+    .project-card__footer {
+      opacity: 0;
+    }
+    .project-card:hover .project-card__footer {
+      opacity: 1;
+    }
   }
   .project-card__name {
     min-width: 0;

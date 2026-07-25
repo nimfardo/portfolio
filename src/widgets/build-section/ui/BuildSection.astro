@@ -1,6 +1,7 @@
 ---
 import { Stat } from '@entities/stat';
 import type { StatData } from '@entities/stat';
+import { Heading } from '@shared/ui';
 
 interface Props {
   sitemapImage: string;
@@ -12,7 +13,7 @@ const { sitemapImage, caption, stats } = Astro.props;
 ---
 
 <section class="build-section">
-  <h2 class="build-section__heading">Build</h2>
+  <Heading class="build-section__heading">Build</Heading>
   <div class="build-section__body">
     <div class="build-section__sitemap">
       <p class="build-section__sitemap-label">Sitemap:</p>
@@ -36,15 +37,8 @@ const { sitemapImage, caption, stats } = Astro.props;
     column-gap: 80px;
     align-items: start;
   }
-  .build-section__heading {
+  :global(.build-section__heading) {
     grid-column: 1 / 2;
-    margin: 0;
-    font-family: var(--font-family-body);
-    font-size: var(--font-size-4xl);
-    line-height: var(--font-line-height-4xl);
-    font-weight: var(--font-weight-bold);
-    letter-spacing: -0.01em;
-    color: var(--color-text-emphasis);
   }
   .build-section__body {
     grid-column: 2 / 4;
@@ -62,7 +56,8 @@ const { sitemapImage, caption, stats } = Astro.props;
     margin: 0;
     font-family: var(--font-family-body);
     font-size: var(--font-size-2xl);
-    line-height: var(--font-line-height-2xl);
+    /* 48px, not the shared 2xl token (32px) — see Heading.astro. */
+    line-height: 48px;
     font-weight: var(--font-weight-bold);
     color: var(--color-text-emphasis);
   }
@@ -94,7 +89,9 @@ const { sitemapImage, caption, stats } = Astro.props;
       grid-template-columns: 1fr;
       gap: var(--spacing-xl);
     }
-    .build-section__heading,
+    :global(.build-section__heading) {
+      grid-column: 1;
+    }
     .build-section__body {
       grid-column: 1;
     }
