@@ -1,41 +1,49 @@
 ---
-import { Divider } from '@shared/ui';
+import { Divider, Icon } from '@shared/ui';
 
-// Reused for both the top Hero (with tags) and the Deliverables interstitial
-// further down the page (same "important-text-container" pattern in Figma,
-// just without tags) — pass `tags` only for the hero.
+// The top hero is now just a bare full-bleed image + a "Scroll down" cue
+// (Figma dropped the tags/eyebrow/headline card from it — tags moved to
+// widgets/overview-section, see connectis.ts). The eyebrow/headline card
+// below is still used by the mid-page Challenge interstitial, but only
+// until that section is migrated onto ContentSection's generalized
+// `blocks` prop (see STATE.md) — this component will lose the card
+// entirely once that lands, leaving just the bare-image+scroll-cue shape.
 interface Props {
   image: string;
   imageAlt: string;
-  eyebrow: string;
-  headline: string[];
-  tags?: string[];
+  eyebrow?: string;
+  headline?: string[];
+  scrollCue?: boolean;
   class?: string;
 }
 
-const { image, imageAlt, eyebrow, headline, tags, class: className } = Astro.props;
+const { image, imageAlt, eyebrow, headline, scrollCue, class: className } = Astro.props;
+const hasCard = Boolean(eyebrow && headline);
 ---
 
 <section class:list={['project-hero', className]}>
-  <div class="project-hero__image-wrap">
+  <div class:list={['project-hero__image-wrap', { 'project-hero__image-wrap--card': hasCard }]}>
     <img class="project-hero__image" src={image} alt={imageAlt} loading="lazy" />
-    {
-      tags && tags.length > 0 && (
-        <ul class="project-hero__tags">
-          {tags.map((tag) => (
-            <li class="project-hero__tag">{tag}</li>
-          ))}
-        </ul>
-      )
-    }
   </div>
-  <div class="project-hero__card">
-    <p class="project-hero__eyebrow">{eyebrow}</p>
-    <Divider class="project-hero__divider" />
-    <p class="project-hero__headline">
-      {headline.map((line) => <span>{line}</span>)}
-    </p>
-  </div>
+  {
+    scrollCue && (
+      <div class="project-hero__scroll-cue">
+        <p class="project-hero__scroll-text">Scroll down</p>
+        <Icon name="scroll" size={28} />
+      </div>
+    )
+  }
+  {
+    hasCard && (
+      <div class="project-hero__card">
+        <p class="project-hero__eyebrow">{eyebrow}</p>
+        <Divider class="project-hero__divider" />
+        <p class="project-hero__headline">
+          {headline!.map((line) => <span>{line}</span>)}
+        </p>
+      </div>
+    )
+  }
 </section>
 
 <style>
@@ -49,6 +57,10 @@ const { image, imageAlt, eyebrow, headline, tags, class: className } = Astro.pro
     position: relative;
     width: 100%;
     height: 800px;
+  }
+  /* Only the card variant needs the image pulled up underneath it — the
+     bare scroll-cue variant sits in normal flow below the image instead. */
+  .project-hero__image-wrap--card {
     margin-bottom: -230px;
   }
   .project-hero__image {
@@ -56,29 +68,21 @@ const { image, imageAlt, eyebrow, headline, tags, class: className } = Astro.pro
     height: 100%;
     object-fit: cover;
   }
-  .project-hero__tags {
-    position: absolute;
-    top: 16px;
-    left: 50%;
-    transform: translateX(-50%);
+
+  .project-hero__scroll-cue {
     display: flex;
-    gap: 15px;
-    margin: 0;
-    padding: 0;
-    list-style: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    margin-top: 40px;
+    color: var(--color-icon-default);
   }
-  .project-hero__tag {
-    padding: 8px 14px;
-    border: 1px solid var(--color-border-strong);
-    border-radius: var(--radius-full);
-    background: rgba(0, 0, 0, 0.3);
+  .project-hero__scroll-text {
+    margin: 0;
     font-family: var(--font-family-body);
     font-size: var(--font-size-xs);
     line-height: var(--font-line-height-xs);
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    color: var(--color-text-emphasis);
-    white-space: nowrap;
+    color: var(--color-text-primary);
   }
 
   .project-hero__card {
@@ -120,6 +124,8 @@ const { image, imageAlt, eyebrow, headline, tags, class: className } = Astro.pro
   @media (max-width: 767px) {
     .project-hero__image-wrap {
       height: 400px;
+    }
+    .project-hero__image-wrap--card {
       margin-bottom: -120px;
     }
     .project-hero__card {

@@ -1,0 +1,91 @@
+---
+// Heading + a big statement line + tag pills, no image — Figma split this
+// out of the old hero card once tags moved off the hero image (see
+// widgets/project-hero). Same 33/66 reference-column grid as ContentSection.
+import { Heading } from '@shared/ui';
+
+interface Props {
+  heading: string;
+  tags: string[];
+  class?: string;
+}
+
+const { heading, tags, class: className } = Astro.props;
+---
+
+<section class:list={['overview-section', className]}>
+  <Heading class="overview-section__heading">{heading}</Heading>
+  <div class="overview-section__body">
+    <p class="overview-section__text"><slot /></p>
+    <ul class="overview-section__tags">
+      {tags.map((tag) => (
+        <li class="overview-section__tag">{tag}</li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .overview-section {
+    display: grid;
+    /* Max's Figma reference columns: 3 equal tracks + 80px gutters — same
+       pattern as ContentSection/BuildSection/Retrospective. */
+    grid-template-columns: repeat(3, 1fr);
+    column-gap: 80px;
+    align-items: start;
+  }
+  /* :global() — class merges onto Heading's own rendered <h2>, which
+     carries Heading.astro's astro-cid, not this component's. */
+  :global(.overview-section__heading) {
+    grid-column: 1 / 2;
+  }
+  .overview-section__body {
+    grid-column: 2 / 4;
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 64px;
+  }
+  .overview-section__text {
+    margin: 0;
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-4xl);
+    line-height: var(--font-line-height-5xl);
+    letter-spacing: -0.4px;
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-emphasis);
+  }
+  .overview-section__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .overview-section__tag {
+    padding: 8px 14px;
+    border: 1px solid var(--color-border-emphasis);
+    border-radius: var(--radius-full);
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-xs);
+    line-height: var(--font-line-height-xs);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--color-text-emphasis);
+    white-space: nowrap;
+  }
+
+  @media (max-width: 1023px) {
+    .overview-section {
+      grid-template-columns: 1fr;
+      gap: var(--spacing-xl);
+    }
+    :global(.overview-section__heading) {
+      grid-column: 1;
+    }
+    .overview-section__body {
+      grid-column: 1;
+    }
+  }
+</style>

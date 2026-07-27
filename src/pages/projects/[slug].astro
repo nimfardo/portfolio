@@ -3,6 +3,7 @@ import Layout from '@app/layouts/Layout.astro';
 import { Heading } from '@shared/ui';
 import { PageHeader } from '@widgets/page-header';
 import { ProjectHero } from '@widgets/project-hero';
+import { OverviewSection } from '@widgets/overview-section';
 import { ContentSection } from '@widgets/content-section';
 import { ProcessAccordion } from '@widgets/process-accordion';
 import { BuildSection } from '@widgets/build-section';
@@ -22,22 +23,12 @@ const { project } = Astro.props;
   <main class="project-page">
     <PageHeader title={project.name} showBack backHref="/" />
 
-    <ProjectHero
-      image={project.hero.image}
-      imageAlt={project.hero.imageAlt}
-      eyebrow={project.hero.eyebrow}
-      headline={project.hero.headline}
-      tags={project.hero.tags}
-    />
+    <ProjectHero image={project.hero.image} imageAlt={project.hero.imageAlt} scrollCue />
 
     <div class="project-page__sections">
-      <ContentSection
-        heading={project.overview.heading}
-        image={project.overview.image}
-        imageAlt={project.overview.imageAlt}
-      >
+      <OverviewSection heading={project.overview.heading} tags={project.overview.tags}>
         {project.overview.text}
-      </ContentSection>
+      </OverviewSection>
 
       <section class="project-page__process">
         <Heading class="project-page__process-heading">Process</Heading>

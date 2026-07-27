@@ -9,18 +9,18 @@ const M = '/media/connectis';
 export const connectis = {
   slug: 'connectis',
   name: 'CONNECTIS',
+  // Figma dropped the hero's tags/eyebrow/headline card — it's now a bare
+  // image + scroll cue. The "Challenge" eyebrow/headline that used to live
+  // here moves to its own ContentSection-style block in Task 3, sourced
+  // fresh from canvas rather than carried over guessed.
   hero: {
-    tags: ['2026', 'Logistics', 'brand · ux', 'Solo designer'],
-    eyebrow: 'Challenge',
-    headline: ['Transform fragmented data into', 'prioritized actions to prevent downtime'],
     image: `${M}/hero.jpg`,
     imageAlt: 'CONNECTIS — dashboard viewed from inside a fleet vehicle',
   },
   overview: {
     heading: 'Project Overview',
-    image: `${M}/overview.jpg`,
-    imageAlt: 'CONNECTIS product overview',
-    text: 'A cloud-based SaaS platform designed for the dynamic, centralized management of large rental vehicle fleets. Enterprise B2B SaaS — subscription-based, built for fleet operations teams managing 500+ assets.',
+    text: 'CONNECTIS is a command center for fleet operators — one dashboard replacing spreadsheets and phone calls.',
+    tags: ['Logistics', 'Solo designer', 'brand · ux', '2026'],
   },
   process: [
     {
