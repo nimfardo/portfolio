@@ -99,20 +99,26 @@
 }
 
 [data-theme='light'] {
-  --color-bg-default: #faeee1;
-  --color-bg-subtle: #f5dcc4;
-  --color-bg-muted: #efcba6;
+  /* bg-default/subtle/muted/elevated + border-default are a neutral gray
+     scale (color/neutral/* in Figma), not the warm amber ramp — the amber
+     steps at light-mode lightness read as tan/orange "colored" surfaces
+     (e.g. the theme-toggle track, icon-badges, sitemap panel), which is
+     the "colored page bg" Max flagged. Text/icon/accent tokens stay on
+     the amber ramp since those should keep the brand's warmth. */
+  --color-bg-default: #ededed;
+  --color-bg-subtle: #e2e2e2;
+  --color-bg-muted: #d6d6d6;
   --color-bg-accent: #885018;
   --color-bg-accent-hover: #4d2d0e;
   --color-bg-inverse: #110a03;
-  --color-bg-elevated: #e0964d;
+  --color-bg-elevated: #c4c4c4;
   --color-text-emphasis: #110a03;
   --color-text-primary: #2f1c08;
   --color-text-secondary: #885018;
   --color-text-muted: #885018;
   --color-text-accent: #885018;
   --color-text-on-accent: #faeee1;
-  --color-border-default: #efcba6;
+  --color-border-default: #dcdcdc;
   --color-border-strong: #2f1c08;
   --color-border-accent: #885018;
   --color-border-emphasis: #110a03;

@@ -10,12 +10,13 @@ interface Props {
   title: string;
   showBack?: boolean;
   backHref?: string;
+  class?: string;
 }
 
-const { title, showBack = false, backHref = '/' } = Astro.props;
+const { title, showBack = false, backHref = '/', class: className } = Astro.props;
 ---
 
-<div class="page-header">
+<div class:list={['page-header', className]}>
   <div class="page-header__title-group">
     {
       showBack && (
