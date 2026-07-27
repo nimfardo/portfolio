@@ -1,23 +1,40 @@
 ---
-// Reused for Project Overview / Brand Development / Design System — every
-// CONNECTIS section that's just a heading + one image + one paragraph.
+// Heading + one or more stacked image+paragraph blocks — reused for
+// Challenge (1 block) and Deliverables (2 blocks, one heading over both:
+// Brand Development + Design System merged into one Figma section).
 import { Heading } from '@shared/ui';
+
+interface ContentBlock {
+  image: string;
+  imageAlt: string;
+  text: string;
+}
 
 interface Props {
   heading: string;
-  image: string;
-  imageAlt: string;
+  blocks: ContentBlock[];
   class?: string;
 }
 
-const { heading, image, imageAlt, class: className } = Astro.props;
+const { heading, blocks, class: className } = Astro.props;
 ---
 
 <section class:list={['content-section', className]}>
   <Heading class="content-section__heading">{heading}</Heading>
   <div class="content-section__body">
-    <img class="content-section__image" src={image} alt={imageAlt} loading="lazy" />
-    <p class="content-section__text"><slot /></p>
+    {
+      blocks.map((block) => (
+        <div class="content-section__block">
+          <img
+            class="content-section__image"
+            src={block.image}
+            alt={block.imageAlt}
+            loading="lazy"
+          />
+          <p class="content-section__text">{block.text}</p>
+        </div>
+      ))
+    }
   </div>
 </section>
 
@@ -42,7 +59,14 @@ const { heading, image, imageAlt, class: className } = Astro.props;
     display: flex;
     min-width: 0;
     flex-direction: column;
-    gap: 80px;
+    /* 160px between stacked blocks (Deliverables' 2 blocks) — matches the
+       page's own section rhythm, per Figma. */
+    gap: 160px;
+  }
+  .content-section__block {
+    display: flex;
+    flex-direction: column;
+    gap: 64px;
   }
   .content-section__image {
     width: 100%;
@@ -52,9 +76,10 @@ const { heading, image, imageAlt, class: className } = Astro.props;
   .content-section__text {
     margin: 0;
     font-family: var(--font-family-body);
-    font-size: var(--font-size-xl);
-    line-height: 2;
-    font-weight: var(--font-weight-regular);
+    font-size: var(--font-size-4xl);
+    line-height: var(--font-line-height-5xl);
+    letter-spacing: -0.4px;
+    font-weight: var(--font-weight-medium);
     color: var(--color-text-emphasis);
   }
 

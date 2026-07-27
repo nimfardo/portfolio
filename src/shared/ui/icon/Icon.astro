@@ -2,20 +2,18 @@
 import iconArrowRight from './svg/arrow-right.svg?raw';
 import iconArrowLeft from './svg/arrow-left.svg?raw';
 import iconBehance from './svg/behance.svg?raw';
-import iconCheck from './svg/check.svg?raw';
 import iconClose from './svg/close.svg?raw';
 import iconDrop from './svg/drop.svg?raw';
 import iconEye from './svg/eye.svg?raw';
 import iconEyeOff from './svg/eye-off.svg?raw';
 import iconLeaf from './svg/leaf.svg?raw';
 import iconLinkedin from './svg/linkedin.svg?raw';
-import iconList from './svg/list.svg?raw';
 import iconLocker from './svg/locker.svg?raw';
 import iconMenu from './svg/menu.svg?raw';
 import iconMinus from './svg/minus.svg?raw';
 import iconPlus from './svg/plus.svg?raw';
 import iconScroll from './svg/scroll.svg?raw';
-import iconThumb from './svg/thumb.svg?raw';
+import iconSmile from './svg/smile.svg?raw';
 import iconTree from './svg/tree.svg?raw';
 import iconWaves from './svg/waves.svg?raw';
 
@@ -23,20 +21,18 @@ const icons = {
   'arrow-right': iconArrowRight,
   'arrow-left': iconArrowLeft,
   behance: iconBehance,
-  check: iconCheck,
   close: iconClose,
   drop: iconDrop,
   eye: iconEye,
   'eye-off': iconEyeOff,
   leaf: iconLeaf,
   linkedin: iconLinkedin,
-  list: iconList,
   locker: iconLocker,
   menu: iconMenu,
   minus: iconMinus,
   plus: iconPlus,
   scroll: iconScroll,
-  thumb: iconThumb,
+  smile: iconSmile,
   tree: iconTree,
   waves: iconWaves,
 } as const;
@@ -45,13 +41,13 @@ export type IconName = keyof typeof icons;
 
 // Figma's icon components live in a 28x28 frame with the glyph inset at its
 // own natural size (not stretched to fill it) — e.g. arrow-right's glyph is
-// 14x14 within that 28x28 frame. linkedin/behance are the exception, framed
-// at 32x32. Every exported SVG's width/height already IS that natural glyph
-// size (tight viewBox, not padded to the frame) — see wiki/log.md for how
-// this was diagnosed. So: render each glyph at its own intrinsic size, then
-// scale it by size/nativeFrame to match how Figma scales an icon instance
-// up or down, instead of stretching it to fill an arbitrary box.
-const SOCIAL_ICONS = new Set<IconName>(['linkedin', 'behance']);
+// 14x14 within that 28x28 frame. linkedin/behance/smile are the exception,
+// framed at 32x32. Every exported SVG's width/height already IS that natural
+// glyph size (tight viewBox, not padded to the frame) — see wiki/log.md for
+// how this was diagnosed. So: render each glyph at its own intrinsic size,
+// then scale it by size/nativeFrame to match how Figma scales an icon
+// instance up or down, instead of stretching it to fill an arbitrary box.
+const FRAME_32_ICONS = new Set<IconName>(['linkedin', 'behance', 'smile']);
 
 interface Props {
   name: IconName;
@@ -60,7 +56,7 @@ interface Props {
 }
 
 const { name, size = 28, class: className } = Astro.props;
-const nativeFrame = SOCIAL_ICONS.has(name) ? 32 : 28;
+const nativeFrame = FRAME_32_ICONS.has(name) ? 32 : 28;
 const scale = size / nativeFrame;
 ---
 

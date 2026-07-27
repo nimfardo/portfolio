@@ -30,37 +30,25 @@ const { project } = Astro.props;
         {project.overview.text}
       </OverviewSection>
 
+      <ContentSection
+        heading={project.challenge.heading}
+        blocks={[
+          {
+            image: project.challenge.image,
+            imageAlt: project.challenge.imageAlt,
+            text: project.challenge.text,
+          },
+        ]}
+      />
+
       <section class="project-page__process">
         <Heading class="project-page__process-heading">Process</Heading>
         <div class="project-page__process-body">
           <ProcessAccordion steps={project.process} />
         </div>
       </section>
-    </div>
 
-    <ProjectHero
-      image={project.interstitial.image}
-      imageAlt={project.interstitial.imageAlt}
-      eyebrow={project.interstitial.eyebrow}
-      headline={project.interstitial.headline}
-    />
-
-    <div class="project-page__sections">
-      <ContentSection
-        heading={project.brandDevelopment.heading}
-        image={project.brandDevelopment.image}
-        imageAlt={project.brandDevelopment.imageAlt}
-      >
-        {project.brandDevelopment.text}
-      </ContentSection>
-
-      <ContentSection
-        heading={project.designSystem.heading}
-        image={project.designSystem.image}
-        imageAlt={project.designSystem.imageAlt}
-      >
-        {project.designSystem.text}
-      </ContentSection>
+      <ContentSection heading={project.deliverables.heading} blocks={project.deliverables.blocks} />
 
       <BuildSection
         sitemapImage={project.build.sitemapImage}

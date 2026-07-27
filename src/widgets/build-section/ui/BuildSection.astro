@@ -15,15 +15,12 @@ const { sitemapImage, caption, stats } = Astro.props;
 <section class="build-section">
   <Heading class="build-section__heading">Build</Heading>
   <div class="build-section__body">
-    <div class="build-section__sitemap">
-      <p class="build-section__sitemap-label">Sitemap:</p>
-      <div class="build-section__sitemap-frame">
-        <img src={sitemapImage} alt="CONNECTIS sitemap" loading="lazy" />
-      </div>
+    <div class="build-section__sitemap-frame">
+      <img src={sitemapImage} alt="CONNECTIS sitemap" loading="lazy" />
     </div>
     <p class="build-section__caption">{caption}</p>
     <div class="build-section__stats">
-      {stats.map((stat) => <Stat value={stat.value} label={stat.label} />)}
+      {stats.map((stat) => <Stat value={stat.value} unit={stat.unit} label={stat.label} />)}
     </div>
   </div>
 </section>
@@ -47,20 +44,6 @@ const { sitemapImage, caption, stats } = Astro.props;
     flex-direction: column;
     gap: 80px;
   }
-  .build-section__sitemap {
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-xl);
-  }
-  .build-section__sitemap-label {
-    margin: 0;
-    font-family: var(--font-family-body);
-    font-size: var(--font-size-2xl);
-    /* 48px, not the shared 2xl token (32px) — see Heading.astro. */
-    line-height: 48px;
-    font-weight: var(--font-weight-bold);
-    color: var(--color-text-emphasis);
-  }
   .build-section__sitemap-frame {
     display: flex;
     align-items: center;
@@ -75,8 +58,10 @@ const { sitemapImage, caption, stats } = Astro.props;
   .build-section__caption {
     margin: 0;
     font-family: var(--font-family-body);
-    font-size: var(--font-size-xl);
-    line-height: 2;
+    font-size: var(--font-size-4xl);
+    line-height: var(--font-line-height-5xl);
+    letter-spacing: -0.4px;
+    font-weight: var(--font-weight-medium);
     color: var(--color-text-emphasis);
   }
   .build-section__stats {

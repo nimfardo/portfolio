@@ -55,23 +55,33 @@ export const connectis = {
       body: 'Fed design data straight into code-generation pipelines for instant iteration, then immediately usability-tested the output. Replaced slow handoffs to build and validate a working PoC in record time.',
     },
   ] satisfies ProcessStep[],
-  interstitial: {
-    eyebrow: 'Deliverables',
-    headline: ['A design system, shipped as a working product.'],
-    image: `${M}/interstitial.jpg`,
-    imageAlt: 'CONNECTIS design system documentation',
+  // Figma's old "Deliverables" eyebrow/headline interstitial banner ("A
+  // design system, shipped as a working product.") is gone — replaced by
+  // the Challenge block below (real content, not a banner) and the merged
+  // Deliverables section immediately after it.
+  challenge: {
+    heading: 'Challenge',
+    image: `${M}/challenge.jpg`,
+    imageAlt: 'CONNECTIS — a fleet operations manager in a glass-walled meeting room',
+    text: 'Transform fragmented data into prioritized actions to prevent downtime.',
   },
-  brandDevelopment: {
-    heading: 'Brand Development',
-    image: `${M}/brand-development.jpg`,
-    imageAlt: 'CONNECTIS brand identity — Michroma wordmark and network mark',
-    text: 'The identity is built on geometric precision: a Michroma wordmark, zero decoration, and a network mark where every dot connects to the next — one connected fleet, not a scattered list of vehicles.',
-  },
-  designSystem: {
-    heading: 'Design System',
-    image: `${M}/design-system.jpg`,
-    imageAlt: 'CONNECTIS two-tiered design token architecture',
-    text: 'A streamlined adaptation of classic Material Design principles utilizing a strict 2-tiered architecture. The system organizes design primitives into two core collections: a foundational reference layer and a semantic layer.',
+  // Brand Development + Design System used to be two separately-headed
+  // sections; Figma merged them under one "Deliverables" heading with both
+  // image+caption blocks stacked underneath.
+  deliverables: {
+    heading: 'Deliverables',
+    blocks: [
+      {
+        image: `${M}/brand-development.jpg`,
+        imageAlt: 'CONNECTIS brand identity — Michroma wordmark and network mark',
+        text: 'Geometric precision: a Michroma wordmark, zero decoration, one connected network mark for the fleet.',
+      },
+      {
+        image: `${M}/design-system.jpg`,
+        imageAlt: 'CONNECTIS two-tiered design token architecture',
+        text: 'A 2-tiered token system — a foundational reference layer feeding a semantic layer built for the product.',
+      },
+    ],
   },
   build: {
     sitemapImage: `${M}/sitemap.png`,
@@ -79,13 +89,13 @@ export const connectis = {
       'Three dependency vulnerabilities patched. Full auth and role-based access, sign-in to sign-out.',
     stats: [
       { value: '394', label: 'Commits, One Month' },
-      { value: '76KB', label: 'Initial JS Bundle' },
+      { value: '76', unit: 'KB', label: 'Initial JS Bundle' },
     ],
   },
   gallery: [`${M}/gallery-1.jpg`, `${M}/gallery-2.jpg`, `${M}/gallery-3.jpg`, `${M}/gallery-4.jpg`],
   retrospective: {
     heading: "What I've Learned",
-    text: 'I learned how fast a working proof of concept comes together when AI carries the handoff. Feeding Figma layouts and tokens straight into Claude Code turned weeks of translation into days, and let me test a real interface instead of a slide deck. The lesson: treat AI as part of the process, not a shortcut around it.',
+    text: 'The lesson: treat AI as part of the process, not a shortcut around it.',
     behanceUrl: 'https://www.behance.net/gallery/251016127/',
   },
 };
