@@ -8,6 +8,7 @@ import { ContentSection } from '@widgets/content-section';
 import { ProcessAccordion } from '@widgets/process-accordion';
 import { BuildSection } from '@widgets/build-section';
 import { Retrospective } from '@widgets/retrospective';
+import { Footer } from '@widgets/footer';
 import { connectis } from '@entities/project';
 
 // Only CONNECTIS exists so far — Arvus and the rest land once Max approves
@@ -57,7 +58,14 @@ const { project } = Astro.props;
       />
 
       <div class="project-page__gallery">
-        {project.gallery.map((src) => <img src={src} alt="" loading="lazy" />)}
+        <img class="project-page__gallery-full" src={project.gallery[0]} alt="" loading="lazy" />
+        <div class="project-page__gallery-row">
+          <img class="project-page__gallery-tall" src={project.gallery[1]} alt="" loading="lazy" />
+          <div class="project-page__gallery-stack">
+            <img src={project.gallery[2]} alt="" loading="lazy" />
+            <img src={project.gallery[3]} alt="" loading="lazy" />
+          </div>
+        </div>
       </div>
 
       <Retrospective
@@ -66,6 +74,8 @@ const { project } = Astro.props;
       >
         {project.retrospective.text}
       </Retrospective>
+
+      <Footer />
     </div>
   </main>
 </Layout>
@@ -108,11 +118,36 @@ const { project } = Astro.props;
   .project-page__gallery {
     display: flex;
     flex-direction: column;
-    gap: 160px;
+    /* 64px — Frame 13's own internal rhythm between the full-width image
+       and the row below, distinct from the page's 160px section gap. */
+    gap: 64px;
   }
-  .project-page__gallery img {
+  .project-page__gallery-full {
     width: 100%;
-    height: auto;
+    aspect-ratio: 1647 / 1000;
+    object-fit: cover;
+  }
+  .project-page__gallery-row {
+    display: flex;
+    gap: 64px;
+  }
+  .project-page__gallery-tall {
+    flex: 1;
+    min-width: 0;
+    aspect-ratio: 791.5 / 1000;
+    object-fit: cover;
+  }
+  .project-page__gallery-stack {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 64px;
+  }
+  .project-page__gallery-stack img {
+    width: 100%;
+    aspect-ratio: 791.5 / 468;
+    object-fit: cover;
   }
 
   @media (max-width: 1023px) {
@@ -146,6 +181,16 @@ const { project } = Astro.props;
     }
     .project-page__sections {
       padding: var(--spacing-3xl) 24px;
+    }
+    .project-page__gallery-row {
+      flex-direction: column;
+      gap: var(--spacing-3xl);
+    }
+    .project-page__gallery-tall {
+      aspect-ratio: 1647 / 1000;
+    }
+    .project-page__gallery-stack {
+      gap: var(--spacing-3xl);
     }
   }
 </style>
