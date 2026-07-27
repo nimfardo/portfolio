@@ -50,6 +50,13 @@ const { heading, behanceUrl } = Astro.props;
     font-weight: var(--font-weight-medium);
     color: var(--color-text-emphasis);
   }
+  /* :global() — class merges onto Button's own rendered <a>/<button>, which
+     carries Button.astro's astro-cid, not this component's. Without this,
+     the button stretches to the full column width via the flex-column
+     parent's default align-items:stretch — Figma has it fixed at 320px. */
+  :global(.retrospective__button) {
+    align-self: flex-start;
+  }
   .retrospective__smile {
     position: relative;
     display: flex;
