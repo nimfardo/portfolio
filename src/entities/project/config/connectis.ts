@@ -26,87 +26,33 @@ export const connectis = {
     {
       number: '01',
       title: 'AI-driven Product Strategy and Framing',
-      blocks: [
-        {
-          heading: 'What we did:',
-          icon: 'list',
-          image: `${M}/process/step1-what.jpg`,
-          imageAlt:
-            'Research deliverables: market research, user personas, journey mapping, problem framing',
-          body: [
-            'Accelerated market research',
-            'User personas',
-            'Journey mapping',
-            'Problem framing using AI',
-          ],
-        },
-        {
-          heading: 'The Value:',
-          icon: 'check',
-          image: `${M}/process/step1-value.jpg`,
-          imageAlt: 'A user persona — Carlos Silva, Senior Fleet Operations Manager',
-          body: 'Compressed the discovery and scoping phase from months to days without sacrificing depth.',
-        },
-      ],
+      image: `${M}/process/step1-what.jpg`,
+      imageAlt:
+        'Research deliverables: market research, user personas, journey mapping, problem framing',
+      body: 'Accelerated market research, user personas, journey mapping, and problem framing using AI. Compressed discovery and scoping from months to days without sacrificing depth.',
     },
     {
       number: '02',
       title: 'Tokenized Design System and Architecture',
-      blocks: [
-        {
-          heading: 'What we did:',
-          icon: 'list',
-          image: `${M}/process/step2-what.jpg`,
-          imageAlt:
-            'A hybrid analog-digital workflow across Pencil & Paper, FigJam, Figma, Claude, and UX Pilot',
-          body: 'Developed sitemaps, user stories, lo-fi wireframes, and a high-fidelity Figma component library with a Level-II token architecture (light/dark modes).',
-        },
-        {
-          heading: 'The Value:',
-          icon: 'check',
-          image: `${M}/process/step2-value.jpg`,
-          imageAlt:
-            'The token architecture, organized by color scale, spacing and shape, and reference vs semantic layers',
-          body: 'Created a structured, systematic design foundation tailored for efficient AI translation.',
-        },
-      ],
+      image: `${M}/process/step2-what.jpg`,
+      imageAlt:
+        'A hybrid analog-digital workflow across Pencil & Paper, FigJam, Figma, Claude, and UX Pilot',
+      body: 'Built sitemaps, user stories, and lo-fi wireframes into a high-fidelity Figma component library with Level-II token architecture for light and dark modes. Delivered a systematic design foundation structured for fast, accurate AI translation.',
     },
     {
       number: '03',
       title: 'Figma-to-Claude Integration and Documentation',
-      blocks: [
-        {
-          heading: 'What we did:',
-          icon: 'list',
-          image: `${M}/process/step3-what.jpg`,
-          imageAlt: 'Figma layouts translated into a structured data graph for Claude',
-          body: 'Used Claude to directly parse our Figma layouts, design tokens, and visual direction.',
-        },
-        {
-          heading: 'The Value:',
-          icon: 'check',
-          body: 'Automated the generation of comprehensive PRDs, user flows, and precise UI reference specs.',
-        },
-      ],
+      image: `${M}/process/step3-what.jpg`,
+      imageAlt: 'Figma layouts translated into a structured data graph for Claude',
+      body: 'Used Claude to parse Figma layouts, design tokens, and visual direction directly. Automated generation of PRDs, user flows, and precise UI reference specs from a single source of truth.',
     },
     {
       number: '04',
       title: 'AI-assisted Build and PoC Delivery',
-      blocks: [
-        {
-          heading: 'What we did:',
-          icon: 'list',
-          image: `${M}/process/step4-what.jpg`,
-          imageAlt:
-            'Claude Code building the CONNECTIS dashboard, live preview alongside the terminal session',
-          body: 'Fed design data into code generation pipelines for an instant iteration loop, followed by immediate usability testing on the output.',
-        },
-        {
-          heading: 'The Value:',
-          icon: 'check',
-          body: 'Replaced slow, traditional handoffs to build and validate a working PoC in record time.',
-        },
-      ],
+      image: `${M}/process/step4-what.jpg`,
+      imageAlt:
+        'Claude Code building the CONNECTIS dashboard, live preview alongside the terminal session',
+      body: 'Fed design data straight into code-generation pipelines for instant iteration, then immediately usability-tested the output. Replaced slow handoffs to build and validate a working PoC in record time.',
     },
   ] satisfies ProcessStep[],
   interstitial: {

@@ -2,10 +2,11 @@
 // Native <details>/<summary> for free, zero-JS expand/collapse — matches
 // Figma's Accordion component (open=true|false variants) exactly, first
 // step open by default. icon/plus <-> icon/minus swap via CSS on [open].
-// The step number now renders inside the same 80x80 IconBadge shell used
-// for the process-block icons — Max moved it off plain text onto that
-// component in Figma, so IconBadge's icon prop is optional here and this
-// projects the number through its slot instead.
+// The step number renders inside the same 80x80 IconBadge shell used for
+// process-block icons elsewhere — IconBadge's icon prop is optional here
+// and this projects the number through its slot instead. Each step is a
+// single image + paragraph (Figma dropped the old What-we-did/The-Value
+// sub-block split).
 import { Icon, IconBadge } from '@shared/ui';
 import type { ProcessStep } from '../model/types';
 
@@ -31,31 +32,13 @@ const { steps } = Astro.props;
           </span>
         </summary>
         <div class="process-step__content">
-          {step.blocks.map((block) => (
-            <div class="process-block">
-              <div class="process-block__heading">
-                <IconBadge icon={block.icon} />
-                <p class="process-block__heading-text">{block.heading}</p>
-              </div>
-              {block.image && (
-                <img
-                  class="process-block__image"
-                  src={block.image}
-                  alt={block.imageAlt ?? ''}
-                  loading="lazy"
-                />
-              )}
-              {Array.isArray(block.body) ? (
-                <ul class="process-block__list">
-                  {block.body.map((item) => (
-                    <li>{item}</li>
-                  ))}
-                </ul>
-              ) : (
-                <p class="process-block__text">{block.body}</p>
-              )}
-            </div>
-          ))}
+          <img
+            class="process-step__image"
+            src={step.image}
+            alt={step.imageAlt}
+            loading="lazy"
+          />
+          <p class="process-step__text">{step.body}</p>
         </div>
       </details>
     ))
@@ -146,41 +129,13 @@ const { steps } = Astro.props;
     margin-left: 120px;
   }
 
-  .process-block {
-    display: flex;
-    flex-direction: column;
-    gap: 40px;
-  }
-  .process-block__heading {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-lg);
-  }
-  .process-block__heading-text {
-    flex: 1;
-    margin: 0;
-    font-family: var(--font-family-body);
-    font-size: var(--font-size-2xl);
-    /* 48px, not the shared 2xl token (32px) — see shared/ui/heading. */
-    line-height: 48px;
-    font-weight: var(--font-weight-bold);
-    color: var(--color-text-emphasis);
-  }
-  .process-block__image {
+  .process-step__image {
     width: 100%;
     aspect-ratio: 1071 / 560;
     object-fit: cover;
   }
-  .process-block__text {
+  .process-step__text {
     margin: 0;
-    font-family: var(--font-family-body);
-    font-size: var(--font-size-xl);
-    line-height: 2;
-    color: var(--color-text-emphasis);
-  }
-  .process-block__list {
-    margin: 0;
-    padding-left: 30px;
     font-family: var(--font-family-body);
     font-size: var(--font-size-xl);
     line-height: 2;

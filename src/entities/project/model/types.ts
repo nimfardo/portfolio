@@ -1,5 +1,3 @@
-import type { IconName } from '@shared/ui';
-
 export type ProjectAccess = 'public' | 'nda';
 
 export interface Project {
@@ -17,16 +15,10 @@ export interface Project {
  * per-project data files and widgets/process-accordion's renderer. Live
  * here (not in the widget) so entities never imports upward from widgets,
  * per FSD's layer rule. */
-export interface ProcessBlock {
-  heading: string;
-  icon: IconName;
-  image?: string;
-  imageAlt?: string;
-  body: string | string[];
-}
-
 export interface ProcessStep {
   number: string;
   title: string;
-  blocks: ProcessBlock[];
+  image: string;
+  imageAlt: string;
+  body: string;
 }
