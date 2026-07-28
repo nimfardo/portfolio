@@ -7,6 +7,8 @@
 // pointing device. No edge-clamping on pan (content maxes out at 4x on a
 // moderately-sized diagram, not large enough to get meaningfully lost) —
 // the reset button always recenters.
+import { Icon } from '@shared/ui';
+
 interface Props {
   class?: string;
   minScale?: number;
@@ -27,13 +29,30 @@ const { class: className, minScale = 1, maxScale = 4 } = Astro.props;
       <slot />
     </div>
   </div>
+  <!-- Figma: — molecules / zoom-control (node 2375:67) -->
   <div class="zoom-pan__controls">
-    <button type="button" class="zoom-pan__button" data-zoom-pan-out aria-label="Zoom out">−</button
+    <button
+      type="button"
+      class="zoom-pan__button zoom-pan__button--icon"
+      data-zoom-pan-out
+      aria-label="Zoom out"
     >
-    <button type="button" class="zoom-pan__button" data-zoom-pan-reset aria-label="Reset zoom"
-      >100%</button
+      <Icon name="minus" size={16} />
+    </button>
+    <button
+      type="button"
+      class="zoom-pan__button zoom-pan__button--reset"
+      data-zoom-pan-reset
+      aria-label="Reset zoom">100%</button
     >
-    <button type="button" class="zoom-pan__button" data-zoom-pan-in aria-label="Zoom in">+</button>
+    <button
+      type="button"
+      class="zoom-pan__button zoom-pan__button--icon"
+      data-zoom-pan-in
+      aria-label="Zoom in"
+    >
+      <Icon name="plus" size={16} />
+    </button>
   </div>
 </div>
 
@@ -235,6 +254,10 @@ const { class: className, minScale = 1, maxScale = 4 } = Astro.props;
   .zoom-pan__content :global(svg) {
     user-select: text;
   }
+  /* Figma: — molecules / zoom-control (node 2375:67). Square corners are
+     intentional — no radius token used, matching that component (most of
+     this design system's controls are sharp-cornered; radius is reserved
+     for pill-shaped chips like Tag/the NDA badge, not this). */
   .zoom-pan__controls {
     position: absolute;
     right: 16px;
@@ -244,23 +267,33 @@ const { class: className, minScale = 1, maxScale = 4 } = Astro.props;
     padding: 4px;
     background: var(--color-bg-elevated);
     border: 1px solid var(--color-border-default);
-    border-radius: var(--radius-full);
   }
   .zoom-pan__button {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-width: 32px;
-    height: 32px;
-    padding: 0 10px;
     border: none;
     background: transparent;
-    border-radius: var(--radius-full);
     font-family: var(--font-family-body);
     font-size: var(--font-size-xs);
     color: var(--color-text-primary);
     cursor: pointer;
     transition: background-color var(--duration-fast) var(--ease-fade);
+  }
+  /* zoom-out/zoom-in: fixed 32x32 icon slots, no padding (Icon centers
+     itself). reset: same 32px height, hugs its "100%" label with 10px
+     horizontal padding — the two button kinds are different widths in
+     Figma, not one uniform shape. */
+  .zoom-pan__button--icon {
+    width: 32px;
+    height: 32px;
+  }
+  .zoom-pan__button--reset {
+    height: 32px;
+    padding: 0 10px;
+  }
+  :global(.zoom-pan__button--icon .icon) {
+    color: var(--color-icon-default);
   }
   .zoom-pan__button:hover {
     background: var(--color-bg-muted);
