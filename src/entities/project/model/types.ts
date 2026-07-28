@@ -15,11 +15,14 @@ export interface Project {
  * per-project data files and widgets/process-accordion's renderer. Live
  * here (not in the widget) so entities never imports upward from widgets,
  * per FSD's layer rule. */
+export type ProcessStepMedia =
+  | { type: 'image'; image: string; imageAlt: string }
+  | { type: 'video'; src: string; poster?: string; alt: string };
+
 export interface ProcessStep {
   number: string;
   title: string;
-  image: string;
-  imageAlt: string;
+  media: ProcessStepMedia;
   body: string;
 }
 

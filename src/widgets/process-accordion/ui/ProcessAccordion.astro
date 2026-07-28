@@ -13,6 +13,7 @@
 // crossfades+rotates via plain CSS on [open] instead of a hard
 // display:none swap.
 import { Icon, IconBadge } from '@shared/ui';
+import { Media } from '@entities/media';
 import { staggerDelay } from '@shared/lib';
 import type { ProcessStep } from '../model/types';
 
@@ -45,12 +46,24 @@ const { steps } = Astro.props;
           </span>
         </summary>
         <div class="process-step__content">
-          <img
-            class="process-step__image"
-            src={step.image}
-            alt={step.imageAlt}
-            loading="lazy"
-          />
+          {
+            step.media.type === 'image' ? (
+              <img
+                class="process-step__image"
+                src={step.media.image}
+                alt={step.media.imageAlt}
+                loading="lazy"
+              />
+            ) : (
+              <Media
+                type="video"
+                class="process-step__image"
+                src={step.media.src}
+                poster={step.media.poster}
+                alt={step.media.alt}
+              />
+            )
+          }
           <p class="process-step__text">{step.body}</p>
         </div>
       </details>
@@ -224,7 +237,15 @@ const { steps } = Astro.props;
     margin-left: 120px;
   }
 
-  .process-step__image {
+  /* :global() — the video branch's class merges onto Media's own rendered
+     root <div>, which carries Media.astro's astro-cid, not this component's
+     (same classlist-merge gotcha as every other Icon/PageHeader consumer in
+     this codebase); :global() also still matches this component's own <img>
+     in the image branch, so one rule covers both. object-fit has no effect
+     on Media's wrapper div itself, but Media's own internal CSS already
+     applies object-fit:cover to its <video>, so both branches crop the same
+     way. */
+  :global(.process-step__image) {
     width: 100%;
     aspect-ratio: 1071 / 560;
     object-fit: cover;

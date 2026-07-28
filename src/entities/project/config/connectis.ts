@@ -27,32 +27,44 @@ export const connectis = {
     {
       number: '01',
       title: 'AI-driven Product Strategy and Framing',
-      image: `${M}/process/step1-what.jpg`,
-      imageAlt:
-        'Research deliverables: market research, user personas, journey mapping, problem framing',
+      media: {
+        type: 'image',
+        image: `${M}/process/step1-what.jpg`,
+        imageAlt:
+          'Research deliverables: market research, user personas, journey mapping, problem framing',
+      },
       body: 'Accelerated market research, user personas, journey mapping, and problem framing using AI. Compressed discovery and scoping from months to days without sacrificing depth.',
     },
     {
       number: '02',
       title: 'Tokenized Design System and Architecture',
-      image: `${M}/process/step2-what.jpg`,
-      imageAlt:
-        'A hybrid analog-digital workflow across Pencil & Paper, FigJam, Figma, Claude, and UX Pilot',
+      media: {
+        type: 'video',
+        src: `${M}/process/step2-what.webm`,
+        poster: `${M}/process/step2-what-poster.jpg`,
+        alt: 'Hand-sketching CONNECTIS\'s lo-fi wireframes on paper — dashboard, analytics and reports, vehicles, and settings screens — next to a laptop',
+      },
       body: 'Built sitemaps, user stories, and lo-fi wireframes into a high-fidelity Figma component library with Level-II token architecture for light and dark modes. Delivered a systematic design foundation structured for fast, accurate AI translation.',
     },
     {
       number: '03',
       title: 'Figma-to-Claude Integration and Documentation',
-      image: `${M}/process/step3-what.jpg`,
-      imageAlt: 'Figma layouts translated into a structured data graph for Claude',
+      media: {
+        type: 'image',
+        image: `${M}/process/step3-what.jpg`,
+        imageAlt: 'Figma layouts translated into a structured data graph for Claude',
+      },
       body: 'Used Claude to parse Figma layouts, design tokens, and visual direction directly. Automated generation of PRDs, user flows, and precise UI reference specs from a single source of truth.',
     },
     {
       number: '04',
       title: 'AI-assisted Build and PoC Delivery',
-      image: `${M}/process/step4-what.jpg`,
-      imageAlt:
-        'Claude Code building the CONNECTIS dashboard, live preview alongside the terminal session',
+      media: {
+        type: 'image',
+        image: `${M}/process/step4-what.jpg`,
+        imageAlt:
+          'Claude Code building the CONNECTIS dashboard, live preview alongside the terminal session',
+      },
       body: 'Fed design data straight into code-generation pipelines for instant iteration, then immediately usability-tested the output. Replaced slow handoffs to build and validate a working PoC in record time.',
     },
   ] satisfies ProcessStep[],

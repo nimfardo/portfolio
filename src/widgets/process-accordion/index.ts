@@ -1,2 +1,2 @@
 export { default as ProcessAccordion } from './ui/ProcessAccordion.astro';
-export type { ProcessStep } from './model/types';
+export type { ProcessStep, ProcessStepMedia } from './model/types';
