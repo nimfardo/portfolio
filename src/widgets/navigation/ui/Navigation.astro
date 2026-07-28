@@ -20,7 +20,7 @@ const SOCIAL_LINKS = [
 const currentPath = Astro.url.pathname;
 ---
 
-<nav class="nav-desktop" aria-label="Primary">
+<nav id="nav-desktop" class="nav-desktop" aria-label="Primary" transition:persist>
   <div class="nav-desktop__top">
     <a href="/" aria-label="Home">
       <AnimatedLogo size={64} />
@@ -48,7 +48,7 @@ const currentPath = Astro.url.pathname;
   </div>
 </nav>
 
-<header class="nav-mobile-header">
+<header id="nav-mobile-header" class="nav-mobile-header" transition:persist>
   <a href="/" aria-label="Home">
     <AnimatedLogo size={40} />
   </a>
@@ -64,7 +64,12 @@ const currentPath = Astro.url.pathname;
   </button>
 </header>
 
-<div id="mobile-nav-overlay" class="nav-mobile-overlay" data-mobile-nav-overlay>
+<div
+  id="mobile-nav-overlay"
+  class="nav-mobile-overlay"
+  data-mobile-nav-overlay
+  transition:persist
+>
   <div class="nav-mobile-overlay__top">
     <a href="/" aria-label="Home">
       <AnimatedLogo size={40} />
@@ -108,6 +113,24 @@ const currentPath = Astro.url.pathname;
 </div>
 
 <MobileNavToggle />
+
+<script>
+  // Navigation persists across ClientRouter swaps (transition:persist), so
+  // its `active` prop — computed server-side from Astro.url.pathname at the
+  // *old* page's render — never gets recomputed on client-side navigation.
+  // Re-derive it from the real URL after every load/swap instead. This also
+  // means the underline transition (NavItem.astro) animates when it moves.
+  function syncActiveNavItem() {
+    document.querySelectorAll<HTMLAnchorElement>('.nav-item').forEach((item) => {
+      if (item.getAttribute('href') === location.pathname) {
+        item.setAttribute('aria-current', 'page');
+      } else {
+        item.removeAttribute('aria-current');
+      }
+    });
+  }
+  document.addEventListener('astro:page-load', syncActiveNavItem);
+</script>
 
 <style>
   /* --- Desktop sidebar (Figma: 153x1080, 40px padding all sides) --- */

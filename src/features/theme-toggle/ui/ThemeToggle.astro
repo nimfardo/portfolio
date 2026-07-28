@@ -21,6 +21,11 @@ const { class: className } = Astro.props;
 </button>
 
 <script>
+  // The desktop toggle (PageHeader) is fresh, unpersisted markup on every
+  // page — needs (re)binding after each `astro:page-load`. The mobile
+  // toggle (Navigation's persisted overlay) is the same DOM node the whole
+  // session — the `data-bound` guard stops it from picking up duplicate
+  // click listeners on every subsequent swap.
   const STORAGE_KEY = 'theme';
 
   function syncLabel(button: HTMLElement) {
@@ -30,21 +35,31 @@ const { class: className } = Astro.props;
     button.setAttribute('aria-pressed', String(isLight));
   }
 
-  const buttons = document.querySelectorAll<HTMLButtonElement>('[data-theme-toggle]');
-  buttons.forEach((button) => {
-    syncLabel(button);
-    button.addEventListener('click', () => {
-      const isLight = document.documentElement.dataset.theme === 'light';
-      if (isLight) {
-        delete document.documentElement.dataset.theme;
-        localStorage.setItem(STORAGE_KEY, 'dark');
-      } else {
-        document.documentElement.dataset.theme = 'light';
-        localStorage.setItem(STORAGE_KEY, 'light');
-      }
-      buttons.forEach(syncLabel);
-    });
-  });
+  function syncAllLabels() {
+    document.querySelectorAll<HTMLButtonElement>('[data-theme-toggle]').forEach(syncLabel);
+  }
+
+  function initThemeToggle() {
+    syncAllLabels();
+    document
+      .querySelectorAll<HTMLButtonElement>('[data-theme-toggle]:not([data-bound])')
+      .forEach((button) => {
+        button.dataset.bound = '1';
+        button.addEventListener('click', () => {
+          const isLight = document.documentElement.dataset.theme === 'light';
+          if (isLight) {
+            delete document.documentElement.dataset.theme;
+            localStorage.setItem(STORAGE_KEY, 'dark');
+          } else {
+            document.documentElement.dataset.theme = 'light';
+            localStorage.setItem(STORAGE_KEY, 'light');
+          }
+          syncAllLabels();
+        });
+      });
+  }
+
+  document.addEventListener('astro:page-load', initThemeToggle);
 </script>
 
 <style>

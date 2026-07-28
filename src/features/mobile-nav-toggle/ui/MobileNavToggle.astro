@@ -7,28 +7,39 @@
 ---
 
 <script>
-  const overlay = document.querySelector<HTMLElement>('[data-mobile-nav-overlay]');
-  const trigger = document.querySelector<HTMLElement>('[data-mobile-nav-trigger]');
-  const closeButton = document.querySelector<HTMLElement>('[data-mobile-nav-close]');
+  // The trigger/overlay/close elements live inside Navigation's persisted
+  // (transition:persist) containers, so they're the same DOM nodes across
+  // every client-side navigation — bind once and skip on repeat
+  // `astro:page-load` fires, or clicks would stack duplicate listeners.
+  function initMobileNavToggle() {
+    const trigger = document.querySelector<HTMLElement>('[data-mobile-nav-trigger]');
+    if (!trigger || trigger.dataset.bound) return;
+    trigger.dataset.bound = '1';
 
-  function open() {
-    overlay?.setAttribute('data-open', 'true');
-    trigger?.setAttribute('aria-expanded', 'true');
-    document.body.style.overflow = 'hidden';
+    const overlay = document.querySelector<HTMLElement>('[data-mobile-nav-overlay]');
+    const closeButton = document.querySelector<HTMLElement>('[data-mobile-nav-close]');
+
+    function open() {
+      overlay?.setAttribute('data-open', 'true');
+      trigger?.setAttribute('aria-expanded', 'true');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function close() {
+      overlay?.removeAttribute('data-open');
+      trigger?.setAttribute('aria-expanded', 'false');
+      document.body.style.overflow = '';
+    }
+
+    trigger.addEventListener('click', open);
+    closeButton?.addEventListener('click', close);
+    overlay?.addEventListener('click', (event) => {
+      if (event.target === overlay) close();
+    });
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') close();
+    });
   }
 
-  function close() {
-    overlay?.removeAttribute('data-open');
-    trigger?.setAttribute('aria-expanded', 'false');
-    document.body.style.overflow = '';
-  }
-
-  trigger?.addEventListener('click', open);
-  closeButton?.addEventListener('click', close);
-  overlay?.addEventListener('click', (event) => {
-    if (event.target === overlay) close();
-  });
-  document.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape') close();
-  });
+  document.addEventListener('astro:page-load', initMobileNavToggle);
 </script>

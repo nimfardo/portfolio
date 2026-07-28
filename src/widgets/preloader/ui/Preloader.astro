@@ -12,7 +12,14 @@
 import { AnimatedLogo, LoadingIndicator } from '@shared/ui';
 ---
 
-<div class="preloader" id="preloader" data-preloader>
+{
+  /* transition:persist keeps this exact DOM node across ClientRouter swaps
+     (matched by its existing id) — without it, every client-side navigation
+     would insert a fresh, un-faded preloader from the new page's own render
+     and flash the loading screen back in. Its script only ever runs once
+     (sessionStorage-gated) regardless, so nothing else needs to change. */
+}
+<div class="preloader" id="preloader" data-preloader transition:persist>
   <AnimatedLogo size={64} autoplayOnce />
   <LoadingIndicator progress={0} class="preloader__bar" />
 </div>

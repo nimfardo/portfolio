@@ -58,26 +58,38 @@ const { size = 64, class: className, autoplayOnce = false } = Astro.props;
     };
   };
 
-  if (!prefersReducedMotion()) {
-    document.querySelectorAll<HTMLElement>('[data-animated-logo]').forEach((wrapper) => {
-      const player = wrapper.querySelector<DotLottieElement>('dotlottie-wc');
-      if (!player) return;
+  // Every current instance lives inside Navigation's persisted containers
+  // or the persisted Preloader, so `astro:page-load` firing again after a
+  // client-side navigation would hit the same DOM nodes — the `data-bound`
+  // guard stops duplicate mouseenter/mouseleave listeners from stacking,
+  // and (just as importantly) stops the preloader's autoplay-once instance
+  // from replaying its reveal on every navigation.
+  function initAnimatedLogos() {
+    if (prefersReducedMotion()) return;
+    document
+      .querySelectorAll<HTMLElement>('[data-animated-logo]:not([data-bound])')
+      .forEach((wrapper) => {
+        wrapper.dataset.bound = '1';
+        const player = wrapper.querySelector<DotLottieElement>('dotlottie-wc');
+        if (!player) return;
 
-      if (wrapper.dataset.autoplayOnce !== undefined) {
-        player.dotLottie?.setMode('forward');
-        player.dotLottie?.play();
-      }
+        if (wrapper.dataset.autoplayOnce !== undefined) {
+          player.dotLottie?.setMode('forward');
+          player.dotLottie?.play();
+        }
 
-      wrapper.addEventListener('mouseenter', () => {
-        player.dotLottie?.setMode('forward');
-        player.dotLottie?.play();
+        wrapper.addEventListener('mouseenter', () => {
+          player.dotLottie?.setMode('forward');
+          player.dotLottie?.play();
+        });
+        wrapper.addEventListener('mouseleave', () => {
+          player.dotLottie?.setMode('reverse');
+          player.dotLottie?.play();
+        });
       });
-      wrapper.addEventListener('mouseleave', () => {
-        player.dotLottie?.setMode('reverse');
-        player.dotLottie?.play();
-      });
-    });
   }
+
+  document.addEventListener('astro:page-load', initAnimatedLogos);
 </script>
 
 <style>
