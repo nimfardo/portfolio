@@ -1,0 +1,98 @@
+---
+// Figma (node 2377:2011) shows this as a 60x60 icon button anchored to
+// one page's content corner; implemented as global chrome instead (mounted
+// once in Layout.astro, matching Navigation/Preloader) since a "scroll to
+// top" control is conventionally a viewport-fixed FAB that appears once
+// the user has actually scrolled, not something tied to one page's layout.
+import { Icon } from '@shared/ui';
+
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+---
+
+<button
+  type="button"
+  class:list={['scroll-to-top', className]}
+  data-scroll-to-top
+  aria-label="Scroll to top"
+  transition:persist
+>
+  <Icon name="arrow-up" size={28} />
+</button>
+
+<script>
+  import { bindOncePersisted, prefersReducedMotion } from '@shared/lib';
+
+  // Persists across ClientRouter swaps (transition:persist) — bindOncePersisted
+  // stops the scroll/click listeners from stacking on repeat astro:page-load.
+  function initScrollToTop() {
+    bindOncePersisted<HTMLButtonElement>('[data-scroll-to-top]', (button) => {
+      let ticking = false;
+      const sync = () => {
+        button.classList.toggle('is-visible', window.scrollY > window.innerHeight);
+        ticking = false;
+      };
+      window.addEventListener(
+        'scroll',
+        () => {
+          if (ticking) return;
+          ticking = true;
+          requestAnimationFrame(sync);
+        },
+        { passive: true },
+      );
+      sync();
+
+      button.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: prefersReducedMotion() ? 'auto' : 'smooth' });
+      });
+    });
+  }
+
+  document.addEventListener('astro:page-load', initScrollToTop);
+</script>
+
+<style>
+  .scroll-to-top {
+    position: fixed;
+    right: var(--spacing-2xl);
+    bottom: var(--spacing-2xl);
+    z-index: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 60px;
+    height: 60px;
+    border: 1px solid var(--color-border-accent);
+    background: var(--color-bg-default);
+    color: var(--color-text-accent);
+    cursor: pointer;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(8px);
+    transition:
+      opacity var(--duration-base) var(--ease-fade),
+      transform var(--duration-base) var(--ease-fade),
+      border-color var(--duration-base) var(--ease-fade),
+      color var(--duration-base) var(--ease-fade);
+  }
+  .scroll-to-top.is-visible {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+  }
+  .scroll-to-top:hover {
+    border-color: var(--color-border-emphasis);
+    color: var(--color-text-emphasis);
+  }
+
+  @media (max-width: 767px) {
+    .scroll-to-top {
+      right: var(--spacing-lg);
+      bottom: var(--spacing-lg);
+    }
+  }
+</style>

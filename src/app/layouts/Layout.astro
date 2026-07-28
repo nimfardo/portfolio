@@ -5,6 +5,7 @@ import '@app/styles/tokens.css';
 import '@app/styles/global.css';
 import { Preloader } from '@widgets/preloader';
 import { Navigation } from '@widgets/navigation';
+import { ScrollToTop } from '@features/scroll-to-top';
 
 interface Props {
   title: string;
@@ -48,6 +49,7 @@ const { title, hideNav = false } = Astro.props;
   <body>
     <Preloader />
     {!hideNav && <Navigation />}
+    {!hideNav && <ScrollToTop />}
     <div class:list={['page-content', { 'page-content--no-nav': hideNav }]}>
       <slot />
     </div>
