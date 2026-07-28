@@ -8,7 +8,6 @@ import { ContentSection } from '@widgets/content-section';
 import { ProcessAccordion } from '@widgets/process-accordion';
 import { BuildSection } from '@widgets/build-section';
 import { Retrospective } from '@widgets/retrospective';
-import { Footer } from '@widgets/footer';
 import { connectis } from '@entities/project';
 
 // Only CONNECTIS exists so far — Arvus and the rest land once Max approves
@@ -86,8 +85,6 @@ const { project } = Astro.props;
       >
         {project.retrospective.text}
       </Retrospective>
-
-      <Footer />
     </div>
   </main>
 </Layout>
