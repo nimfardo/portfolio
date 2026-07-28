@@ -128,6 +128,6 @@ export const connectis = {
   retrospective: {
     heading: "What I've Learned",
     text: 'The lesson: treat AI as part of the process, not a shortcut around it.',
-    behanceUrl: 'https://www.behance.net/gallery/251016127/',
+    behanceUrl: 'https://www.behance.net/gallery/251016127/CONNECTIS-Fleet-Intelligence-Platform',
   },
 };

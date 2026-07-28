@@ -13,11 +13,13 @@ import { MobileNavToggle } from '@features/mobile-nav-toggle';
 import NavItem from './NavItem.astro';
 import { NAV_ITEMS } from '../model/nav-items';
 
-// TODO: real LinkedIn/Behance URLs — copy-deck.md flags these as still
-// pending Max's exact handles, same gap as the GitHub/Unsplash URLs.
 const SOCIAL_LINKS = [
-  { name: 'linkedin' as const, href: '#', label: 'LinkedIn' },
-  { name: 'behance' as const, href: '#', label: 'Behance' },
+  {
+    name: 'linkedin' as const,
+    href: 'https://www.linkedin.com/in/maksym-shturma-680292149/',
+    label: 'LinkedIn',
+  },
+  { name: 'behance' as const, href: 'https://www.behance.net/shturma', label: 'Behance' },
 ];
 
 const currentPath = Astro.url.pathname;
