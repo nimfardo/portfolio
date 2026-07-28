@@ -96,6 +96,15 @@
   --font-line-height-7xl: 88px;
   --font-line-height-8xl: 104px;
   --font-line-height-9xl: 136px;
+
+  /* Motion — adapted from wearemotto.com/work (wiki/concepts/motto-motion-patterns.md).
+     Two curves, not one: reveals get a decisive expo-out settle, fades get
+     a gentler ease-out. Durations match what that site actually ships. */
+  --ease-reveal: cubic-bezier(0.19, 1, 0.22, 1);
+  --ease-fade: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --duration-fast: 0.2s;
+  --duration-base: 0.35s;
+  --duration-slow: 0.75s;
 }
 
 [data-theme='light'] {

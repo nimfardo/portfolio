@@ -14,15 +14,21 @@ const { href, active = false, large = false } = Astro.props;
   aria-current={active ? 'page' : undefined}
 >
   <span class="nav-item__label"><slot /></span>
-  {active && <span class="nav-item__indicator" />}
 </a>
 
 <style>
+  /* Underline wipe adapted from wearemotto.com/work's `.uline` pattern
+     (wiki/concepts/motto-motion-patterns.md): one pseudo-element, flipping
+     `transform-origin` between rest and hover/active so the same scaleX
+     transition reads as "wipes in from the left, retreats to the right"
+     instead of a plain fade. Replaces the old active-only indicator span —
+     hover and the active-page state now share one mechanism. */
   .nav-item {
     display: inline-flex;
     flex-direction: column;
     align-items: center;
-    gap: 4px;
+    position: relative;
+    padding-bottom: 6px;
     text-decoration: none;
     font-family: var(--font-family-body);
     font-size: var(--font-size-sm);
@@ -31,18 +37,31 @@ const { href, active = false, large = false } = Astro.props;
     letter-spacing: 0.04em;
     text-transform: uppercase;
     color: var(--color-text-primary);
+    transition: color var(--duration-base) var(--ease-fade);
+  }
+  .nav-item::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 1.5px;
+    background: var(--color-icon-default);
+    transform: scaleX(0);
+    transform-origin: right center;
+    transition: transform var(--duration-slow) var(--ease-reveal);
   }
   .nav-item:hover {
     color: var(--color-text-accent);
+  }
+  .nav-item:hover::after,
+  .nav-item[aria-current='page']::after {
+    transform-origin: left center;
+    transform: scaleX(1);
   }
   .nav-item--large {
     font-size: var(--font-size-lg);
     line-height: var(--font-line-height-lg);
     font-weight: var(--font-weight-bold);
-  }
-  .nav-item__indicator {
-    width: 16px;
-    height: 1.5px;
-    background: var(--color-icon-default);
   }
 </style>

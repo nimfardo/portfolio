@@ -43,6 +43,7 @@ const { project } = Astro.props;
     width: 100%;
     aspect-ratio: 515 / 400;
     overflow: hidden;
+    transition: opacity var(--duration-base) var(--ease-fade);
   }
   .project-card__media img {
     width: 100%;
@@ -58,7 +59,7 @@ const { project } = Astro.props;
     /* 16px inset both sides — Figma's updated hover master pads the name
        and the NDA-badge+arrow group in from the card edges. */
     padding: 0 var(--spacing-md);
-    transition: opacity 0.2s ease;
+    transition: opacity var(--duration-fast) var(--ease-fade);
   }
   /* Hover-to-reveal only on devices that can actually hover with a
      precise pointer. Gating opacity:0 behind this (rather than applying
@@ -70,6 +71,20 @@ const { project } = Astro.props;
       opacity: 0;
     }
     .project-card:hover .project-card__footer {
+      opacity: 1;
+    }
+
+    /* Dim-siblings-on-hover, adapted from wearemotto.com's `.h-fade-invert`
+       (wiki/concepts/motto-motion-patterns.md): hovering the grid dims every
+       card's media, then the specifically-hovered card overrides back to
+       full opacity — focuses attention without any JS. `:global()` is
+       required here since `.project-grid` belongs to ProjectGrid.astro, a
+       different component's scope (same gotcha as the Icon color race in
+       bug-002/bug-004). */
+    :global(.project-grid:hover) .project-card__media {
+      opacity: 0.4;
+    }
+    .project-card:hover .project-card__media {
       opacity: 1;
     }
   }
