@@ -1,6 +1,13 @@
 ---
 // Native <details>/<summary> — matches Figma's Accordion component
-// (open=true|false variants), first step open by default. The step number
+// (open=true|false variants); all steps start closed, and only one can be
+// open at a time (opening a step closes whichever other one is open) —
+// enforced entirely by the <script> below, not the native `name` grouping
+// attribute: that was tried and reverted, since setting `details.open =
+// true` on the newly-opened step makes the browser instantly force-close
+// same-named siblings itself, which snapped the previous step shut before
+// its own WAAPI collapse animation ever got a chance to run. The step
+// number
 // renders inside the same 80x80 IconBadge shell used for process-block
 // icons elsewhere — IconBadge's icon prop is optional here and this
 // projects the number through its slot instead. Each step is a single
@@ -28,8 +35,7 @@ const { steps } = Astro.props;
   {
     steps.map((step, index) => (
       <details
-        class:list={['process-step', { 'is-open': index === 0 }]}
-        open={index === 0}
+        class="process-step"
         data-reveal
         style={`--reveal-delay: ${staggerDelay(index, 80, 4)}`}
       >
@@ -87,6 +93,13 @@ const { steps } = Astro.props;
     const duration = parseFloat(root.getPropertyValue('--duration-base')) * 1000;
     const easing = root.getPropertyValue('--ease-reveal').trim();
 
+    // Accordion behavior: only one step open at a time. Each step's `toggle`
+    // is a closure scoped to its own `animation` variable, so a shared map
+    // is needed to reach across steps and close whichever other one is open
+    // before opening this one.
+    let openStep: HTMLDetailsElement | null = null;
+    const toggles = new Map<HTMLDetailsElement, (open: boolean) => void>();
+
     document.querySelectorAll<HTMLDetailsElement>('.process-step').forEach((details) => {
       const summary = details.querySelector<HTMLElement>('.process-step__summary');
       const content = details.querySelector<HTMLElement>('.process-step__content');
@@ -96,8 +109,13 @@ const { steps } = Astro.props;
 
       summary.addEventListener('click', (event) => {
         event.preventDefault();
+        const opening = !details.open;
         details.style.overflow = 'hidden';
-        toggle(!details.open);
+        if (opening && openStep && openStep !== details) {
+          toggles.get(openStep)?.(false);
+        }
+        toggle(opening);
+        openStep = opening ? details : null;
       });
 
       function finish(open: boolean) {
@@ -133,6 +151,8 @@ const { steps } = Astro.props;
         animation = details.animate({ height: [startHeight, endHeight] }, { duration, easing });
         animation.onfinish = () => finish(open);
       }
+
+      toggles.set(details, toggle);
     });
   }
 

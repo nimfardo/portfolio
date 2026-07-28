@@ -110,8 +110,10 @@ export const connectis = {
     poster: `${M}/sign-in-dashboard-poster.jpg`,
     alt: 'CONNECTIS product walkthrough — sign-in screen through to the fleet dashboard',
   },
+  // gallery-1.jpg (the old lead shot) was the same sign-in scene the video
+  // above now opens on -- dropped to avoid showing that shot twice on the
+  // page (2026-07-28).
   gallery: [
-    { type: 'full', image: `${M}/gallery-1.jpg` },
     { type: 'split', tall: `${M}/gallery-2.jpg`, stack: [`${M}/gallery-3.jpg`, `${M}/gallery-4.jpg`] },
   ] satisfies GalleryRow[],
   retrospective: {
