@@ -4,12 +4,18 @@ import type { Project } from '@entities/project';
 
 interface Props {
   project: Project;
+  revealDelay?: string;
 }
 
-const { project } = Astro.props;
+const { project, revealDelay } = Astro.props;
 ---
 
-<a href={`/projects/${project.slug}`} class="project-card">
+<a
+  href={`/projects/${project.slug}`}
+  class="project-card"
+  data-reveal
+  style={revealDelay ? `--reveal-delay: ${revealDelay}` : undefined}
+>
   <div class="project-card__media">
     <img src={project.thumbnail} alt={project.name} loading="lazy" />
   </div>

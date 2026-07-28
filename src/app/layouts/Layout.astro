@@ -35,6 +35,10 @@ const { title } = Astro.props;
     <div class="page-content">
       <slot />
     </div>
+    <script>
+      import { initScrollReveal } from '@shared/lib';
+      initScrollReveal();
+    </script>
   </body>
 </html>
 

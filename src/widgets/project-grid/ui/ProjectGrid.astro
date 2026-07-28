@@ -4,7 +4,11 @@ import ProjectCard from './ProjectCard.astro';
 ---
 
 <div class="project-grid">
-  {PROJECTS.map((project) => <ProjectCard project={project} />)}
+  {
+    PROJECTS.map((project, i) => (
+      <ProjectCard project={project} revealDelay={`${(i % 3) * 80}ms`} />
+    ))
+  }
 </div>
 
 <style>
