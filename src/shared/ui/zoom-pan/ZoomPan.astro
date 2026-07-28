@@ -132,7 +132,17 @@ const { class: className, minScale = 1, maxScale = 4 } = Astro.props;
       }
 
       viewport.addEventListener('pointerdown', (event) => {
-        viewport!.setPointerCapture(event.pointerId);
+        // Capture is a nice-to-have (keeps pointermove firing if the cursor
+        // leaves the viewport mid-drag), not required for panning itself —
+        // it can throw (e.g. "no active pointer with the given id") in
+        // edge cases, and an uncaught throw here would abort the rest of
+        // this handler, silently breaking the whole gesture (panStart never
+        // gets set). Swallow and continue either way.
+        try {
+          viewport!.setPointerCapture(event.pointerId);
+        } catch {
+          // no-op — see comment above
+        }
         pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
         if (pointers.size === 1) {
           panStart = { x: event.clientX, y: event.clientY, contentX: x, contentY: y };
@@ -209,7 +219,21 @@ const { class: className, minScale = 1, maxScale = 4 } = Astro.props;
     width: 100%;
     height: 100%;
     object-fit: contain;
-    pointer-events: none; /* drag passes through to the viewport, not native image/svg drag */
+  }
+  /* Raster content has nothing selectable — always pan, never trigger
+     native image-drag. */
+  .zoom-pan__content :global(img) {
+    pointer-events: none;
+  }
+  /* Inlined SVG (e.g. a Mermaid render) can carry real, selectable text —
+     leaving pointer-events at its default lets a drag started directly on
+     a label select text (expected desktop behavior) instead of always
+     panning. Panning itself is unaffected either way: it's driven by
+     pointerdown/pointermove listeners on the viewport (an ancestor), which
+     still fire on bubble regardless of a child's pointer-events value —
+     dragging any non-text area of the diagram pans exactly as before. */
+  .zoom-pan__content :global(svg) {
+    user-select: text;
   }
   .zoom-pan__controls {
     position: absolute;

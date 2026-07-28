@@ -1,4 +1,11 @@
 import type { GalleryRow, ProcessStep } from '../model/types';
+// Raw-imported (not a public/media/ URL like the rest of this file's
+// assets) so BuildSection can inline the real SVG DOM via set:html --
+// crisp at any ZoomPan zoom level and its Mermaid-rendered text labels
+// stay genuinely selectable, neither of which works through an <img src>
+// reference (browsers treat that like an opaque raster image).
+import sitemapDark from './sitemap-dark.svg?raw';
+import sitemapLight from './sitemap-light.svg?raw';
 
 // Content pulled from the live Figma canvas (Project Page/CONNECTIS
 // (Revised), node 2165:2), not reference/content/copy-deck.md — the two
@@ -102,7 +109,7 @@ export const connectis = {
     // via ZoomPan -- see reference/design-system/diagrams/connectis-sitemap
     // (-light).mmd for the source, mermaid-theme.md for the rendering
     // pipeline (2026-07-28).
-    sitemap: { dark: `${M}/sitemap-dark.svg`, light: `${M}/sitemap-light.svg` },
+    sitemap: { dark: sitemapDark, light: sitemapLight },
     caption:
       'Three dependency vulnerabilities patched. Full auth and role-based access, sign-in to sign-out.',
     stats: [

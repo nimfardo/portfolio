@@ -17,18 +17,8 @@ const { sitemap, caption, stats } = Astro.props;
   <div class="build-section__body" data-reveal>
     <div class="build-section__sitemap-frame">
       <ZoomPan>
-        <img
-          class="build-section__sitemap-dark"
-          src={sitemap.dark}
-          alt="CONNECTIS sitemap"
-          loading="lazy"
-        />
-        <img
-          class="build-section__sitemap-light"
-          src={sitemap.light}
-          alt="CONNECTIS sitemap"
-          loading="lazy"
-        />
+        <div class="build-section__sitemap-dark" set:html={sitemap.dark} />
+        <div class="build-section__sitemap-light" set:html={sitemap.light} />
       </ZoomPan>
     </div>
     <p class="build-section__caption">{caption}</p>
@@ -67,14 +57,22 @@ const { sitemap, caption, stats } = Astro.props;
     padding: 40px;
     background: var(--color-bg-subtle);
   }
-  /* Default (dark) shows .build-section__sitemap-dark; light theme swaps to
+  /* Wrapper divs for the inlined SVGs (set:html) — sized so the actual
+     <svg> inside (ZoomPan styles it to width:100%/height:100%) has a real
+     box to resolve against. Default (dark) shows
+     .build-section__sitemap-dark; light theme swaps to
      .build-section__sitemap-light — same display:none/block pattern as
      AnimatedLogo's own dark/light asset swap, since these SVGs bake their
      colors in at render time rather than using currentColor. !important is
-     needed here: ZoomPan's own `.zoom-pan__content :global(img)` rule (1
+     needed here: ZoomPan's own `.zoom-pan__content :global(svg)` rule (1
      class + 1 attribute + 1 element) outranks this plain class selector (1
      class + 1 attribute) on specificity alone, so without it ZoomPan's
-     generic display:block wins and both images show at once. */
+     generic display:block wins and both diagrams show at once. */
+  .build-section__sitemap-dark,
+  .build-section__sitemap-light {
+    width: 100%;
+    height: 100%;
+  }
   .build-section__sitemap-light {
     display: none !important;
   }
