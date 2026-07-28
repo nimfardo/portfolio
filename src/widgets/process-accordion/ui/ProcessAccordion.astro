@@ -27,7 +27,7 @@ const { steps } = Astro.props;
   {
     steps.map((step, index) => (
       <details
-        class="process-step"
+        class:list={['process-step', { 'is-open': index === 0 }]}
         open={index === 0}
         data-reveal
         style={`--reveal-delay: ${staggerDelay(index, 80, 4)}`}
@@ -104,6 +104,14 @@ const { steps } = Astro.props;
       // height), which setting `open` doesn't affect.
       function toggle(open: boolean) {
         animation?.cancel();
+        // Drives the +/- icon swap, decoupled from `details.open` on purpose:
+        // closing must keep `open=true` for the whole collapse (native
+        // <details> hides content the instant `open` is removed, which would
+        // break the height animation), so `details.open` only flips to false
+        // in finish() — if the icon CSS keyed off `[open]` instead of this
+        // class, it'd stay showing "minus" for the entire close animation and
+        // only snap to "plus" after the box had already finished collapsing.
+        details.classList.toggle('is-open', open);
         const startHeight = open ? `${summary!.offsetHeight}px` : `${details.offsetHeight}px`;
         if (open) details.open = true;
         const endHeight = open
@@ -197,11 +205,11 @@ const { steps } = Astro.props;
       opacity var(--duration-base) var(--ease-fade),
       transform var(--duration-base) var(--ease-fade);
   }
-  .process-step:not([open]) :global(.process-step__icon--open) {
+  .process-step:not(.is-open) :global(.process-step__icon--open) {
     opacity: 0;
     transform: rotate(-45deg);
   }
-  .process-step[open] :global(.process-step__icon--closed) {
+  .process-step.is-open :global(.process-step__icon--closed) {
     opacity: 0;
     transform: rotate(45deg);
   }
