@@ -29,7 +29,7 @@ const hasCard = Boolean(eyebrow && headline);
     scrollCue && (
       <div class="project-hero__scroll-cue">
         <p class="project-hero__scroll-text">Scroll down</p>
-        <Icon name="scroll" size={28} />
+        <Icon name="scroll" size={28} class="project-hero__scroll-icon" />
       </div>
     )
   }
@@ -88,6 +88,33 @@ const hasCard = Boolean(eyebrow && headline);
     font-size: var(--font-size-xs);
     line-height: var(--font-line-height-xs);
     color: var(--color-text-primary);
+  }
+  /* :global() required — class merges onto Icon's own rendered <span>
+     (same classlist-merge gotcha as every other Icon consumer). Animates
+     `transform` only so the text/image above never reflow. */
+  @keyframes project-hero-scroll-bounce {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(14px);
+    }
+  }
+  :global(.project-hero__scroll-icon) {
+    animation: project-hero-scroll-bounce 3s ease-in-out infinite;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    :global(.project-hero__scroll-icon) {
+      animation: none;
+    }
+  }
+  /* No mouse on touch devices — the icon doesn't make sense there, the
+     "Scroll down" text alone still carries the cue. */
+  @media (max-width: 767px) {
+    :global(.project-hero__scroll-icon) {
+      display: none;
+    }
   }
 
   .project-hero__card {
