@@ -1,0 +1,43 @@
+---
+// Astro's file-based 404 convention. Figma frame (node 2326:1301) has no
+// nav/header, unlike every other page — Layout's hideNav prop matches that.
+import Layout from '@app/layouts/Layout.astro';
+import { PageNotFoundCat } from '@shared/ui';
+---
+
+<Layout title="Page not found — Max Shturma" hideNav>
+  <main class="not-found">
+    <div class="not-found__illustration">
+      <PageNotFoundCat />
+    </div>
+    <p class="not-found__text">Page not found</p>
+  </main>
+</Layout>
+
+<style>
+  .not-found {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-md);
+    min-height: 100vh;
+    text-align: center;
+  }
+  .not-found__illustration {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 240px;
+    height: 240px;
+    color: var(--color-icon-default);
+  }
+  .not-found__text {
+    margin: 0;
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-2xl);
+    line-height: var(--font-line-height-4xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-text-emphasis);
+  }
+</style>

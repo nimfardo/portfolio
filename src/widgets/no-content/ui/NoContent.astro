@@ -1,0 +1,48 @@
+---
+// Figma `Project Page/CONNECTIS-No Content` (node 2348:1451): shown for any
+// project that has a grid card but no real case-study content written yet
+// — most of them, right now. Shares its illustration with the 404 page
+// (src/pages/404.astro); "No Content yet" is the only copy difference.
+import { PageNotFoundCat } from '@shared/ui';
+
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+---
+
+<div class:list={['no-content', className]}>
+  <div class="no-content__illustration">
+    <PageNotFoundCat />
+  </div>
+  <p class="no-content__text">No Content yet</p>
+</div>
+
+<style>
+  .no-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-md);
+    min-height: 60vh;
+    justify-content: center;
+    text-align: center;
+  }
+  .no-content__illustration {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 240px;
+    height: 240px;
+    color: var(--color-icon-default);
+  }
+  .no-content__text {
+    margin: 0;
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-2xl);
+    line-height: var(--font-line-height-4xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-text-emphasis);
+  }
+</style>

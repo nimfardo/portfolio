@@ -8,84 +8,108 @@ import { ContentSection } from '@widgets/content-section';
 import { ProcessAccordion } from '@widgets/process-accordion';
 import { BuildSection } from '@widgets/build-section';
 import { Retrospective } from '@widgets/retrospective';
-import { connectis } from '@entities/project';
+import { NoContent } from '@widgets/no-content';
+import { PasswordGate } from '@widgets/password-gate';
+import { PROJECTS, PROJECT_CONTENT } from '@entities/project';
 
-// Only CONNECTIS exists so far — Arvus and the rest land once Max approves
-// more hi-fi designs in Figma (see planning/specs/site-implementation.md).
+// Every project card gets a route now, not just the ones with real content
+// written (currently only CONNECTIS) — clicking any other card used to
+// 404. `content` is undefined for a slug with no entry in PROJECT_CONTENT;
+// the template falls back to the No Content state for those.
 export function getStaticPaths() {
-  return [{ params: { slug: connectis.slug }, props: { project: connectis } }];
+  return PROJECTS.map((meta) => ({
+    params: { slug: meta.slug },
+    props: { meta, content: PROJECT_CONTENT[meta.slug] },
+  }));
 }
 
-const { project } = Astro.props;
+const { meta, content } = Astro.props;
+// Gating a project with no content yet would just be a password prompt
+// guarding an empty page — content readiness takes priority over access.
+const isGated = Boolean(content) && meta.access === 'nda';
 ---
 
-<Layout title={`${project.name} — Max Shturma`}>
+<Layout title={`${meta.name} — Max Shturma`}>
   <main class="project-page">
-    <PageHeader title={project.name} showBack backHref="/" class="project-page__header" />
+    <PageHeader title={meta.name} showBack backHref="/" class="project-page__header" />
 
-    <ProjectHero image={project.hero.image} imageAlt={project.hero.imageAlt} scrollCue />
+    {!content && <NoContent />}
 
-    <div class="project-page__sections">
-      <OverviewSection heading={project.overview.heading} tags={project.overview.tags}>
-        {project.overview.text}
-      </OverviewSection>
+    {
+      content && (
+        <PasswordGate active={isGated}>
+          <ProjectHero image={content.hero.image} imageAlt={content.hero.imageAlt} scrollCue />
 
-      <ContentSection
-        heading={project.challenge.heading}
-        blocks={[
-          {
-            image: project.challenge.image,
-            imageAlt: project.challenge.imageAlt,
-            text: project.challenge.text,
-          },
-        ]}
-      />
+          <div class="project-page__sections">
+            <OverviewSection heading={content.overview.heading} tags={content.overview.tags}>
+              {content.overview.text}
+            </OverviewSection>
 
-      <section class="project-page__process">
-        <Heading class="project-page__process-heading">Process</Heading>
-        <div class="project-page__process-body">
-          <ProcessAccordion steps={project.process} />
-        </div>
-      </section>
+            <ContentSection
+              heading={content.challenge.heading}
+              blocks={[
+                {
+                  image: content.challenge.image,
+                  imageAlt: content.challenge.imageAlt,
+                  text: content.challenge.text,
+                },
+              ]}
+            />
 
-      <ContentSection heading={project.deliverables.heading} blocks={project.deliverables.blocks} />
+            <section class="project-page__process">
+              <Heading class="project-page__process-heading">Process</Heading>
+              <div class="project-page__process-body">
+                <ProcessAccordion steps={content.process} />
+              </div>
+            </section>
 
-      <BuildSection
-        sitemapImage={project.build.sitemapImage}
-        caption={project.build.caption}
-        stats={project.build.stats}
-      />
+            <ContentSection heading={content.deliverables.heading} blocks={content.deliverables.blocks} />
 
-      <div class="project-page__gallery">
-        <img
-          class="project-page__gallery-full"
-          src={project.gallery[0]}
-          alt=""
-          loading="lazy"
-          data-reveal
-        />
-        <div class="project-page__gallery-row">
-          <img
-            class="project-page__gallery-tall"
-            src={project.gallery[1]}
-            alt=""
-            loading="lazy"
-            data-reveal
-          />
-          <div class="project-page__gallery-stack">
-            <img src={project.gallery[2]} alt="" loading="lazy" data-reveal />
-            <img src={project.gallery[3]} alt="" loading="lazy" data-reveal style="--reveal-delay: 100ms" />
+            <BuildSection
+              sitemapImage={content.build.sitemapImage}
+              caption={content.build.caption}
+              stats={content.build.stats}
+            />
+
+            <div class="project-page__gallery">
+              <img
+                class="project-page__gallery-full"
+                src={content.gallery[0]}
+                alt=""
+                loading="lazy"
+                data-reveal
+              />
+              <div class="project-page__gallery-row">
+                <img
+                  class="project-page__gallery-tall"
+                  src={content.gallery[1]}
+                  alt=""
+                  loading="lazy"
+                  data-reveal
+                />
+                <div class="project-page__gallery-stack">
+                  <img src={content.gallery[2]} alt="" loading="lazy" data-reveal />
+                  <img
+                    src={content.gallery[3]}
+                    alt=""
+                    loading="lazy"
+                    data-reveal
+                    style="--reveal-delay: 100ms"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <Retrospective
+              heading={content.retrospective.heading}
+              behanceUrl={content.retrospective.behanceUrl}
+            >
+              {content.retrospective.text}
+            </Retrospective>
           </div>
-        </div>
-      </div>
-
-      <Retrospective
-        heading={project.retrospective.heading}
-        behanceUrl={project.retrospective.behanceUrl}
-      >
-        {project.retrospective.text}
-      </Retrospective>
-    </div>
+        </PasswordGate>
+      )
+    }
   </main>
 </Layout>
 

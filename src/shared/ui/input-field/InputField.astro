@@ -1,0 +1,140 @@
+---
+// Figma component `input-field` (password-gate, node 2326:1854): label
+// above a bordered input box, white background regardless of theme (a raw
+// fill in the design, not bound to a bg/* token — matches the screenshot).
+// `type="password"` adds an eye/eye-off toggle using the icons that
+// already exist in the icon set.
+import Icon from '../icon/Icon.astro';
+
+interface Props {
+  label: string;
+  name: string;
+  type?: 'text' | 'password';
+  placeholder?: string;
+  class?: string;
+}
+
+const { label, name, type = 'text', placeholder, class: className } = Astro.props;
+const isPassword = type === 'password';
+---
+
+<div class:list={['input-field', className]}>
+  <label class="input-field__label" for={name}>{label}</label>
+  <div class="input-field__box">
+    <input
+      class="input-field__input"
+      type={isPassword ? 'password' : 'text'}
+      id={name}
+      name={name}
+      placeholder={placeholder}
+      autocomplete={isPassword ? 'off' : undefined}
+      data-input-field-input={isPassword ? '' : undefined}
+    />
+    {
+      isPassword && (
+        <button
+          type="button"
+          class="input-field__toggle"
+          data-input-field-toggle
+          aria-label="Show password"
+        >
+          <Icon name="eye" size={28} class="input-field__icon input-field__icon--show" />
+          <Icon name="eye-off" size={28} class="input-field__icon input-field__icon--hide" />
+        </button>
+      )
+    }
+  </div>
+</div>
+
+<script>
+  // Only password-type inputs render a toggle button, so this is a no-op
+  // wherever there isn't one. Not inside any transition:persist region —
+  // unguarded re-init on every astro:page-load, same as ProcessAccordion.
+  function initInputFieldToggles() {
+    document.querySelectorAll<HTMLButtonElement>('[data-input-field-toggle]').forEach((toggle) => {
+      const box = toggle.closest('.input-field__box');
+      const input = box?.querySelector<HTMLInputElement>('[data-input-field-input]');
+      if (!input) return;
+
+      toggle.addEventListener('click', () => {
+        const willShow = input.type === 'password';
+        input.type = willShow ? 'text' : 'password';
+        toggle.setAttribute('aria-label', willShow ? 'Hide password' : 'Show password');
+        toggle.classList.toggle('input-field__toggle--visible', willShow);
+      });
+    });
+  }
+  document.addEventListener('astro:page-load', initInputFieldToggles);
+</script>
+
+<style>
+  .input-field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    min-width: 320px;
+  }
+  .input-field__label {
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-base);
+    line-height: var(--font-line-height-base);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-primary);
+  }
+  .input-field__box {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    width: 100%;
+    padding: 20px 24px;
+    background: var(--color-white);
+    border-bottom: 1px solid var(--color-border-strong);
+  }
+  /* Hardcoded dark text/icon color, not a text-primary/icon-default token —
+     the box itself is intentionally white in both themes (see above), so
+     its content needs to stay dark-on-white too instead of flipping to a
+     near-white color in dark theme, which would be unreadable. */
+  .input-field__input {
+    flex: 1;
+    min-width: 0;
+    border: none;
+    outline: none;
+    background: none;
+    padding: 0;
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-sm);
+    line-height: var(--font-line-height-sm);
+    color: #2f1c08;
+  }
+  .input-field__input::placeholder {
+    color: #2f1c08;
+    opacity: 0.6;
+  }
+  .input-field__toggle {
+    position: relative;
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #2f1c08;
+  }
+  .input-field__toggle :global(.input-field__icon) {
+    position: absolute;
+    inset: 0;
+    opacity: 1;
+    transition: opacity var(--duration-fast) var(--ease-fade);
+  }
+  .input-field__toggle :global(.input-field__icon--hide) {
+    opacity: 0;
+  }
+  .input-field__toggle--visible :global(.input-field__icon--show) {
+    opacity: 0;
+  }
+  .input-field__toggle--visible :global(.input-field__icon--hide) {
+    opacity: 1;
+  }
+</style>

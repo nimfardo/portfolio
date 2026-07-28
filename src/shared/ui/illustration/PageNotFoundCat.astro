@@ -1,0 +1,29 @@
+---
+// Figma `Illustration/Page not found - cat` (node I2348:1630;2118:1678),
+// shared by the No Content and 404 states. Imported as raw text and
+// inlined via set:html — same pattern as Logo/Icon — because an <img
+// src="*.svg"> renders the file in an isolated context that can't inherit
+// `color`, so the SVG's `fill="currentColor"` would never resolve.
+import catSvg from './page-not-found-cat.svg?raw';
+
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+---
+
+<span class:list={['page-not-found-cat', className]} set:html={catSvg} />
+
+<style>
+  .page-not-found-cat {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .page-not-found-cat :global(svg) {
+    display: block;
+    width: 228px;
+    height: auto;
+  }
+</style>
