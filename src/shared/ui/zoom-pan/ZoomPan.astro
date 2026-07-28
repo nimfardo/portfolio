@@ -1,0 +1,244 @@
+---
+// Generic zoom/pan wrapper for large static content (diagrams, images) that
+// doesn't read comfortably at its natural size in a fixed content column.
+// Wheel-zooms centered on the cursor, drag-pans once zoomed in, pinch-zooms
+// on touch (2-pointer distance tracking), plus +/-/reset buttons — wheel/
+// touch-only zoom is both undiscoverable and inaccessible without a
+// pointing device. No edge-clamping on pan (content maxes out at 4x on a
+// moderately-sized diagram, not large enough to get meaningfully lost) —
+// the reset button always recenters.
+interface Props {
+  class?: string;
+  minScale?: number;
+  maxScale?: number;
+}
+
+const { class: className, minScale = 1, maxScale = 4 } = Astro.props;
+---
+
+<div
+  class:list={['zoom-pan', className]}
+  data-zoom-pan
+  data-min-scale={minScale}
+  data-max-scale={maxScale}
+>
+  <div class="zoom-pan__viewport" data-zoom-pan-viewport>
+    <div class="zoom-pan__content" data-zoom-pan-content>
+      <slot />
+    </div>
+  </div>
+  <div class="zoom-pan__controls">
+    <button type="button" class="zoom-pan__button" data-zoom-pan-out aria-label="Zoom out">−</button
+    >
+    <button type="button" class="zoom-pan__button" data-zoom-pan-reset aria-label="Reset zoom"
+      >100%</button
+    >
+    <button type="button" class="zoom-pan__button" data-zoom-pan-in aria-label="Zoom in">+</button>
+  </div>
+</div>
+
+<script>
+  import { bindOncePersisted, prefersReducedMotion } from '@shared/lib';
+
+  // Not inside any transition:persist region, but bindOncePersisted's guard
+  // is still the simplest way to avoid double-binding if initZoomPan ever
+  // runs twice for the same node within one load (matches the project's
+  // established pattern for this exact class of bug).
+  function initZoomPan() {
+    bindOncePersisted<HTMLElement>('[data-zoom-pan]', (root) => {
+      const viewport = root.querySelector<HTMLElement>('[data-zoom-pan-viewport]');
+      const content = root.querySelector<HTMLElement>('[data-zoom-pan-content]');
+      const btnIn = root.querySelector<HTMLButtonElement>('[data-zoom-pan-in]');
+      const btnOut = root.querySelector<HTMLButtonElement>('[data-zoom-pan-out]');
+      const btnReset = root.querySelector<HTMLButtonElement>('[data-zoom-pan-reset]');
+      if (!viewport || !content) return;
+
+      const minScale = parseFloat(root.dataset.minScale || '1');
+      const maxScale = parseFloat(root.dataset.maxScale || '4');
+
+      let scale = minScale;
+      let x = 0;
+      let y = 0;
+
+      function apply(animated: boolean) {
+        content!.style.transition =
+          animated && !prefersReducedMotion() ? 'transform 0.2s ease-out' : 'none';
+        content!.style.transform = `translate(${x}px, ${y}px) scale(${scale})`;
+        viewport!.style.cursor = scale > minScale ? 'grab' : 'default';
+      }
+
+      function clamp(next: number) {
+        return Math.min(maxScale, Math.max(minScale, next));
+      }
+
+      function zoomAt(clientX: number, clientY: number, factor: number, animated: boolean) {
+        const rect = viewport!.getBoundingClientRect();
+        const originX = clientX - rect.left;
+        const originY = clientY - rect.top;
+        const nextScale = clamp(scale * factor);
+        if (nextScale === scale) return;
+        // Keep the point under the cursor/pinch-midpoint stationary while scaling.
+        x = originX - ((originX - x) / scale) * nextScale;
+        y = originY - ((originY - y) / scale) * nextScale;
+        scale = nextScale;
+        if (scale === minScale) {
+          x = 0;
+          y = 0;
+        }
+        apply(animated);
+      }
+
+      viewport.addEventListener(
+        'wheel',
+        (event) => {
+          event.preventDefault();
+          const factor = event.deltaY < 0 ? 1.2 : 1 / 1.2;
+          zoomAt(event.clientX, event.clientY, factor, false);
+        },
+        { passive: false },
+      );
+
+      btnIn?.addEventListener('click', () => {
+        const rect = viewport!.getBoundingClientRect();
+        zoomAt(rect.left + rect.width / 2, rect.top + rect.height / 2, 1.4, true);
+      });
+      btnOut?.addEventListener('click', () => {
+        const rect = viewport!.getBoundingClientRect();
+        zoomAt(rect.left + rect.width / 2, rect.top + rect.height / 2, 1 / 1.4, true);
+      });
+      btnReset?.addEventListener('click', () => {
+        scale = minScale;
+        x = 0;
+        y = 0;
+        apply(true);
+      });
+
+      // Drag-to-pan (mouse + touch via Pointer Events) doubles as the
+      // pinch-zoom driver: tracks up to 2 active pointers, switching from
+      // pan to distance-based zoom the moment a second one joins.
+      const pointers = new Map<number, { x: number; y: number }>();
+      let panStart: { x: number; y: number; contentX: number; contentY: number } | null = null;
+      let pinchStartDist: number | null = null;
+      let pinchStartScale = 1;
+
+      function pinchDistance() {
+        const pts = [...pointers.values()];
+        if (pts.length < 2) return null;
+        return Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
+      }
+      function pinchMidpoint() {
+        const pts = [...pointers.values()];
+        return { x: (pts[0].x + pts[1].x) / 2, y: (pts[0].y + pts[1].y) / 2 };
+      }
+
+      viewport.addEventListener('pointerdown', (event) => {
+        viewport!.setPointerCapture(event.pointerId);
+        pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+        if (pointers.size === 1) {
+          panStart = { x: event.clientX, y: event.clientY, contentX: x, contentY: y };
+        } else if (pointers.size === 2) {
+          panStart = null;
+          pinchStartDist = pinchDistance();
+          pinchStartScale = scale;
+        }
+      });
+
+      viewport.addEventListener('pointermove', (event) => {
+        if (!pointers.has(event.pointerId)) return;
+        pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+
+        if (pointers.size === 2 && pinchStartDist) {
+          const dist = pinchDistance();
+          if (!dist) return;
+          const mid = pinchMidpoint();
+          const targetScale = clamp(pinchStartScale * (dist / pinchStartDist));
+          const rect = viewport!.getBoundingClientRect();
+          const originX = mid.x - rect.left;
+          const originY = mid.y - rect.top;
+          x = originX - ((originX - x) / scale) * targetScale;
+          y = originY - ((originY - y) / scale) * targetScale;
+          scale = targetScale;
+          apply(false);
+          return;
+        }
+
+        if (panStart && scale > minScale) {
+          x = panStart.contentX + (event.clientX - panStart.x);
+          y = panStart.contentY + (event.clientY - panStart.y);
+          apply(false);
+        }
+      });
+
+      function endPointer(event: PointerEvent) {
+        pointers.delete(event.pointerId);
+        if (pointers.size < 2) pinchStartDist = null;
+        if (pointers.size === 0) panStart = null;
+      }
+      viewport.addEventListener('pointerup', endPointer);
+      viewport.addEventListener('pointercancel', endPointer);
+      viewport.addEventListener('pointerleave', endPointer);
+
+      apply(false);
+    });
+  }
+
+  document.addEventListener('astro:page-load', initZoomPan);
+</script>
+
+<style>
+  .zoom-pan {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+  .zoom-pan__viewport {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    touch-action: none; /* pan/pinch handled ourselves via Pointer Events */
+  }
+  .zoom-pan__content {
+    width: 100%;
+    height: 100%;
+    transform-origin: 0 0;
+    will-change: transform;
+  }
+  .zoom-pan__content :global(img),
+  .zoom-pan__content :global(svg) {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    pointer-events: none; /* drag passes through to the viewport, not native image/svg drag */
+  }
+  .zoom-pan__controls {
+    position: absolute;
+    right: 16px;
+    bottom: 16px;
+    display: flex;
+    gap: 4px;
+    padding: 4px;
+    background: var(--color-bg-elevated);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-full);
+  }
+  .zoom-pan__button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 32px;
+    height: 32px;
+    padding: 0 10px;
+    border: none;
+    background: transparent;
+    border-radius: var(--radius-full);
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-xs);
+    color: var(--color-text-primary);
+    cursor: pointer;
+    transition: background-color var(--duration-fast) var(--ease-fade);
+  }
+  .zoom-pan__button:hover {
+    background: var(--color-bg-muted);
+  }
+</style>

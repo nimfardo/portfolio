@@ -42,7 +42,7 @@ export const connectis = {
         type: 'video',
         src: `${M}/process/step2-what.webm`,
         poster: `${M}/process/step2-what-poster.jpg`,
-        alt: 'Hand-sketching CONNECTIS\'s lo-fi wireframes on paper — dashboard, analytics and reports, vehicles, and settings screens — next to a laptop',
+        alt: "Hand-sketching CONNECTIS's lo-fi wireframes on paper — dashboard, analytics and reports, vehicles, and settings screens — next to a laptop",
       },
       body: 'Built sitemaps, user stories, and lo-fi wireframes into a high-fidelity Figma component library with Level-II token architecture for light and dark modes. Delivered a systematic design foundation structured for fast, accurate AI translation.',
     },
@@ -97,7 +97,12 @@ export const connectis = {
     ],
   },
   build: {
-    sitemapImage: `${M}/sitemap.png`,
+    // sitemap.png (Figma export, wrong fallback font + drifted from the
+    // current .mmd source) replaced by a real Mermaid render, interactive
+    // via ZoomPan -- see reference/design-system/diagrams/connectis-sitemap
+    // (-light).mmd for the source, mermaid-theme.md for the rendering
+    // pipeline (2026-07-28).
+    sitemap: { dark: `${M}/sitemap-dark.svg`, light: `${M}/sitemap-light.svg` },
     caption:
       'Three dependency vulnerabilities patched. Full auth and role-based access, sign-in to sign-out.',
     stats: [
@@ -114,7 +119,11 @@ export const connectis = {
   // above now opens on -- dropped to avoid showing that shot twice on the
   // page (2026-07-28).
   gallery: [
-    { type: 'split', tall: `${M}/gallery-2.jpg`, stack: [`${M}/gallery-3.jpg`, `${M}/gallery-4.jpg`] },
+    {
+      type: 'split',
+      tall: `${M}/gallery-2.jpg`,
+      stack: [`${M}/gallery-3.jpg`, `${M}/gallery-4.jpg`],
+    },
   ] satisfies GalleryRow[],
   retrospective: {
     heading: "What I've Learned",

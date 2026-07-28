@@ -1,22 +1,35 @@
 ---
 import { Stat } from '@entities/stat';
 import type { StatData } from '@entities/stat';
-import { Heading } from '@shared/ui';
+import { Heading, ZoomPan } from '@shared/ui';
 
 interface Props {
-  sitemapImage: string;
+  sitemap: { dark: string; light: string };
   caption: string;
   stats: StatData[];
 }
 
-const { sitemapImage, caption, stats } = Astro.props;
+const { sitemap, caption, stats } = Astro.props;
 ---
 
 <section class="build-section">
   <Heading class="build-section__heading">Build</Heading>
   <div class="build-section__body" data-reveal>
     <div class="build-section__sitemap-frame">
-      <img src={sitemapImage} alt="CONNECTIS sitemap" loading="lazy" />
+      <ZoomPan>
+        <img
+          class="build-section__sitemap-dark"
+          src={sitemap.dark}
+          alt="CONNECTIS sitemap"
+          loading="lazy"
+        />
+        <img
+          class="build-section__sitemap-light"
+          src={sitemap.light}
+          alt="CONNECTIS sitemap"
+          loading="lazy"
+        />
+      </ZoomPan>
     </div>
     <p class="build-section__caption">{caption}</p>
     <div class="build-section__stats">
@@ -45,15 +58,31 @@ const { sitemapImage, caption, stats } = Astro.props;
     gap: 80px;
   }
   .build-section__sitemap-frame {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    /* Same box every other content image on this page uses (see
+       ContentSection.astro) — was free-height-sized to the PNG's own
+       intrinsic ratio before, now a fixed, consistent frame; ZoomPan/the
+       diagram fit inside via object-fit:contain instead of the photo
+       object-fit:cover other sections use, so graph content never crops. */
+    aspect-ratio: 1071 / 630;
     padding: 40px;
     background: var(--color-bg-subtle);
   }
-  .build-section__sitemap-frame img {
-    width: 100%;
-    height: auto;
+  /* Default (dark) shows .build-section__sitemap-dark; light theme swaps to
+     .build-section__sitemap-light — same display:none/block pattern as
+     AnimatedLogo's own dark/light asset swap, since these SVGs bake their
+     colors in at render time rather than using currentColor. !important is
+     needed here: ZoomPan's own `.zoom-pan__content :global(img)` rule (1
+     class + 1 attribute + 1 element) outranks this plain class selector (1
+     class + 1 attribute) on specificity alone, so without it ZoomPan's
+     generic display:block wins and both images show at once. */
+  .build-section__sitemap-light {
+    display: none !important;
+  }
+  :global([data-theme='light']) .build-section__sitemap-dark {
+    display: none !important;
+  }
+  :global([data-theme='light']) .build-section__sitemap-light {
+    display: block !important;
   }
   .build-section__caption {
     margin: 0;
