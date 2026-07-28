@@ -4,14 +4,16 @@
 // then reveals the page. Shows once per browser session (sessionStorage),
 // not on every internal navigation between static pages.
 //
-// The logo itself is the static SVG mark for now — the animated version
-// (from max-logo.aep) is a follow-up Max will do later; this widget only
-// needs a `logoAnimated` swap-in point when that's ready.
-import { Logo, LoadingIndicator } from '@shared/ui';
+// Logo plays the real Lottie mark once on mount (adapted from Motto's
+// masked-reveal preloader — wiki/concepts/motto-motion-patterns.md),
+// resolving the open "preloader logo" decision in STATE.md. Dark theme
+// only, same as every other AnimatedLogo use — light theme falls back to
+// the static glyph via AnimatedLogo's own CSS.
+import { AnimatedLogo, LoadingIndicator } from '@shared/ui';
 ---
 
 <div class="preloader" id="preloader" data-preloader>
-  <Logo size={64} />
+  <AnimatedLogo size={64} autoplayOnce />
   <LoadingIndicator progress={0} class="preloader__bar" />
 </div>
 
