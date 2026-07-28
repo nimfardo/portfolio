@@ -23,8 +23,8 @@ const { heading, blocks, class: className } = Astro.props;
   <Heading class="content-section__heading">{heading}</Heading>
   <div class="content-section__body">
     {
-      blocks.map((block) => (
-        <div class="content-section__block">
+      blocks.map((block, i) => (
+        <div class="content-section__block" data-reveal style={`--reveal-delay: ${i * 100}ms`}>
           <img
             class="content-section__image"
             src={block.image}

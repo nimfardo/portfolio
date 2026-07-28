@@ -58,12 +58,24 @@ const { project } = Astro.props;
       />
 
       <div class="project-page__gallery">
-        <img class="project-page__gallery-full" src={project.gallery[0]} alt="" loading="lazy" />
+        <img
+          class="project-page__gallery-full"
+          src={project.gallery[0]}
+          alt=""
+          loading="lazy"
+          data-reveal
+        />
         <div class="project-page__gallery-row">
-          <img class="project-page__gallery-tall" src={project.gallery[1]} alt="" loading="lazy" />
+          <img
+            class="project-page__gallery-tall"
+            src={project.gallery[1]}
+            alt=""
+            loading="lazy"
+            data-reveal
+          />
           <div class="project-page__gallery-stack">
-            <img src={project.gallery[2]} alt="" loading="lazy" />
-            <img src={project.gallery[3]} alt="" loading="lazy" />
+            <img src={project.gallery[2]} alt="" loading="lazy" data-reveal />
+            <img src={project.gallery[3]} alt="" loading="lazy" data-reveal style="--reveal-delay: 100ms" />
           </div>
         </div>
       </div>

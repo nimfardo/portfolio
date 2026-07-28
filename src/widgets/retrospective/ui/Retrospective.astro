@@ -12,7 +12,7 @@ const { heading, behanceUrl } = Astro.props;
 
 <section class="retrospective">
   <Heading class="retrospective__heading">{heading}</Heading>
-  <div class="retrospective__body">
+  <div class="retrospective__body" data-reveal>
     <p class="retrospective__text"><slot /></p>
     <Button type="solid" href={behanceUrl} class="retrospective__button">Check on Behance</Button>
     <div class="retrospective__smile">

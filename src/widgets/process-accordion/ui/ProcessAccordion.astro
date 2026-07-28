@@ -20,7 +20,12 @@ const { steps } = Astro.props;
 <div class="process-accordion">
   {
     steps.map((step, index) => (
-      <details class="process-step" open={index === 0}>
+      <details
+        class="process-step"
+        open={index === 0}
+        data-reveal
+        style={`--reveal-delay: ${(index % 4) * 80}ms`}
+      >
         <summary class="process-step__summary">
           <IconBadge class="process-step__number-badge">
             <span class="process-step__number">{step.number}</span>

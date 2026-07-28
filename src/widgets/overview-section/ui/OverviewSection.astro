@@ -15,7 +15,7 @@ const { heading, tags, class: className } = Astro.props;
 
 <section class:list={['overview-section', className]}>
   <Heading class="overview-section__heading">{heading}</Heading>
-  <div class="overview-section__body">
+  <div class="overview-section__body" data-reveal>
     <p class="overview-section__text"><slot /></p>
     <ul class="overview-section__tags">
       {tags.map((tag) => (
