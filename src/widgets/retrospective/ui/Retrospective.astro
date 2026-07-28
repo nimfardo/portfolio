@@ -70,11 +70,27 @@ const { heading, behanceUrl } = Astro.props;
     position: absolute;
     inset: 0;
     display: flex;
+    /* Slow continuous spin on the ring's text path — the smile icon it
+       surrounds stays static/centered. No token fits a multi-second
+       decorative loop (tokens.css's durations are all sub-second UI
+       transitions), so this is a literal value scoped to this component,
+       same precedent as the hero scroll-cue's bounce animation. */
+    animation: retrospective-ring-spin 20s linear infinite;
   }
   .retrospective__smile-ring :global(svg) {
     display: block;
     width: 100%;
     height: 100%;
+  }
+  @keyframes retrospective-ring-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .retrospective__smile-ring {
+      animation: none;
+    }
   }
 
   @media (max-width: 1023px) {
