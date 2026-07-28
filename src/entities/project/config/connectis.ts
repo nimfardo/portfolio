@@ -1,4 +1,4 @@
-import type { ProcessStep } from '../model/types';
+import type { GalleryRow, ProcessStep } from '../model/types';
 
 // Content pulled from the live Figma canvas (Project Page/CONNECTIS
 // (Revised), node 2165:2), not reference/content/copy-deck.md — the two
@@ -92,7 +92,10 @@ export const connectis = {
       { value: '76', unit: 'KB', label: 'Initial JS Bundle' },
     ],
   },
-  gallery: [`${M}/gallery-1.jpg`, `${M}/gallery-2.jpg`, `${M}/gallery-3.jpg`, `${M}/gallery-4.jpg`],
+  gallery: [
+    { type: 'full', image: `${M}/gallery-1.jpg` },
+    { type: 'split', tall: `${M}/gallery-2.jpg`, stack: [`${M}/gallery-3.jpg`, `${M}/gallery-4.jpg`] },
+  ] satisfies GalleryRow[],
   retrospective: {
     heading: "What I've Learned",
     text: 'The lesson: treat AI as part of the process, not a shortcut around it.',

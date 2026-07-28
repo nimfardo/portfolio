@@ -1,0 +1,102 @@
+---
+// Project detail-page gallery — a sequence of rows, each either a
+// full-width image or a tall image + N stacked images (the two shapes
+// that exist on the Figma canvas so far, see entities/project's
+// GalleryRow). Images are decorative on canvas (no per-image alt
+// authored), so every <img> renders alt="".
+import { staggerDelay } from '@shared/lib';
+import type { GalleryRow } from '../model/types';
+
+interface Props {
+  rows: GalleryRow[];
+  class?: string;
+}
+
+const { rows, class: className } = Astro.props;
+---
+
+<div class:list={['project-gallery', className]}>
+  {
+    rows.map((row) =>
+      row.type === 'full' ? (
+        <img class="project-gallery__full" src={row.image} alt="" loading="lazy" data-reveal />
+      ) : (
+        <div class="project-gallery__row">
+          <img class="project-gallery__tall" src={row.tall} alt="" loading="lazy" data-reveal />
+          <div class="project-gallery__stack">
+            {row.stack.map((src, i) => (
+              <img
+                src={src}
+                alt=""
+                loading="lazy"
+                data-reveal
+                style={`--reveal-delay: ${staggerDelay(i, 100)}`}
+              />
+            ))}
+          </div>
+        </div>
+      ),
+    )
+  }
+</div>
+
+<style>
+  .project-gallery {
+    display: flex;
+    flex-direction: column;
+    /* 64px — Frame 13's own internal rhythm between rows, distinct from
+       the page's 160px section gap. */
+    gap: 64px;
+  }
+  .project-gallery__full {
+    width: 100%;
+    aspect-ratio: 1647 / 1000;
+    object-fit: cover;
+  }
+  .project-gallery__row {
+    display: flex;
+    gap: 64px;
+  }
+  .project-gallery__tall {
+    flex: 1;
+    min-width: 0;
+    aspect-ratio: 791.5 / 1000;
+    object-fit: cover;
+  }
+  .project-gallery__stack {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 64px;
+  }
+  .project-gallery__stack img {
+    width: 100%;
+    aspect-ratio: 791.5 / 468;
+    object-fit: cover;
+  }
+
+  @media (max-width: 1023px) {
+    /* Matches .project-page__sections' own rhythm scaling at this
+       breakpoint — same visual weight reduction applies to the gap
+       between gallery rows as to the gap between page sections. */
+    .project-gallery {
+      gap: var(--spacing-4xl);
+    }
+  }
+  @media (max-width: 767px) {
+    .project-gallery {
+      gap: var(--spacing-3xl);
+    }
+    .project-gallery__row {
+      flex-direction: column;
+      gap: var(--spacing-3xl);
+    }
+    .project-gallery__tall {
+      aspect-ratio: 1647 / 1000;
+    }
+    .project-gallery__stack {
+      gap: var(--spacing-3xl);
+    }
+  }
+</style>

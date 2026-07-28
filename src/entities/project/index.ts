@@ -1,4 +1,4 @@
 export { PROJECTS } from './config/projects';
 export { connectis } from './config/connectis';
 export { PROJECT_CONTENT } from './config/content';
-export type { Project, ProjectAccess, ProcessStep } from './model/types';
+export type { Project, ProjectAccess, ProcessStep, GalleryRow } from './model/types';

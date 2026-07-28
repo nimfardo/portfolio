@@ -22,3 +22,11 @@ export interface ProcessStep {
   imageAlt: string;
   body: string;
 }
+
+/** One row of a project's detail-page gallery — the two layout shapes that
+ * exist on the Figma canvas so far: a full-width single image, or a tall
+ * image beside N stacked images. Gallery images are decorative on canvas
+ * (no per-image caption/alt authored), so consumers render `alt=""`. */
+export type GalleryRow =
+  | { type: 'full'; image: string }
+  | { type: 'split'; tall: string; stack: string[] };
