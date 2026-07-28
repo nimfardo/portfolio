@@ -39,14 +39,20 @@ const { icon, class: className } = Astro.props;
     height: 2px;
     background: var(--color-bg-accent);
   }
+  /* Each corner square is centered on its border corner (2px square at
+     -1px/-1px straddles the (0,0) point exactly). The duplicate on the
+     opposite corner needs to move by exactly the badge's own width (80px)
+     to land centered on (80,0)/(80,80) — it was 82px, 2px too far right,
+     which is the misalignment Max caught (corners not flush with the
+     border). */
   .icon-badge::before {
     top: -1px;
     left: -1px;
-    box-shadow: 82px 0 var(--color-bg-accent);
+    box-shadow: 80px 0 var(--color-bg-accent);
   }
   .icon-badge::after {
     bottom: -1px;
     left: -1px;
-    box-shadow: 82px 0 var(--color-bg-accent);
+    box-shadow: 80px 0 var(--color-bg-accent);
   }
 </style>
