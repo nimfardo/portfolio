@@ -1,12 +1,17 @@
 ---
-// Native <details>/<summary> for free, zero-JS expand/collapse — matches
-// Figma's Accordion component (open=true|false variants) exactly, first
-// step open by default. icon/plus <-> icon/minus swap via CSS on [open].
-// The step number renders inside the same 80x80 IconBadge shell used for
-// process-block icons elsewhere — IconBadge's icon prop is optional here
-// and this projects the number through its slot instead. Each step is a
-// single image + paragraph (Figma dropped the old What-we-did/The-Value
+// Native <details>/<summary> — matches Figma's Accordion component
+// (open=true|false variants), first step open by default. The step number
+// renders inside the same 80x80 IconBadge shell used for process-block
+// icons elsewhere — IconBadge's icon prop is optional here and this
+// projects the number through its slot instead. Each step is a single
+// image + paragraph (Figma dropped the old What-we-did/The-Value
 // sub-block split).
+//
+// Open/close is no longer instant: the <script> below animates height via
+// WAAPI (the standard details/summary animation recipe — toggling `open`
+// natively gives no transition hook at all) and the plus/minus icon
+// crossfades+rotates via plain CSS on [open] instead of a hard
+// display:none swap.
 import { Icon, IconBadge } from '@shared/ui';
 import type { ProcessStep } from '../model/types';
 
@@ -32,8 +37,10 @@ const { steps } = Astro.props;
           </IconBadge>
           <span class="process-step__title-row">
             <span class="process-step__title">{step.title}</span>
-            <Icon name="plus" size={32} class="process-step__icon process-step__icon--closed" />
-            <Icon name="minus" size={32} class="process-step__icon process-step__icon--open" />
+            <span class="process-step__icon-swap">
+              <Icon name="plus" size={32} class="process-step__icon process-step__icon--closed" />
+              <Icon name="minus" size={32} class="process-step__icon process-step__icon--open" />
+            </span>
           </span>
         </summary>
         <div class="process-step__content">
@@ -49,6 +56,68 @@ const { steps } = Astro.props;
     ))
   }
 </div>
+
+<script>
+  import { prefersReducedMotion } from '@shared/lib';
+
+  // Native <details> toggling is instant with no transition hook — this is
+  // the standard WAAPI details/summary animation recipe (animate `height`
+  // on the <details> element itself between its current and target height,
+  // flip the `open` attribute once the animation settles). Not inside any
+  // transition:persist region, so re-init unguarded on every
+  // `astro:page-load`, same as scroll-reveal/Media's video observer.
+  function initAccordionAnimations() {
+    if (prefersReducedMotion()) return;
+
+    const root = getComputedStyle(document.documentElement);
+    const duration = parseFloat(root.getPropertyValue('--duration-base')) * 1000;
+    const easing = root.getPropertyValue('--ease-reveal').trim();
+
+    document.querySelectorAll<HTMLDetailsElement>('.process-step').forEach((details) => {
+      const summary = details.querySelector<HTMLElement>('.process-step__summary');
+      const content = details.querySelector<HTMLElement>('.process-step__content');
+      if (!summary || !content) return;
+
+      let animation: Animation | null = null;
+
+      summary.addEventListener('click', (event) => {
+        event.preventDefault();
+        details.style.overflow = 'hidden';
+        if (details.open) {
+          collapse();
+        } else {
+          expand();
+        }
+      });
+
+      function finish(open: boolean) {
+        details.open = open;
+        animation = null;
+        details.style.height = '';
+        details.style.overflow = '';
+      }
+
+      function expand() {
+        animation?.cancel();
+        details.open = true;
+        const startHeight = `${summary!.offsetHeight}px`;
+        const endHeight = `${summary!.offsetHeight + content!.offsetHeight}px`;
+        animation = details.animate({ height: [startHeight, endHeight] }, { duration, easing });
+        animation.onfinish = () => finish(true);
+      }
+
+      function collapse() {
+        animation?.cancel();
+        const startHeight = `${details.offsetHeight}px`;
+        const endHeight = `${summary!.offsetHeight}px`;
+        animation = details.animate({ height: [startHeight, endHeight] }, { duration, easing });
+        animation.onfinish = () => finish(false);
+      }
+    });
+  }
+
+  document.addEventListener('astro:page-load', initAccordionAnimations);
+</script>
 
 <style>
   .process-accordion {
@@ -113,15 +182,29 @@ const { steps } = Astro.props;
     font-weight: var(--font-weight-bold);
     color: var(--color-text-emphasis);
   }
-  .process-step :global(.process-step__icon) {
+  .process-step__icon-swap {
+    position: relative;
     flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+  }
+  .process-step :global(.process-step__icon) {
+    position: absolute;
+    inset: 0;
     color: var(--color-icon-default);
+    opacity: 1;
+    transform: rotate(0deg);
+    transition:
+      opacity var(--duration-base) var(--ease-fade),
+      transform var(--duration-base) var(--ease-fade);
   }
   .process-step:not([open]) :global(.process-step__icon--open) {
-    display: none;
+    opacity: 0;
+    transform: rotate(-45deg);
   }
   .process-step[open] :global(.process-step__icon--closed) {
-    display: none;
+    opacity: 0;
+    transform: rotate(45deg);
   }
 
   .process-step__content {
