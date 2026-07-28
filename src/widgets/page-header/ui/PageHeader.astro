@@ -41,7 +41,12 @@ const { title, showBack = false, backHref = '/', class: className } = Astro.prop
       align-items: center;
       justify-content: space-between;
       height: 48px;
-      margin-bottom: var(--spacing-2xl);
+      /* 40px top+bottom — Figma's real gap on both Home and CONNECTIS
+         (`header` instance sits at y=40 on both frames, and the next
+         element starts exactly 40px after it), not the 48px --spacing-2xl
+         token (bug-012, 2026-07-28). */
+      margin-top: 40px;
+      margin-bottom: 40px;
     }
     .page-header__title-group {
       display: flex;

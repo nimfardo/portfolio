@@ -51,6 +51,11 @@ const hasCard = Boolean(eyebrow && headline);
     display: flex;
     flex-direction: column;
     align-items: center;
+    /* Figma's Hero-section is the exact same 1647px-wide column as every
+       other section on the page (same width/x-offset as Project Overview,
+       Process, etc.) — not full-bleed. Matches .project-page__sections'
+       horizontal padding schedule exactly (bug-012, 2026-07-28). */
+    padding: 0 40px;
   }
 
   .project-hero__image-wrap {
@@ -122,6 +127,10 @@ const hasCard = Boolean(eyebrow && headline);
   }
 
   @media (max-width: 767px) {
+    .project-hero {
+      /* Matches .project-page__sections' own 24px mobile horizontal padding. */
+      padding: 0 24px;
+    }
     .project-hero__image-wrap {
       height: 400px;
     }

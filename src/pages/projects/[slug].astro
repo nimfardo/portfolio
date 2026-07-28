@@ -83,14 +83,13 @@ const { project } = Astro.props;
 <style>
   /* :global() — class merges onto PageHeader's own rendered element, which
      carries PageHeader.astro's astro-cid, not this component's. Only
-     left/right margin — not the full `margin` shorthand — so it doesn't
-     collide with PageHeader's own margin-bottom. Matches
-     .project-page__sections' box model exactly so the header's back-arrow
-     and title line up with the section headings below it at every width. */
+     horizontal padding — not a max-width — so it stays full-bleed like
+     the hero/gallery images and every other page (Home has no page-wide
+     cap either); a max-width here centered the header/sections into a
+     column narrower than the full-bleed hero above ~1900px viewports,
+     which read as misaligned even though it was mathematically symmetric
+     (bug-012, 2026-07-28). */
   :global(.project-page__header) {
-    max-width: 1727px;
-    margin-left: auto;
-    margin-right: auto;
     padding: 0 40px;
   }
   .project-page__sections {
@@ -100,14 +99,6 @@ const { project } = Astro.props;
        directly off the Figma frame's child y-positions, consistent across
        all 8 gaps. Not a token; this page's own established rhythm. */
     gap: 160px;
-    /* 1647px is Figma's real CONTENT width (excluding page margins) — but
-       box-sizing:border-box (global.css) means max-width caps the border
-       box INCLUDING this rule's own 40px+40px horizontal padding. Without
-       adding that back, content was capping 80px short of Figma's true
-       width at full viewport size, which was quietly skewing the 33/66
-       column math below (bug-004c) even before that fix landed. */
-    max-width: 1727px;
-    margin: 0 auto;
     padding: 160px 40px;
   }
   .project-page__process {

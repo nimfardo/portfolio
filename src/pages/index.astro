@@ -15,4 +15,12 @@ import { ProjectGrid } from '@widgets/project-grid';
   .home {
     padding: var(--spacing-xl) 40px;
   }
+
+  /* PageHeader owns its own 40px top margin at this breakpoint (bug-012) —
+     without zeroing this out, the two stack and overshoot Figma's y=40. */
+  @media (min-width: 1024px) {
+    .home {
+      padding-top: 0;
+    }
+  }
 </style>
