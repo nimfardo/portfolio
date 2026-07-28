@@ -7,37 +7,37 @@
 ---
 
 <script>
+  import { bindOncePersisted } from '@shared/lib';
+
   // The trigger/overlay/close elements live inside Navigation's persisted
   // (transition:persist) containers, so they're the same DOM nodes across
-  // every client-side navigation — bind once and skip on repeat
+  // every client-side navigation — bindOncePersisted skips repeat
   // `astro:page-load` fires, or clicks would stack duplicate listeners.
   function initMobileNavToggle() {
-    const trigger = document.querySelector<HTMLElement>('[data-mobile-nav-trigger]');
-    if (!trigger || trigger.dataset.bound) return;
-    trigger.dataset.bound = '1';
+    bindOncePersisted<HTMLElement>('[data-mobile-nav-trigger]', (trigger) => {
+      const overlay = document.querySelector<HTMLElement>('[data-mobile-nav-overlay]');
+      const closeButton = document.querySelector<HTMLElement>('[data-mobile-nav-close]');
 
-    const overlay = document.querySelector<HTMLElement>('[data-mobile-nav-overlay]');
-    const closeButton = document.querySelector<HTMLElement>('[data-mobile-nav-close]');
+      function open() {
+        overlay?.setAttribute('data-open', 'true');
+        trigger.setAttribute('aria-expanded', 'true');
+        document.body.style.overflow = 'hidden';
+      }
 
-    function open() {
-      overlay?.setAttribute('data-open', 'true');
-      trigger?.setAttribute('aria-expanded', 'true');
-      document.body.style.overflow = 'hidden';
-    }
+      function close() {
+        overlay?.removeAttribute('data-open');
+        trigger.setAttribute('aria-expanded', 'false');
+        document.body.style.overflow = '';
+      }
 
-    function close() {
-      overlay?.removeAttribute('data-open');
-      trigger?.setAttribute('aria-expanded', 'false');
-      document.body.style.overflow = '';
-    }
-
-    trigger.addEventListener('click', open);
-    closeButton?.addEventListener('click', close);
-    overlay?.addEventListener('click', (event) => {
-      if (event.target === overlay) close();
-    });
-    document.addEventListener('keydown', (event) => {
-      if (event.key === 'Escape') close();
+      trigger.addEventListener('click', open);
+      closeButton?.addEventListener('click', close);
+      overlay?.addEventListener('click', (event) => {
+        if (event.target === overlay) close();
+      });
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') close();
+      });
     });
   }
 

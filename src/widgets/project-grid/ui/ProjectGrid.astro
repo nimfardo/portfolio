@@ -1,12 +1,13 @@
 ---
 import { PROJECTS } from '@entities/project';
+import { staggerDelay } from '@shared/lib';
 import ProjectCard from './ProjectCard.astro';
 ---
 
 <div class="project-grid" data-project-grid>
   {
     PROJECTS.map((project, i) => (
-      <ProjectCard project={project} revealDelay={`${(i % 3) * 80}ms`} />
+      <ProjectCard project={project} revealDelay={staggerDelay(i, 80, 3)} />
     ))
   }
 </div>

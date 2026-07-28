@@ -125,7 +125,10 @@ const currentPath = Astro.url.pathname;
   // means the underline transition (NavItem.astro) animates when it moves.
   function syncActiveNavItem() {
     document.querySelectorAll<HTMLAnchorElement>('.nav-item').forEach((item) => {
-      if (item.getAttribute('href') === location.pathname) {
+      const isActive = item.getAttribute('href') === location.pathname;
+      const wasActive = item.hasAttribute('aria-current');
+      if (isActive === wasActive) return;
+      if (isActive) {
         item.setAttribute('aria-current', 'page');
       } else {
         item.removeAttribute('aria-current');

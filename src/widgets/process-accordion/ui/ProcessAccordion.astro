@@ -13,6 +13,7 @@
 // crossfades+rotates via plain CSS on [open] instead of a hard
 // display:none swap.
 import { Icon, IconBadge } from '@shared/ui';
+import { staggerDelay } from '@shared/lib';
 import type { ProcessStep } from '../model/types';
 
 interface Props {
@@ -29,7 +30,7 @@ const { steps } = Astro.props;
         class="process-step"
         open={index === 0}
         data-reveal
-        style={`--reveal-delay: ${(index % 4) * 80}ms`}
+        style={`--reveal-delay: ${staggerDelay(index, 80, 4)}`}
       >
         <summary class="process-step__summary">
           <IconBadge class="process-step__number-badge">
@@ -83,11 +84,7 @@ const { steps } = Astro.props;
       summary.addEventListener('click', (event) => {
         event.preventDefault();
         details.style.overflow = 'hidden';
-        if (details.open) {
-          collapse();
-        } else {
-          expand();
-        }
+        toggle(!details.open);
       });
 
       function finish(open: boolean) {
@@ -97,21 +94,23 @@ const { steps } = Astro.props;
         details.style.overflow = '';
       }
 
-      function expand() {
+      // Opening and closing are the same animation with the direction
+      // flipped: cancel whatever's in flight, animate `height` from the
+      // current value to the target, settle `open` on finish. The only
+      // asymmetry is startHeight when opening — `details.open = true` must
+      // happen before reading `content.offsetHeight` for endHeight (that's
+      // how the browser lays out the now-visible content), but startHeight
+      // itself comes from `summary.offsetHeight` either way (the collapsed
+      // height), which setting `open` doesn't affect.
+      function toggle(open: boolean) {
         animation?.cancel();
-        details.open = true;
-        const startHeight = `${summary!.offsetHeight}px`;
-        const endHeight = `${summary!.offsetHeight + content!.offsetHeight}px`;
+        const startHeight = open ? `${summary!.offsetHeight}px` : `${details.offsetHeight}px`;
+        if (open) details.open = true;
+        const endHeight = open
+          ? `${summary!.offsetHeight + content!.offsetHeight}px`
+          : `${summary!.offsetHeight}px`;
         animation = details.animate({ height: [startHeight, endHeight] }, { duration, easing });
-        animation.onfinish = () => finish(true);
-      }
-
-      function collapse() {
-        animation?.cancel();
-        const startHeight = `${details.offsetHeight}px`;
-        const endHeight = `${summary!.offsetHeight}px`;
-        animation = details.animate({ height: [startHeight, endHeight] }, { duration, easing });
-        animation.onfinish = () => finish(false);
+        animation.onfinish = () => finish(open);
       }
     });
   }

@@ -21,11 +21,13 @@ const { class: className } = Astro.props;
 </button>
 
 <script>
+  import { bindOncePersisted } from '@shared/lib';
+
   // The desktop toggle (PageHeader) is fresh, unpersisted markup on every
   // page — needs (re)binding after each `astro:page-load`. The mobile
   // toggle (Navigation's persisted overlay) is the same DOM node the whole
-  // session — the `data-bound` guard stops it from picking up duplicate
-  // click listeners on every subsequent swap.
+  // session — bindOncePersisted stops it from picking up duplicate click
+  // listeners on every subsequent swap.
   const STORAGE_KEY = 'theme';
 
   function syncLabel(button: HTMLElement) {
@@ -41,22 +43,19 @@ const { class: className } = Astro.props;
 
   function initThemeToggle() {
     syncAllLabels();
-    document
-      .querySelectorAll<HTMLButtonElement>('[data-theme-toggle]:not([data-bound])')
-      .forEach((button) => {
-        button.dataset.bound = '1';
-        button.addEventListener('click', () => {
-          const isLight = document.documentElement.dataset.theme === 'light';
-          if (isLight) {
-            delete document.documentElement.dataset.theme;
-            localStorage.setItem(STORAGE_KEY, 'dark');
-          } else {
-            document.documentElement.dataset.theme = 'light';
-            localStorage.setItem(STORAGE_KEY, 'light');
-          }
-          syncAllLabels();
-        });
+    bindOncePersisted<HTMLButtonElement>('[data-theme-toggle]', (button) => {
+      button.addEventListener('click', () => {
+        const isLight = document.documentElement.dataset.theme === 'light';
+        if (isLight) {
+          delete document.documentElement.dataset.theme;
+          localStorage.setItem(STORAGE_KEY, 'dark');
+        } else {
+          document.documentElement.dataset.theme = 'light';
+          localStorage.setItem(STORAGE_KEY, 'light');
+        }
+        syncAllLabels();
       });
+    });
   }
 
   document.addEventListener('astro:page-load', initThemeToggle);

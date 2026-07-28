@@ -31,3 +31,14 @@ export function initScrollReveal(): void {
 
   elements.forEach((el) => observer.observe(el));
 }
+
+/**
+ * `--reveal-delay` value for the Nth item in a staggered group (e.g. grid
+ * columns, accordion steps) — cycles every `mod` items if given, so a
+ * multi-row/column layout staggers each row/column the same way instead of
+ * accumulating one long delay across the whole list.
+ */
+export function staggerDelay(index: number, stepMs: number, mod?: number): string {
+  const i = mod ? index % mod : index;
+  return `${i * stepMs}ms`;
+}

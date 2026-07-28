@@ -3,6 +3,7 @@
 // Challenge (1 block) and Deliverables (2 blocks, one heading over both:
 // Brand Development + Design System merged into one Figma section).
 import { Heading } from '@shared/ui';
+import { staggerDelay } from '@shared/lib';
 
 interface ContentBlock {
   image: string;
@@ -24,7 +25,7 @@ const { heading, blocks, class: className } = Astro.props;
   <div class="content-section__body">
     {
       blocks.map((block, i) => (
-        <div class="content-section__block" data-reveal style={`--reveal-delay: ${i * 100}ms`}>
+        <div class="content-section__block" data-reveal style={`--reveal-delay: ${staggerDelay(i, 100)}`}>
           <img
             class="content-section__image"
             src={block.image}
