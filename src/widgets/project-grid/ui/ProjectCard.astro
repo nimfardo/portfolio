@@ -81,13 +81,17 @@ const { project, revealDelay } = Astro.props;
     }
 
     /* Dim-siblings-on-hover, adapted from wearemotto.com's `.h-fade-invert`
-       (wiki/concepts/motto-motion-patterns.md): hovering the grid dims every
-       card's media, then the specifically-hovered card overrides back to
-       full opacity — focuses attention without any JS. `:global()` is
-       required here since `.project-grid` belongs to ProjectGrid.astro, a
-       different component's scope (same gotcha as the Icon color race in
-       bug-002/bug-004). */
-    :global(.project-grid:hover) .project-card__media {
+       (wiki/concepts/motto-motion-patterns.md). Trigger is a JS-toggled
+       `.project-grid--card-hover` class (see ProjectGrid.astro's script),
+       not a bare `.project-grid:hover` — that fired for the gap space
+       between cards too, dimming everything just from moving the cursor
+       through the gutters (caught by Max). A `:has(.project-card:hover)`
+       CSS-only version was tried first but didn't reliably invalidate style
+       on sibling cards when tested live, so this uses an explicit class
+       instead. `:global()` is required since `.project-grid` belongs to
+       ProjectGrid.astro, a different component's scope (same gotcha as the
+       Icon color race in bug-002/bug-004). */
+    :global(.project-grid--card-hover) .project-card__media {
       opacity: 0.4;
     }
     .project-card:hover .project-card__media {

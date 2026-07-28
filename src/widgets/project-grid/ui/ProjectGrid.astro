@@ -3,13 +3,34 @@ import { PROJECTS } from '@entities/project';
 import ProjectCard from './ProjectCard.astro';
 ---
 
-<div class="project-grid">
+<div class="project-grid" data-project-grid>
   {
     PROJECTS.map((project, i) => (
       <ProjectCard project={project} revealDelay={`${(i % 3) * 80}ms`} />
     ))
   }
 </div>
+
+<script>
+  // Dim-siblings-on-hover (ProjectCard.astro's `.project-grid--card-hover`
+  // rule) needs its trigger to be an actual card, not the grid container —
+  // a bare `.project-grid:hover` fires for the gap space between cards too
+  // (Max caught this reading as a bug). `:has(.project-card:hover)` is the
+  // pure-CSS equivalent but didn't reliably invalidate style on sibling
+  // cards when tested, so this uses plain non-bubbling mouseenter/mouseleave
+  // on each card instead — simple, and every current AND future page-load's
+  // cards need this re-wired after `astro:page-load` (ClientRouter swaps
+  // aren't guaranteed to keep this exact set of nodes around).
+  function initProjectGridHover() {
+    const grid = document.querySelector<HTMLElement>('[data-project-grid]');
+    if (!grid) return;
+    grid.querySelectorAll<HTMLElement>('.project-card').forEach((card) => {
+      card.addEventListener('mouseenter', () => grid.classList.add('project-grid--card-hover'));
+      card.addEventListener('mouseleave', () => grid.classList.remove('project-grid--card-hover'));
+    });
+  }
+  document.addEventListener('astro:page-load', initProjectGridHover);
+</script>
 
 <style>
   .project-grid {
