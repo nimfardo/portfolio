@@ -1,3 +1,5 @@
+import type { IconName } from '@shared/ui';
+
 export type ProjectAccess = 'public' | 'nda';
 
 export interface Project {
@@ -20,7 +22,9 @@ export type ProcessStepMedia =
   | { type: 'video'; src: string; poster?: string; alt: string };
 
 export interface ProcessStep {
-  number: string;
+  /** Figma dropped the plain step number in favor of a per-step icon in
+   * the same 80x80 badge shell (comp update synced from node 2304:1490). */
+  icon: IconName;
   title: string;
   media: ProcessStepMedia;
   body: string;

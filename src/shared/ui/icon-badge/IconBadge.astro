@@ -8,14 +8,18 @@ import type { IconName } from '../icon/Icon.astro';
 
 interface Props {
   icon?: IconName;
+  /** Icon glyph size in px, passed straight to Icon. Default 48 matches
+   * this badge's original process-block icon usage; process-accordion
+   * passes 32 to match its icons' real Figma frame. */
+  size?: number;
   class?: string;
 }
 
-const { icon, class: className } = Astro.props;
+const { icon, size = 48, class: className } = Astro.props;
 ---
 
 <span class:list={['icon-badge', className]}>
-  {icon ? <Icon name={icon} size={48} /> : <slot />}
+  {icon ? <Icon name={icon} size={size} /> : <slot />}
 </span>
 
 <style>

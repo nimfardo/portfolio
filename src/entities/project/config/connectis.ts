@@ -32,7 +32,7 @@ export const connectis = {
   },
   process: [
     {
-      number: '01',
+      icon: 'ai',
       title: 'AI-driven Product Strategy and Framing',
       media: {
         type: 'image',
@@ -43,7 +43,7 @@ export const connectis = {
       body: 'Accelerated market research, user personas, journey mapping, and problem framing using AI. Compressed discovery and scoping from months to days without sacrificing depth.',
     },
     {
-      number: '02',
+      icon: 'architecture',
       title: 'Tokenized Design System and Architecture',
       media: {
         type: 'video',
@@ -54,7 +54,7 @@ export const connectis = {
       body: 'Built sitemaps, user stories, and lo-fi wireframes into a high-fidelity Figma component library with Level-II token architecture for light and dark modes. Delivered a systematic design foundation structured for fast, accurate AI translation.',
     },
     {
-      number: '03',
+      icon: 'integration',
       title: 'Figma-to-Claude Integration and Documentation',
       media: {
         type: 'image',
@@ -64,7 +64,7 @@ export const connectis = {
       body: 'Used Claude to parse Figma layouts, design tokens, and visual direction directly. Automated generation of PRDs, user flows, and precise UI reference specs from a single source of truth.',
     },
     {
-      number: '04',
+      icon: 'code',
       title: 'AI-assisted Build and PoC Delivery',
       media: {
         type: 'image',

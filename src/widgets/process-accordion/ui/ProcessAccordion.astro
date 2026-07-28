@@ -6,13 +6,11 @@
 // attribute: that was tried and reverted, since setting `details.open =
 // true` on the newly-opened step makes the browser instantly force-close
 // same-named siblings itself, which snapped the previous step shut before
-// its own WAAPI collapse animation ever got a chance to run. The step
-// number
-// renders inside the same 80x80 IconBadge shell used for process-block
-// icons elsewhere — IconBadge's icon prop is optional here and this
-// projects the number through its slot instead. Each step is a single
-// image + paragraph (Figma dropped the old What-we-did/The-Value
-// sub-block split).
+// its own WAAPI collapse animation ever got a chance to run. Each step's
+// icon (per-step, synced from Figma node 2304:1490 — replaced the plain
+// step number this badge used to show) renders at 32px inside the same
+// 80x80 IconBadge shell. Each step is a single image + paragraph (Figma
+// dropped the old What-we-did/The-Value sub-block split).
 //
 // Open/close is no longer instant: the <script> below animates height via
 // WAAPI (the standard details/summary animation recipe — toggling `open`
@@ -40,9 +38,7 @@ const { steps } = Astro.props;
         style={`--reveal-delay: ${staggerDelay(index, 80, 4)}`}
       >
         <summary class="process-step__summary">
-          <IconBadge class="process-step__number-badge">
-            <span class="process-step__number">{step.number}</span>
-          </IconBadge>
+          <IconBadge icon={step.icon} size={32} class="process-step__number-badge" />
           <span class="process-step__title-row">
             <span class="process-step__title">{step.title}</span>
             <span class="process-step__icon-swap">
@@ -190,12 +186,6 @@ const { steps } = Astro.props;
      carries IconBadge.astro's astro-cid, not this component's. */
   :global(.process-step__number-badge) {
     flex-shrink: 0;
-  }
-  .process-step__number {
-    font-family: var(--font-family-body);
-    font-size: var(--font-size-xl);
-    line-height: var(--font-line-height-xl);
-    color: var(--color-text-primary);
   }
   .process-step__title-row {
     /* Figma nests title+icon in their own row (951px wide, space-between)
