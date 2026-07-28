@@ -1,34 +1,14 @@
 ---
-// Marquee copy is copy-deck.md's literal "Footer marquee" line — still
-// framed as "Product Designer," which predates the 2026-07-22 positioning
-// update to "Design Engineer" (.context/identity.md). Not rewritten here;
-// this task is motion, not a copy audit, and the deck's staleness is a
-// tracked open item (STATE.md), not silently resolved by picking new words.
-import { Marquee } from '@shared/ui';
-
-const MARQUEE_TEXT = 'MAKSYM SHTURMA · PRODUCT DESIGNER · OPEN TO WORK · ';
 ---
 
 <footer class="footer">
-  <Marquee text={MARQUEE_TEXT} class="footer__marquee" />
   <p class="footer__text">© 2026 Max Shturma</p>
 </footer>
 
 <style>
   .footer {
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: var(--spacing-lg);
-  }
-  .footer__marquee {
-    mask-image: linear-gradient(
-      to right,
-      transparent,
-      black var(--spacing-2xl),
-      black calc(100% - var(--spacing-2xl)),
-      transparent
-    );
+    justify-content: center;
   }
   .footer__text {
     margin: 0;
