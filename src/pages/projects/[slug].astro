@@ -11,6 +11,7 @@ import { Retrospective } from '@widgets/retrospective';
 import { NoContent } from '@widgets/no-content';
 import { PasswordGate } from '@widgets/password-gate';
 import { ProjectGallery } from '@widgets/project-gallery';
+import { VideoSection } from '@widgets/video-section';
 import { PROJECTS, PROJECT_CONTENT } from '@entities/project';
 
 // Every project card gets a route now, not just the ones with real content
@@ -71,6 +72,8 @@ const isGated = Boolean(content) && meta.access === 'nda';
               caption={content.build.caption}
               stats={content.build.stats}
             />
+
+            <VideoSection src={content.video.src} poster={content.video.poster} alt={content.video.alt} />
 
             <ProjectGallery rows={content.gallery} />
 

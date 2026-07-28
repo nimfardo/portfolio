@@ -14,8 +14,9 @@ export const connectis = {
   // here moves to its own ContentSection-style block in Task 3, sourced
   // fresh from canvas rather than carried over guessed.
   hero: {
-    image: `${M}/hero.jpg`,
-    imageAlt: 'CONNECTIS — dashboard viewed from inside a fleet vehicle',
+    image: `${M}/hero.png`,
+    imageAlt:
+      'CONNECTIS fleet dashboard UI on a tablet — European vehicle map, health score, and action-needed queue',
   },
   overview: {
     heading: 'Project Overview',
@@ -91,6 +92,11 @@ export const connectis = {
       { value: '394', label: 'Commits, One Month' },
       { value: '76', unit: 'KB', label: 'Initial JS Bundle' },
     ],
+  },
+  video: {
+    src: `${M}/sign-in-dashboard.webm`,
+    poster: `${M}/sign-in-dashboard-poster.jpg`,
+    alt: 'CONNECTIS product walkthrough — sign-in screen through to the fleet dashboard',
   },
   gallery: [
     { type: 'full', image: `${M}/gallery-1.jpg` },

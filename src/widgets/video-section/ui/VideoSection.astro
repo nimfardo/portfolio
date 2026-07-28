@@ -1,0 +1,39 @@
+---
+// Full-width, aspect-ratio-locked video block for a project's detail page
+// (first use: CONNECTIS's sign-in/dashboard walkthrough after Build).
+// `Media` has no intrinsic sizing of its own — this is its first real
+// consumer — so the wrapper here owns width:100%/aspect-ratio (matched to
+// the real source dimensions) and forces `Media`'s own root to fill it,
+// letting `object-fit: cover` (already built into `Media`) do the rest.
+import { Media } from '@entities/media';
+
+interface Props {
+  src: string;
+  poster?: string;
+  alt: string;
+  class?: string;
+}
+
+const { src, poster, alt, class: className } = Astro.props;
+---
+
+<div class:list={['video-section', className]}>
+  <Media type="video" src={src} poster={poster} alt={alt} class="video-section__media" />
+</div>
+
+<style>
+  .video-section {
+    width: 100%;
+    /* Matches the real source video's dimensions (1920x1080) — no letterbox,
+       no crop needed at its own native ratio; object-fit:cover (Media's own
+       CSS) still handles any container/source mismatch on a future video. */
+    aspect-ratio: 16 / 9;
+  }
+  /* :global() — class merges onto Media's own rendered root <div> (same
+     classlist-merge pattern as every other Icon/PageHeader consumer in this
+     codebase), not a descendant, so Media has a real box to fill. */
+  :global(.video-section__media) {
+    width: 100%;
+    height: 100%;
+  }
+</style>
