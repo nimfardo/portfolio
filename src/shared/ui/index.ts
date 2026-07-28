@@ -9,3 +9,4 @@ export { default as Icon } from './icon/Icon.astro';
 export type { IconName } from './icon/Icon.astro';
 export { default as IconBadge } from './icon-badge/IconBadge.astro';
 export { default as Heading } from './heading/Heading.astro';
+export { default as Marquee } from './marquee/Marquee.astro';
