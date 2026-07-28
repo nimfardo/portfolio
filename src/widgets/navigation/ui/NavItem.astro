@@ -37,7 +37,6 @@ const { href, active = false, large = false } = Astro.props;
     letter-spacing: 0.04em;
     text-transform: uppercase;
     color: var(--color-text-primary);
-    transition: color var(--duration-base) var(--ease-fade);
   }
   .nav-item::after {
     content: '';
@@ -50,9 +49,6 @@ const { href, active = false, large = false } = Astro.props;
     transform: scaleX(0);
     transform-origin: right center;
     transition: transform var(--duration-slow) var(--ease-reveal);
-  }
-  .nav-item:hover {
-    color: var(--color-text-accent);
   }
   .nav-item:hover::after,
   .nav-item[aria-current='page']::after {
