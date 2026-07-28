@@ -4,12 +4,11 @@
 // then reveals the page. Shows once per browser session (sessionStorage),
 // not on every internal navigation between static pages.
 //
-// Logo plays the real Lottie mark once on mount (adapted from Motto's
-// masked-reveal preloader — wiki/concepts/motto-motion-patterns.md),
-// resolving the open "preloader logo" decision in STATE.md. Dark theme
-// only, same as every other AnimatedLogo use — light theme falls back to
-// the static glyph via AnimatedLogo's own CSS.
-import { AnimatedLogo, LoadingIndicator } from '@shared/ui';
+// Static logo, not AnimatedLogo — Max didn't like the current Lottie
+// export (raw/max-logo.json) and will provide a replacement later. This
+// also removes the dotlottie-wc fetch-abort/InvalidStateError console
+// noise feat-019 logged as an open ClientRouter-transition caveat.
+import { Logo, LoadingIndicator } from '@shared/ui';
 ---
 
 {
@@ -20,7 +19,7 @@ import { AnimatedLogo, LoadingIndicator } from '@shared/ui';
      (sessionStorage-gated) regardless, so nothing else needs to change. */
 }
 <div class="preloader" id="preloader" data-preloader transition:persist>
-  <AnimatedLogo size={64} autoplayOnce />
+  <Logo size={64} />
   <LoadingIndicator progress={0} class="preloader__bar" />
 </div>
 
