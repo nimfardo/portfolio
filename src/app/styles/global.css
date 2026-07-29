@@ -29,6 +29,53 @@ svg {
   max-width: 100%;
 }
 
+/* Responsive type scale — a code-side decision (fix list 2026-07-29), NOT
+   from Figma; lives here so tokens.css stays purely Figma-generated and
+   survives re-pulls. Display sizes (3xl+) step down on tablet (~0.88x)
+   and mobile (~0.7x); body sizes (xs–2xl) stay put for readability.
+   Loaded after tokens.css (Layout.astro import order), so these win.
+   Size/line-height pairs are overridden together so widgets that
+   cross-pair tokens (e.g. size-4xl with line-height-5xl) keep sane
+   ratios at every breakpoint. */
+@media (max-width: 1023px) {
+  :root {
+    --font-size-3xl: 28px;
+    --font-size-4xl: 36px;
+    --font-size-5xl: 40px;
+    --font-size-6xl: 56px;
+    --font-size-7xl: 64px;
+    --font-size-8xl: 80px;
+    --font-size-9xl: 104px;
+
+    --font-line-height-3xl: 36px;
+    --font-line-height-4xl: 44px;
+    --font-line-height-5xl: 48px;
+    --font-line-height-6xl: 64px;
+    --font-line-height-7xl: 72px;
+    --font-line-height-8xl: 88px;
+    --font-line-height-9xl: 112px;
+  }
+}
+@media (max-width: 767px) {
+  :root {
+    --font-size-3xl: 28px;
+    --font-size-4xl: 28px;
+    --font-size-5xl: 32px;
+    --font-size-6xl: 40px;
+    --font-size-7xl: 48px;
+    --font-size-8xl: 56px;
+    --font-size-9xl: 72px;
+
+    --font-line-height-3xl: 36px;
+    --font-line-height-4xl: 38px;
+    --font-line-height-5xl: 40px;
+    --font-line-height-6xl: 48px;
+    --font-line-height-7xl: 56px;
+    --font-line-height-8xl: 64px;
+    --font-line-height-9xl: 80px;
+  }
+}
+
 /* Scroll-reveal primitive (shared/lib/scroll-reveal.ts), adapted from
    wearemotto.com/work's line/element reveal pattern — see
    wiki/concepts/motto-motion-patterns.md. `--reveal-delay` lets a consumer
