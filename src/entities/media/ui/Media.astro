@@ -64,9 +64,10 @@ const videoFallbackSrc = type === 'video' ? src.replace(/\.webm$/i, '.mp4') : un
 
     const observer = new IntersectionObserver(
       (entries) => {
+        const atLeastTablet = isViewportAtLeast('tablet');
         for (const entry of entries) {
           const video = entry.target as HTMLVideoElement;
-          if (entry.isIntersecting && isViewportAtLeast('tablet')) {
+          if (entry.isIntersecting && atLeastTablet) {
             video.muted = true;
             void video.play().catch(() => {
               // Autoplay can still be blocked by the browser — the poster

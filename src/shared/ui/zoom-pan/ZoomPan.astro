@@ -78,6 +78,10 @@ const { class: className, minScale = 1, maxScale = 4 } = Astro.props;
       let scale = minScale;
       let x = 0;
       let y = 0;
+      // Cached instead of read on every wheel/pointermove event — recomputed
+      // on pointerdown (gesture start) and window resize, the only two times
+      // it can actually change during a session.
+      let cachedRect = viewport.getBoundingClientRect();
 
       function apply(animated: boolean) {
         content!.style.transition =
@@ -91,7 +95,7 @@ const { class: className, minScale = 1, maxScale = 4 } = Astro.props;
       }
 
       function zoomAt(clientX: number, clientY: number, factor: number, animated: boolean) {
-        const rect = viewport!.getBoundingClientRect();
+        const rect = cachedRect;
         const originX = clientX - rect.left;
         const originY = clientY - rect.top;
         const nextScale = clamp(scale * factor);
@@ -151,6 +155,7 @@ const { class: className, minScale = 1, maxScale = 4 } = Astro.props;
       }
 
       viewport.addEventListener('pointerdown', (event) => {
+        cachedRect = viewport!.getBoundingClientRect();
         // Capture is a nice-to-have (keeps pointermove firing if the cursor
         // leaves the viewport mid-drag), not required for panning itself —
         // it can throw (e.g. "no active pointer with the given id") in
@@ -181,7 +186,7 @@ const { class: className, minScale = 1, maxScale = 4 } = Astro.props;
           if (!dist) return;
           const mid = pinchMidpoint();
           const targetScale = clamp(pinchStartScale * (dist / pinchStartDist));
-          const rect = viewport!.getBoundingClientRect();
+          const rect = cachedRect;
           const originX = mid.x - rect.left;
           const originY = mid.y - rect.top;
           x = originX - ((originX - x) / scale) * targetScale;
@@ -206,6 +211,10 @@ const { class: className, minScale = 1, maxScale = 4 } = Astro.props;
       viewport.addEventListener('pointerup', endPointer);
       viewport.addEventListener('pointercancel', endPointer);
       viewport.addEventListener('pointerleave', endPointer);
+
+      window.addEventListener('resize', () => {
+        cachedRect = viewport!.getBoundingClientRect();
+      });
 
       apply(false);
     });
