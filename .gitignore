@@ -64,6 +64,9 @@ env/
 .ruff_cache/
 *.egg-info/
 
+# Adobe After Effects
+*.aep
+
 # Misc build / cache
 .cache/
 .parcel-cache/
