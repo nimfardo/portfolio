@@ -151,8 +151,11 @@ const isGated = Boolean(content) && meta.access === 'nda';
   }
   @media (max-width: 767px) {
     .project-page__sections {
-      gap: var(--spacing-3xl);
-      padding: var(--spacing-3xl) 24px;
+      /* Bumped from --spacing-3xl (64px) — too tight to read as a real
+         section break while scrolling on a phone (Max caught this live).
+         Matches the tablet breakpoint's value now. */
+      gap: var(--spacing-4xl);
+      padding: var(--spacing-4xl) 24px;
     }
   }
 </style>
