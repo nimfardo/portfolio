@@ -162,6 +162,9 @@ const currentPath = Astro.url.pathname;
       flex-direction: column;
       gap: 40px;
     }
+    .nav-desktop__top > a {
+      display: flex;
+    }
     .nav-desktop__items {
       display: flex;
       flex-direction: column;
@@ -191,6 +194,14 @@ const currentPath = Astro.url.pathname;
     background: var(--color-bg-default);
     border-bottom: 1px solid var(--color-border-default);
     z-index: 900;
+  }
+  /* The logo anchors are plain inline elements around an inline-flex span,
+     so the line box adds descender space below the glyph — the logo box
+     grows ~4px taller than the logo and sits visibly above the header's
+     vertical center. Flex anchors shrink-wrap the glyph exactly. */
+  .nav-mobile-header > a,
+  .nav-mobile-overlay__top > a {
+    display: flex;
   }
   .nav-mobile-header__trigger {
     display: flex;
