@@ -61,11 +61,20 @@ const hasCard = Boolean(eyebrow && headline);
   .project-hero__image-wrap {
     position: relative;
     width: 100%;
-    height: 800px;
+    /* Bare variant shows the whole image: hero masters are exported
+       1647×800 from Figma, and the content column is narrower than 1647px
+       at laptop widths, so a fixed 800px height + cover was cropping the
+       mockup horizontally. aspect-ratio reserves the box before the image
+       loads (no CLS); the fixed-height cover-crop lives on the card
+       variant only, where the portrait challenge image behind the card
+       makes cropping intentional. */
+    aspect-ratio: 1647 / 800;
   }
   /* Only the card variant needs the image pulled up underneath it — the
      bare scroll-cue variant sits in normal flow below the image instead. */
   .project-hero__image-wrap--card {
+    aspect-ratio: auto;
+    height: 800px;
     margin-bottom: -230px;
   }
   .project-hero__image {
@@ -158,10 +167,8 @@ const hasCard = Boolean(eyebrow && headline);
       /* Matches .project-page__sections' own 24px mobile horizontal padding. */
       padding: 0 24px;
     }
-    .project-hero__image-wrap {
-      height: 400px;
-    }
     .project-hero__image-wrap--card {
+      height: 400px;
       margin-bottom: -120px;
     }
     .project-hero__card {
