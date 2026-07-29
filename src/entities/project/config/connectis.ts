@@ -21,7 +21,7 @@ export const connectis = {
   // here moves to its own ContentSection-style block in Task 3, sourced
   // fresh from canvas rather than carried over guessed.
   hero: {
-    image: `${M}/hero.png`,
+    image: `${M}/hero.jpg`,
     imageAlt:
       'CONNECTIS fleet dashboard UI on a tablet — European vehicle map, health score, and action-needed queue',
   },

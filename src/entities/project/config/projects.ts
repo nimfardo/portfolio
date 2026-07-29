@@ -18,7 +18,7 @@ export const PROJECTS: Project[] = [
     category: 'Security · B2B',
     tags: ['ux', 'ui', 'brand', 'motion'],
     access: 'public',
-    thumbnail: '/media/arvus/thumbnail.png',
+    thumbnail: '/media/arvus/thumbnail.jpg',
   },
   {
     slug: 'defenceSystems',
@@ -26,7 +26,7 @@ export const PROJECTS: Project[] = [
     category: 'Military',
     tags: ['brand', 'ux', 'ui', 'motion'],
     access: 'nda',
-    thumbnail: '/media/defenceSystems/thumbnail.png',
+    thumbnail: '/media/defenceSystems/thumbnail.jpg',
   },
   {
     slug: 'connectis',
@@ -34,13 +34,13 @@ export const PROJECTS: Project[] = [
     category: 'Enterprise · Logistics',
     tags: ['ux', 'ui', 'design system', 'code'],
     access: 'public',
-    thumbnail: '/media/connectis/thumbnail.png',
+    thumbnail: '/media/connectis/thumbnail.jpg',
   },
   {
     slug: 'medicalSoftware',
     name: 'medicalSoftware',
     access: 'nda',
-    thumbnail: '/media/medicalSoftware/thumbnail.png',
+    thumbnail: '/media/medicalSoftware/thumbnail.jpg',
   },
   {
     slug: 'enterpriseIt',
@@ -48,7 +48,7 @@ export const PROJECTS: Project[] = [
     category: 'Enterprise tools',
     tags: ['ux', 'ui', 'dashboards'],
     access: 'nda',
-    thumbnail: '/media/enterpriseIt/thumbnail.png',
+    thumbnail: '/media/enterpriseIt/thumbnail.jpg',
   },
   {
     slug: 'eLearning',
@@ -62,13 +62,13 @@ export const PROJECTS: Project[] = [
     slug: 'art-annanolli',
     name: 'Art Annanolli',
     access: 'public',
-    thumbnail: '/media/art-annanolli/thumbnail.png',
+    thumbnail: '/media/art-annanolli/thumbnail.jpg',
   },
   {
     slug: 'logofolio',
     name: 'Logofolio',
     access: 'public',
-    thumbnail: '/media/logofolio/thumbnail.png',
+    thumbnail: '/media/logofolio/thumbnail.jpg',
   },
   {
     slug: 'socialVideo',
@@ -76,13 +76,13 @@ export const PROJECTS: Project[] = [
     category: 'Social video',
     tags: ['ux', 'ui', 'motion', 'design system'],
     access: 'nda',
-    thumbnail: '/media/socialVideo/thumbnail.png',
+    thumbnail: '/media/socialVideo/thumbnail.jpg',
   },
   {
     slug: 'metest',
     name: 'MeTest',
     access: 'public',
-    thumbnail: '/media/metest/thumbnail.png',
+    thumbnail: '/media/metest/thumbnail.jpg',
   },
   {
     slug: 'seismo',
@@ -94,6 +94,6 @@ export const PROJECTS: Project[] = [
     slug: 'khvyliasti',
     name: 'Khvyliasti',
     access: 'public',
-    thumbnail: '/media/khvyliasti/thumbnail.png',
+    thumbnail: '/media/khvyliasti/thumbnail.jpg',
   },
 ];
