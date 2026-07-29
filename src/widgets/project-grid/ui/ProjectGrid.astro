@@ -7,7 +7,7 @@ import ProjectCard from './ProjectCard.astro';
 <div class="project-grid" data-project-grid>
   {
     PROJECTS.map((project, i) => (
-      <ProjectCard project={project} revealDelay={staggerDelay(i, 80, 3)} />
+      <ProjectCard project={project} revealDelay={staggerDelay(i, 80, 3)} eager={i < 3} />
     ))
   }
 </div>

@@ -23,7 +23,7 @@ const hasCard = Boolean(eyebrow && headline);
 
 <section class:list={['project-hero', className]}>
   <div class:list={['project-hero__image-wrap', { 'project-hero__image-wrap--card': hasCard }]}>
-    <img class="project-hero__image" src={image} alt={imageAlt} loading="lazy" />
+    <img class="project-hero__image" src={image} alt={imageAlt} />
   </div>
   {
     scrollCue && (

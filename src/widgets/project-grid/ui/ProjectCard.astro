@@ -5,9 +5,10 @@ import type { Project } from '@entities/project';
 interface Props {
   project: Project;
   revealDelay?: string;
+  eager?: boolean;
 }
 
-const { project, revealDelay } = Astro.props;
+const { project, revealDelay, eager } = Astro.props;
 ---
 
 <a
@@ -17,7 +18,7 @@ const { project, revealDelay } = Astro.props;
   style={revealDelay ? `--reveal-delay: ${revealDelay}` : undefined}
 >
   <div class="project-card__media">
-    <img src={project.thumbnail} alt={project.name} loading="lazy" />
+    <img src={project.thumbnail} alt={project.name} loading={eager ? undefined : 'lazy'} />
   </div>
   <div class="project-card__footer">
     <span class="project-card__name">{project.name}</span>
