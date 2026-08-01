@@ -53,12 +53,16 @@ const { title, showBack = false, backHref = '/', class: className } = Astro.prop
       align-items: center;
       gap: var(--spacing-lg);
     }
+    /* Manrope/xl/regular, synced from the "header" master (node 2304:1538,
+       bug-033). Was 2xl/bold with a hardcoded 48px line-height — that was
+       the bug-005 style-vs-variable divergence special case, which no
+       longer applies now that this style sits cleanly on its own size
+       step's tokens. */
     .page-header__title {
       font-family: var(--font-family-body);
-      font-size: var(--font-size-2xl);
-      /* 48px, not the shared 2xl token (32px) — see shared/ui/heading. */
-      line-height: 48px;
-      font-weight: var(--font-weight-bold);
+      font-size: var(--font-size-xl);
+      line-height: var(--font-line-height-xl);
+      font-weight: var(--font-weight-regular);
       color: var(--color-text-primary);
     }
     .page-header__back {
