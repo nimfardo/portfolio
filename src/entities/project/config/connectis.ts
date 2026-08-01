@@ -1,4 +1,4 @@
-import type { GalleryRow, ProcessStep } from '../model/types';
+import type { GalleryRow, ProcessStep, ProjectMedia } from '../model/types';
 // Raw-imported (not a public/media/ URL like the rest of this file's
 // assets) so BuildSection can inline the real SVG DOM via set:html --
 // crisp at any ZoomPan zoom level and its Mermaid-rendered text labels
@@ -20,11 +20,18 @@ export const connectis = {
   // image + scroll cue. The "Challenge" eyebrow/headline that used to live
   // here moves to its own ContentSection-style block in Task 3, sourced
   // fresh from canvas rather than carried over guessed.
+  //
+  // Now a video (feat-031). It opens on a black fade-in, so the poster is
+  // pulled from the dashboard shot at t=3s rather than frame 0 — that's the
+  // only still phone users see, since Media gates video autoplay to tablet
+  // width and up. hero.jpg (the still this replaced) is left in place,
+  // unreferenced.
   hero: {
-    image: `${M}/hero.jpg`,
-    imageAlt:
-      'CONNECTIS fleet dashboard UI on a tablet — European vehicle map, health score, and action-needed queue',
-  },
+    type: 'video',
+    src: `${M}/hero.webm`,
+    poster: `${M}/hero-poster.jpg`,
+    alt: "CONNECTIS in use — a fleet operator's dual-monitor setup showing the Analytics & Reports and Dashboard screens above a full vehicle lot, cutting to a driver's view of an open road",
+  } satisfies ProjectMedia,
   overview: {
     heading: 'Project Overview',
     text: 'CONNECTIS is a command center for fleet operators — one dashboard replacing spreadsheets and phone calls.',

@@ -40,7 +40,7 @@ const isGated = Boolean(content) && meta.access === 'nda';
     {
       content && (
         <PasswordGate active={isGated}>
-          <ProjectHero image={content.hero.image} imageAlt={content.hero.imageAlt} scrollCue />
+          <ProjectHero media={content.hero} scrollCue />
 
           <div class="project-page__sections">
             <OverviewSection heading={content.overview.heading} tags={content.overview.tags}>

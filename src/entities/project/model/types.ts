@@ -14,12 +14,21 @@ export interface Project {
 }
 
 /** Project-detail-page content types — shared between entities/project's
- * per-project data files and widgets/process-accordion's renderer. Live
- * here (not in the widget) so entities never imports upward from widgets,
- * per FSD's layer rule. */
-export type ProcessStepMedia =
+ * per-project data files and the widgets that render them. Live here (not
+ * in the widgets) so entities never imports upward from widgets, per FSD's
+ * layer rule. */
+
+/** A content slot that can hold either a still or a video. Used by the page
+ * hero (feat-031) and by each process step (feat-026). Video slots name the
+ * .webm — entities/media derives the .mp4 fallback by swapping the
+ * extension, so both must ship under the same basename. */
+export type ProjectMedia =
   | { type: 'image'; image: string; imageAlt: string }
   | { type: 'video'; src: string; poster?: string; alt: string };
+
+/** Alias — process-accordion re-exports this name, and the shape is
+ * identical now that the hero shares the same union. */
+export type ProcessStepMedia = ProjectMedia;
 
 export interface ProcessStep {
   /** Figma dropped the plain step number in favor of a per-step icon in
