@@ -17,8 +17,7 @@ export const connectis = {
   // Now a video (feat-031). It opens on a black fade-in, so the poster is
   // pulled from the dashboard shot at t=3s rather than frame 0 — that's the
   // only still phone users see, since Media gates video autoplay to tablet
-  // width and up. hero.jpg (the still this replaced) is left in place,
-  // unreferenced.
+  // width and up.
   hero: {
     type: 'video',
     src: `${M}/hero.webm`,
@@ -32,8 +31,7 @@ export const connectis = {
   },
   // Figma reverted the per-step icons (feat-028) back to plain numbers, and
   // dropped the media from steps 03/04 — `media` is optional now, and those
-  // two steps render as title + paragraph only. step3-what.jpg and
-  // step4-what.jpg are consequently unreferenced, left in place.
+  // two steps render as title + paragraph only.
   process: [
     {
       number: '01',
@@ -89,9 +87,7 @@ export const connectis = {
   },
   // Brand Development + Design System used to be two separately-headed
   // sections; Figma merged them under one "Deliverables" heading with both
-  // caption blocks stacked underneath. Both are videos as of feat-032 --
-  // brand-development.jpg and design-system.jpg (the stills they replaced)
-  // are left on disk unreferenced.
+  // caption blocks stacked underneath. Both are videos as of feat-032.
   deliverables: {
     heading: 'Deliverables',
     blocks: [
@@ -117,8 +113,7 @@ export const connectis = {
   },
   build: {
     // Was an interactive Mermaid sitemap (feat-027) rendered through
-    // ZoomPan; Max replaced it with footage of the real build. The .mmd
-    // sources and both rendered SVGs are still in the repo, unreferenced.
+    // ZoomPan; Max replaced it with footage of the real build.
     media: {
       type: 'video',
       src: `${M}/build.webm`,

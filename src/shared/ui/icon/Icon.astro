@@ -1,16 +1,12 @@
 ---
-import iconAi from './svg/ai.svg?raw';
-import iconArchitecture from './svg/architecture.svg?raw';
 import iconArrowRight from './svg/arrow-right.svg?raw';
 import iconArrowLeft from './svg/arrow-left.svg?raw';
 import iconArrowUp from './svg/arrow-up.svg?raw';
 import iconBehance from './svg/behance.svg?raw';
 import iconClose from './svg/close.svg?raw';
-import iconCode from './svg/code.svg?raw';
 import iconDrop from './svg/drop.svg?raw';
 import iconEye from './svg/eye.svg?raw';
 import iconEyeOff from './svg/eye-off.svg?raw';
-import iconIntegration from './svg/integration.svg?raw';
 import iconLeaf from './svg/leaf.svg?raw';
 import iconLinkedin from './svg/linkedin.svg?raw';
 import iconLocker from './svg/locker.svg?raw';
@@ -23,18 +19,14 @@ import iconTree from './svg/tree.svg?raw';
 import iconWaves from './svg/waves.svg?raw';
 
 const icons = {
-  ai: iconAi,
-  architecture: iconArchitecture,
   'arrow-right': iconArrowRight,
   'arrow-left': iconArrowLeft,
   'arrow-up': iconArrowUp,
   behance: iconBehance,
   close: iconClose,
-  code: iconCode,
   drop: iconDrop,
   eye: iconEye,
   'eye-off': iconEyeOff,
-  integration: iconIntegration,
   leaf: iconLeaf,
   linkedin: iconLinkedin,
   locker: iconLocker,
@@ -57,15 +49,7 @@ export type IconName = keyof typeof icons;
 // how this was diagnosed. So: render each glyph at its own intrinsic size,
 // then scale it by size/nativeFrame to match how Figma scales an icon
 // instance up or down, instead of stretching it to fill an arbitrary box.
-const FRAME_32_ICONS = new Set<IconName>([
-  'linkedin',
-  'behance',
-  'smile',
-  'ai',
-  'architecture',
-  'integration',
-  'code',
-]);
+const FRAME_32_ICONS = new Set<IconName>(['linkedin', 'behance', 'smile']);
 
 interface Props {
   name: IconName;
