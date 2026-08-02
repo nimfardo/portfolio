@@ -1,5 +1,3 @@
-import type { IconName } from '@shared/ui';
-
 export type ProjectAccess = 'public' | 'nda';
 
 export interface Project {
@@ -30,12 +28,22 @@ export type ProjectMedia =
  * identical now that the hero shares the same union. */
 export type ProcessStepMedia = ProjectMedia;
 
+/** One media+paragraph block inside a ContentSection (Challenge's single
+ * block, Deliverables' two). Same image|video union as the hero and the
+ * process steps — Deliverables' blocks are both videos as of feat-032. */
+export interface ContentBlock {
+  media: ProjectMedia;
+  text: string;
+}
+
 export interface ProcessStep {
-  /** Figma dropped the plain step number in favor of a per-step icon in
-   * the same 80x80 badge shell (comp update synced from node 2304:1490). */
-  icon: IconName;
+  /** Figma went back to a plain "01"–"04" number in the 80x80 badge shell,
+   * reverting the per-step icon feat-028 synced (node 2124:3405). */
+  number: string;
   title: string;
-  media: ProcessStepMedia;
+  /** Optional — Figma dropped the media from steps 03 and 04, which now
+   * render as title + paragraph only. */
+  media?: ProcessStepMedia;
   body: string;
 }
 

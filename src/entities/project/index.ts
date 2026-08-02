@@ -5,6 +5,7 @@ export type {
   Project,
   ProjectAccess,
   ProjectMedia,
+  ContentBlock,
   ProcessStep,
   ProcessStepMedia,
   GalleryRow,

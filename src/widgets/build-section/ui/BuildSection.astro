@@ -1,26 +1,40 @@
 ---
+// The interactive Mermaid sitemap (feat-027) that used to sit here — two
+// pre-rendered SVGs inlined via set:html and wrapped in ZoomPan — was
+// replaced by a plain media slot at Max's request: same image|video union
+// every other slot on this page uses. ZoomPan, both sitemap SVGs and their
+// .mmd sources are all left on disk unreferenced rather than deleted.
 import { Stat } from '@entities/stat';
 import type { StatData } from '@entities/stat';
-import { Heading, ZoomPan } from '@shared/ui';
+import { Media } from '@entities/media';
+import { Heading } from '@shared/ui';
+import type { ProjectMedia } from '@entities/project';
 
 interface Props {
-  sitemap: { dark: string; light: string };
+  media: ProjectMedia;
   caption: string;
   stats: StatData[];
 }
 
-const { sitemap, caption, stats } = Astro.props;
+const { media, caption, stats } = Astro.props;
 ---
 
 <section class="build-section">
   <Heading class="build-section__heading">Build</Heading>
   <div class="build-section__body" data-reveal>
-    <div class="build-section__sitemap-frame">
-      <ZoomPan>
-        <div class="build-section__sitemap-dark" set:html={sitemap.dark} />
-        <div class="build-section__sitemap-light" set:html={sitemap.light} />
-      </ZoomPan>
-    </div>
+    {
+      media.type === 'image' ? (
+        <img class="build-section__media" src={media.image} alt={media.imageAlt} loading="lazy" />
+      ) : (
+        <Media
+          type="video"
+          class="build-section__media"
+          src={media.src}
+          poster={media.poster}
+          alt={media.alt}
+        />
+      )
+    }
     <p class="build-section__caption">{caption}</p>
     <div class="build-section__stats">
       {stats.map((stat) => <Stat value={stat.value} unit={stat.unit} label={stat.label} />)}
@@ -47,40 +61,16 @@ const { sitemap, caption, stats } = Astro.props;
     flex-direction: column;
     gap: 80px;
   }
-  .build-section__sitemap-frame {
-    /* Same box every other content image on this page uses (see
-       ContentSection.astro) — was free-height-sized to the PNG's own
-       intrinsic ratio before, now a fixed, consistent frame; ZoomPan/the
-       diagram fit inside via object-fit:contain instead of the photo
-       object-fit:cover other sections use, so graph content never crops. */
-    aspect-ratio: 1071 / 630;
-    padding: 40px;
-    background: var(--color-bg-subtle);
-  }
-  /* Wrapper divs for the inlined SVGs (set:html) — sized so the actual
-     <svg> inside (ZoomPan styles it to width:100%/height:100%) has a real
-     box to resolve against. Default (dark) shows
-     .build-section__sitemap-dark; light theme swaps to
-     .build-section__sitemap-light — same display:none/block pattern as
-     AnimatedLogo's own dark/light asset swap, since these SVGs bake their
-     colors in at render time rather than using currentColor. !important is
-     needed here: ZoomPan's own `.zoom-pan__content :global(svg)` rule (1
-     class + 1 attribute + 1 element) outranks this plain class selector (1
-     class + 1 attribute) on specificity alone, so without it ZoomPan's
-     generic display:block wins and both diagrams show at once. */
-  .build-section__sitemap-dark,
-  .build-section__sitemap-light {
+  /* Same box every other content media on this page uses (see
+     ContentSection.astro) — no padding/bg-subtle frame anymore: that
+     existed to give the Mermaid diagram breathing room, and the video
+     fills the frame edge to edge at its native 1070x630.
+     :global() for the usual classlist-merge reason — in the video branch
+     the class lands on Media's own rendered root, not a descendant. */
+  :global(.build-section__media) {
     width: 100%;
-    height: 100%;
-  }
-  .build-section__sitemap-light {
-    display: none !important;
-  }
-  :global([data-theme='light']) .build-section__sitemap-dark {
-    display: none !important;
-  }
-  :global([data-theme='light']) .build-section__sitemap-light {
-    display: block !important;
+    aspect-ratio: 1071 / 630;
+    object-fit: cover;
   }
   .build-section__caption {
     margin: 0;

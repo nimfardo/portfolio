@@ -1,11 +1,4 @@
-import type { GalleryRow, ProcessStep, ProjectMedia } from '../model/types';
-// Raw-imported (not a public/media/ URL like the rest of this file's
-// assets) so BuildSection can inline the real SVG DOM via set:html --
-// crisp at any ZoomPan zoom level and its Mermaid-rendered text labels
-// stay genuinely selectable, neither of which works through an <img src>
-// reference (browsers treat that like an opaque raster image).
-import sitemapDark from './sitemap-dark.svg?raw';
-import sitemapLight from './sitemap-light.svg?raw';
+import type { ContentBlock, GalleryRow, ProcessStep, ProjectMedia } from '../model/types';
 
 // Content pulled from the live Figma canvas (Project Page/CONNECTIS
 // (Revised), node 2165:2), not reference/content/copy-deck.md — the two
@@ -35,11 +28,15 @@ export const connectis = {
   overview: {
     heading: 'Project Overview',
     text: 'CONNECTIS is a command center for fleet operators — one dashboard replacing spreadsheets and phone calls.',
-    tags: ['Logistics', 'Solo designer', 'brand · ux', '2026'],
+    tags: ['Logistics', 'Solo designer', 'Research · UX/UI · Brand · Prototype · Motion', '2026'],
   },
+  // Figma reverted the per-step icons (feat-028) back to plain numbers, and
+  // dropped the media from steps 03/04 — `media` is optional now, and those
+  // two steps render as title + paragraph only. step3-what.jpg and
+  // step4-what.jpg are consequently unreferenced, left in place.
   process: [
     {
-      icon: 'ai',
+      number: '01',
       title: 'AI-driven Product Strategy and Framing',
       media: {
         type: 'image',
@@ -50,7 +47,7 @@ export const connectis = {
       body: 'Accelerated market research, user personas, journey mapping, and problem framing using AI. Compressed discovery and scoping from months to days without sacrificing depth.',
     },
     {
-      icon: 'architecture',
+      number: '02',
       title: 'Tokenized Design System and Architecture',
       media: {
         type: 'video',
@@ -61,24 +58,13 @@ export const connectis = {
       body: 'Built sitemaps, user stories, and lo-fi wireframes into a high-fidelity Figma component library with Level-II token architecture for light and dark modes. Delivered a systematic design foundation structured for fast, accurate AI translation.',
     },
     {
-      icon: 'integration',
+      number: '03',
       title: 'Figma-to-Claude Integration and Documentation',
-      media: {
-        type: 'image',
-        image: `${M}/process/step3-what.jpg`,
-        imageAlt: 'Figma layouts translated into a structured data graph for Claude',
-      },
       body: 'Used Claude to parse Figma layouts, design tokens, and visual direction directly. Automated generation of PRDs, user flows, and precise UI reference specs from a single source of truth.',
     },
     {
-      icon: 'code',
+      number: '04',
       title: 'AI-assisted Build and PoC Delivery',
-      media: {
-        type: 'image',
-        image: `${M}/process/step4-what.jpg`,
-        imageAlt:
-          'Claude Code building the CONNECTIS dashboard, live preview alongside the terminal session',
-      },
       body: 'Fed design data straight into code-generation pipelines for instant iteration, then immediately usability-tested the output. Replaced slow handoffs to build and validate a working PoC in record time.',
     },
   ] satisfies ProcessStep[],
@@ -86,42 +72,67 @@ export const connectis = {
   // design system, shipped as a working product.") is gone — replaced by
   // the Challenge block below (real content, not a banner) and the merged
   // Deliverables section immediately after it.
+  // Same {heading, blocks} shape as deliverables below — ContentSection
+  // renders both, Challenge just happens to have a single block.
   challenge: {
     heading: 'Challenge',
-    image: `${M}/challenge.jpg`,
-    imageAlt: 'CONNECTIS — a fleet operations manager in a glass-walled meeting room',
-    text: 'Transform fragmented data into prioritized actions to prevent downtime.',
+    blocks: [
+      {
+        media: {
+          type: 'image',
+          image: `${M}/challenge.jpg`,
+          imageAlt: 'CONNECTIS — a fleet operations manager in a glass-walled meeting room',
+        },
+        text: 'Transform fragmented data into prioritized actions to prevent downtime.',
+      },
+    ] satisfies ContentBlock[],
   },
   // Brand Development + Design System used to be two separately-headed
   // sections; Figma merged them under one "Deliverables" heading with both
-  // image+caption blocks stacked underneath.
+  // caption blocks stacked underneath. Both are videos as of feat-032 --
+  // brand-development.jpg and design-system.jpg (the stills they replaced)
+  // are left on disk unreferenced.
   deliverables: {
     heading: 'Deliverables',
     blocks: [
       {
-        image: `${M}/brand-development.jpg`,
-        imageAlt: 'CONNECTIS brand identity — Michroma wordmark and network mark',
+        media: {
+          type: 'video',
+          src: `${M}/brand-development.webm`,
+          poster: `${M}/brand-development-poster.jpg`,
+          alt: 'CONNECTIS brand identity — the connected-network monogram drawn on its geometric construction grid, the app icon sitting in a macOS dock, and the Michroma typeface specimen',
+        },
         text: 'Geometric precision: a Michroma wordmark, zero decoration, one connected network mark for the fleet.',
       },
       {
-        image: `${M}/design-system.jpg`,
-        imageAlt: 'CONNECTIS two-tiered design token architecture',
+        media: {
+          type: 'video',
+          src: `${M}/design-system.webm`,
+          poster: `${M}/design-system-poster.jpg`,
+          alt: "CONNECTIS's token architecture — a radial map of the two tiers, then the reference layer's full colour ramps, then the semantic layer wired on top of them",
+        },
         text: 'A 2-tiered token system — a foundational reference layer feeding a semantic layer built for the product.',
       },
-    ],
+    ] satisfies ContentBlock[],
   },
   build: {
-    // sitemap.png (Figma export, wrong fallback font + drifted from the
-    // current .mmd source) replaced by a real Mermaid render, interactive
-    // via ZoomPan -- see reference/design-system/diagrams/connectis-sitemap
-    // (-light).mmd for the source, mermaid-theme.md for the rendering
-    // pipeline (2026-07-28).
-    sitemap: { dark: sitemapDark, light: sitemapLight },
+    // Was an interactive Mermaid sitemap (feat-027) rendered through
+    // ZoomPan; Max replaced it with footage of the real build. The .mmd
+    // sources and both rendered SVGs are still in the repo, unreferenced.
+    media: {
+      type: 'video',
+      src: `${M}/build.webm`,
+      poster: `${M}/build-poster.jpg`,
+      alt: 'Building CONNECTIS — a Claude Code session running in the terminal, then the dashboard it produced: fleet health score, live incident map, and the action-needed queue',
+    } satisfies ProjectMedia,
     caption:
       'Three dependency vulnerabilities patched. Full auth and role-based access, sign-in to sign-out.',
     stats: [
       { value: '394', label: 'Commits, One Month' },
-      { value: '76', unit: 'KB', label: 'Initial JS Bundle' },
+      // Was "76 KB / Initial JS Bundle" -- a build metric that didn't read
+      // as meaningful next to the velocity stat. Three roles (admin,
+      // executive, ops_manager) counted off the real route graph.
+      { value: '3', label: 'Roles, One Codebase' },
     ],
   },
   video: {
@@ -141,7 +152,7 @@ export const connectis = {
   ] satisfies GalleryRow[],
   retrospective: {
     heading: "What I've Learned",
-    text: 'The lesson: treat AI as part of the process, not a shortcut around it.',
+    text: 'A fully functioning, production-ready POC built, tested, and validated in record time—proving the value proposition before writing traditional code.',
     behanceUrl: 'https://www.behance.net/gallery/251016127/CONNECTIS-Fleet-Intelligence-Platform',
   },
 };

@@ -7,10 +7,11 @@
 // true` on the newly-opened step makes the browser instantly force-close
 // same-named siblings itself, which snapped the previous step shut before
 // its own WAAPI collapse animation ever got a chance to run. Each step's
-// icon (per-step, synced from Figma node 2304:1490 — replaced the plain
-// step number this badge used to show) renders at 32px inside the same
-// 80x80 IconBadge shell. Each step is a single image + paragraph (Figma
-// dropped the old What-we-did/The-Value sub-block split).
+// number ("01"–"04") renders through the slot of the same 80x80 IconBadge
+// shell — Figma reverted the per-step icons feat-028 had synced back to a
+// plain number (node 2124:3405). Each step is a paragraph, optionally
+// preceded by one image or video: steps 03 and 04 currently have no media
+// on canvas, so they render text-only.
 //
 // Open/close is no longer instant: the <script> below animates height via
 // WAAPI (the standard details/summary animation recipe — toggling `open`
@@ -38,7 +39,9 @@ const { steps } = Astro.props;
         style={`--reveal-delay: ${staggerDelay(index, 80, 4)}`}
       >
         <summary class="process-step__summary">
-          <IconBadge icon={step.icon} size={32} class="process-step__number-badge" />
+          <IconBadge class="process-step__number-badge">
+            <span class="process-step__number">{step.number}</span>
+          </IconBadge>
           <span class="process-step__title-row">
             <span class="process-step__title">{step.title}</span>
             <span class="process-step__icon-swap">
@@ -48,24 +51,23 @@ const { steps } = Astro.props;
           </span>
         </summary>
         <div class="process-step__content">
-          {
-            step.media.type === 'image' ? (
-              <img
-                class="process-step__image"
-                src={step.media.image}
-                alt={step.media.imageAlt}
-                loading="lazy"
-              />
-            ) : (
-              <Media
-                type="video"
-                class="process-step__image"
-                src={step.media.src}
-                poster={step.media.poster}
-                alt={step.media.alt}
-              />
-            )
-          }
+          {step.media?.type === 'image' && (
+            <img
+              class="process-step__image"
+              src={step.media.image}
+              alt={step.media.imageAlt}
+              loading="lazy"
+            />
+          )}
+          {step.media?.type === 'video' && (
+            <Media
+              type="video"
+              class="process-step__image"
+              src={step.media.src}
+              poster={step.media.poster}
+              alt={step.media.alt}
+            />
+          )}
           <p class="process-step__text">{step.body}</p>
         </div>
       </details>
@@ -186,6 +188,15 @@ const { steps } = Astro.props;
      carries IconBadge.astro's astro-cid, not this component's. */
   :global(.process-step__number-badge) {
     flex-shrink: 0;
+  }
+  /* Manrope/xl/regular + text-primary, read off the badge master's bound
+     variables (node 2283:1424), not assumed from the pre-feat-028 code. */
+  .process-step__number {
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-xl);
+    line-height: var(--font-line-height-xl);
+    font-weight: var(--font-weight-regular);
+    color: var(--color-text-primary);
   }
   .process-step__title-row {
     /* Figma nests title+icon in their own row (951px wide, space-between)

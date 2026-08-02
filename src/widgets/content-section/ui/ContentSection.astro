@@ -1,15 +1,15 @@
 ---
-// Heading + one or more stacked image+paragraph blocks — reused for
+// Heading + one or more stacked media+paragraph blocks — reused for
 // Challenge (1 block) and Deliverables (2 blocks, one heading over both:
 // Brand Development + Design System merged into one Figma section).
+//
+// Each block's media is the same image|video union the hero (feat-031) and
+// the process steps (feat-026) already use, so Deliverables' two blocks can
+// be videos while Challenge stays a still.
 import { Heading } from '@shared/ui';
+import { Media } from '@entities/media';
 import { staggerDelay } from '@shared/lib';
-
-interface ContentBlock {
-  image: string;
-  imageAlt: string;
-  text: string;
-}
+import type { ContentBlock } from '../model/types';
 
 interface Props {
   heading: string;
@@ -26,12 +26,22 @@ const { heading, blocks, class: className } = Astro.props;
     {
       blocks.map((block, i) => (
         <div class="content-section__block" data-reveal style={`--reveal-delay: ${staggerDelay(i, 100)}`}>
-          <img
-            class="content-section__image"
-            src={block.image}
-            alt={block.imageAlt}
-            loading="lazy"
-          />
+          {block.media.type === 'image' ? (
+            <img
+              class="content-section__image"
+              src={block.media.image}
+              alt={block.media.imageAlt}
+              loading="lazy"
+            />
+          ) : (
+            <Media
+              type="video"
+              class="content-section__image"
+              src={block.media.src}
+              poster={block.media.poster}
+              alt={block.media.alt}
+            />
+          )}
           <p class="content-section__text">{block.text}</p>
         </div>
       ))
@@ -69,7 +79,14 @@ const { heading, blocks, class: className } = Astro.props;
     flex-direction: column;
     gap: 64px;
   }
-  .content-section__image {
+  /* :global() — the video branch's class merges onto Media's own rendered
+     root <div>, which carries Media.astro's astro-cid, not this
+     component's (same classlist-merge gotcha as ProcessAccordion's
+     .process-step__image); :global() still matches this component's own
+     <img> in the image branch, so one rule covers both. object-fit is
+     inert on Media's wrapper div, but Media's internal CSS already applies
+     object-fit:cover to the <video>, so both branches crop identically. */
+  :global(.content-section__image) {
     width: 100%;
     aspect-ratio: 1071 / 630;
     object-fit: cover;

@@ -47,16 +47,7 @@ const isGated = Boolean(content) && meta.access === 'nda';
               {content.overview.text}
             </OverviewSection>
 
-            <ContentSection
-              heading={content.challenge.heading}
-              blocks={[
-                {
-                  image: content.challenge.image,
-                  imageAlt: content.challenge.imageAlt,
-                  text: content.challenge.text,
-                },
-              ]}
-            />
+            <ContentSection heading={content.challenge.heading} blocks={content.challenge.blocks} />
 
             <section class="project-page__process">
               <Heading class="project-page__process-heading">Process</Heading>
@@ -68,7 +59,7 @@ const isGated = Boolean(content) && meta.access === 'nda';
             <ContentSection heading={content.deliverables.heading} blocks={content.deliverables.blocks} />
 
             <BuildSection
-              sitemap={content.build.sitemap}
+              media={content.build.media}
               caption={content.build.caption}
               stats={content.build.stats}
             />
