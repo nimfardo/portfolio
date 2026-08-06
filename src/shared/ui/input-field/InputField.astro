@@ -1,7 +1,9 @@
 ---
-// Figma component `input-field` (password-gate, node 2326:1854): label
-// above a bordered input box, white background regardless of theme (a raw
-// fill in the design, not bound to a bg/* token — matches the screenshot).
+// Figma component `input-field` (master node 2006:1044): label above a
+// bordered input box. The box is bound to bg/subtle — feat-022 originally
+// read a detached password-gate instance (2326:1854) whose white fill was
+// an override, and shipped it hardcoded white in both themes; bug-037
+// resynced every color to the master's real token bindings.
 // `type="password"` adds an eye/eye-off toggle using the icons that
 // already exist in the icon set.
 import Icon from '../icon/Icon.astro';
@@ -88,13 +90,12 @@ const isPassword = type === 'password';
     gap: var(--spacing-sm);
     width: 100%;
     padding: 20px 24px;
-    background: var(--color-white);
+    background: var(--color-bg-subtle);
     border-bottom: 1px solid var(--color-border-strong);
   }
-  /* Hardcoded dark text/icon color, not a text-primary/icon-default token —
-     the box itself is intentionally white in both themes (see above), so
-     its content needs to stay dark-on-white too instead of flipping to a
-     near-white color in dark theme, which would be unreadable. */
+  /* Token bindings straight off the master's variants: typed text =
+     text/emphasis, placeholder = text/primary (its own fill, full
+     opacity), eye toggle = icon/default. */
   .input-field__input {
     flex: 1;
     min-width: 0;
@@ -105,11 +106,11 @@ const isPassword = type === 'password';
     font-family: var(--font-family-body);
     font-size: var(--font-size-sm);
     line-height: var(--font-line-height-sm);
-    color: #2f1c08;
+    color: var(--color-text-emphasis);
   }
   .input-field__input::placeholder {
-    color: #2f1c08;
-    opacity: 0.6;
+    color: var(--color-text-primary);
+    opacity: 1;
   }
   .input-field__toggle {
     position: relative;
@@ -120,7 +121,7 @@ const isPassword = type === 'password';
     background: none;
     border: none;
     cursor: pointer;
-    color: #2f1c08;
+    color: var(--color-icon-default);
   }
   .input-field__toggle :global(.input-field__icon) {
     position: absolute;
