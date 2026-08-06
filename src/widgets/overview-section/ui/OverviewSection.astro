@@ -189,5 +189,12 @@ const { heading, tags, description, linkCards, class: className } = Astro.props;
     .overview-section__card-media img {
       max-width: 70%;
     }
+    /* A single nowrap pill can be wider than a phone screen (defenceSystems's
+       longest tag is ~423px — caught as real 74px page overflow at 375px
+       in feat-033's QA; CONNECTIS's 323px pill only just fit). Let the
+       text wrap inside the pill instead. */
+    .overview-section__tag {
+      white-space: normal;
+    }
   }
 </style>

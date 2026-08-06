@@ -1,5 +1,6 @@
 import type { ProjectContent } from '../model/types';
 import { connectis } from './connectis';
+import { defenceSystems } from './defenceSystems';
 
 /**
  * Slug -> full case-study content, for projects that have one written.
@@ -11,4 +12,5 @@ import { connectis } from './connectis';
  */
 export const PROJECT_CONTENT: Record<string, ProjectContent> = {
   connectis,
+  defenceSystems,
 };
