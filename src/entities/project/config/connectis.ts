@@ -33,7 +33,7 @@ export const connectis = {
   overview: {
     heading: 'Project Overview',
     text: 'CONNECTIS is a command center for fleet operators — one dashboard replacing spreadsheets and phone calls.',
-    tags: ['Logistics', 'Solo designer', 'Research · UX/UI · Brand · Prototype · Motion', '2026'],
+    tags: ['Logistics', 'Solo design engineer', 'Research · UX/UI · Brand · Prototype · Motion', '2026'],
   },
   // Figma reverted the per-step icons (feat-028) back to plain numbers, and
   // dropped the media from steps 03/04 — `media` is optional now, and those
@@ -128,16 +128,29 @@ export const connectis = {
           poster: `${M}/build-poster.jpg`,
           alt: 'Building CONNECTIS — a Claude Code session running in the terminal, then the dashboard it produced: fleet health score, live incident map, and the action-needed queue',
         },
-        text: 'Three dependency vulnerabilities patched. Full auth and role-based access, sign-in to sign-out.',
+        text: 'Full auth and role-based access, sign-in to sign-out.',
+      },
+      // The Glacier Flow block is shared with defenceSystems's Build section — same
+      // video file (public/media/shared/), same text, synced from canvas
+      // nodes 2495:1545/2441:7604 (copy-008's 3-line cap applies).
+      {
+        media: {
+          type: 'video',
+          src: '/media/shared/glacier-flow.webm',
+          poster: '/media/shared/glacier-flow-poster.jpg',
+          alt: "Glacier Flow's title card, then a scroll through the template's public GitHub README — core idea, folder map, and the gated task workflow",
+        },
+        text: 'I use Glacier Flow, a Claude Code project template: folder-based routing, a markdown knowledge base, and XML task gates — no change lands without approval.',
       },
     ] satisfies ContentBlock[],
     stats: [
       { value: '394', label: 'Commits, One Month' },
-      // Was "76 KB / Initial JS Bundle" -- a build metric that didn't read
-      // as meaningful next to the velocity stat. Three roles (admin,
-      // executive, ops_manager) counted off the real route graph.
-      { value: '3', label: 'Roles, One Codebase' },
+      // feat-032 swapped this for "3 / Roles, One Codebase"; Max's approved
+      // canvas (copy-008 review, 2026-08-06) has 76 KB back — he re-edited
+      // the section and kept it, so this is deliberate, not stale.
+      { value: '76', unit: 'KB', label: 'Initial JS Bundle' },
     ],
+    githubUrl: 'https://github.com/nimfardo/glacier-flow',
   },
   video: {
     src: `${M}/sign-in-dashboard.webm`,
@@ -156,7 +169,7 @@ export const connectis = {
   ] satisfies GalleryRow[],
   retrospective: {
     heading: "What I've Learned",
-    text: 'A fully functioning, production-ready POC built, tested, and validated in record time—proving the value proposition before writing traditional code.',
+    text: 'A production-ready PoC built, tested, and validated in record time — proving the value proposition before writing traditional code.',
     behanceUrl: 'https://www.behance.net/gallery/251016127/CONNECTIS-Fleet-Intelligence-Platform',
   },
 } satisfies ProjectContent;
