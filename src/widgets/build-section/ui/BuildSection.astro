@@ -5,41 +5,60 @@
 // on this page uses. ZoomPan and the rendered SVGs are gone; the .mmd
 // sources stay in reference/design-system/diagrams/ as case-study
 // documentation of the product's real route structure.
+//
+// feat-033: generalized from one media+caption to media+text blocks —
+// CONNECTIS gained a second block (the shared Glacier Flow video) and a
+// GitHub button; defenceSystems's whole Build section is that one Glacier block.
+// Stats render after the first block's text, the button after the last.
 import { Stat } from '@entities/stat';
-import type { StatData } from '@entities/stat';
 import { Media } from '@entities/media';
-import { Heading } from '@shared/ui';
-import type { ProjectMedia } from '@entities/project';
+import { Button, Heading } from '@shared/ui';
+import { staggerDelay } from '@shared/lib';
+import type { BuildData } from '@entities/project';
 
 interface Props {
-  media: ProjectMedia;
-  caption: string;
-  stats: StatData[];
+  blocks: BuildData['blocks'];
+  stats?: BuildData['stats'];
+  githubUrl?: string;
 }
 
-const { media, caption, stats } = Astro.props;
+const { blocks, stats, githubUrl } = Astro.props;
+const lastIndex = blocks.length - 1;
 ---
 
 <section class="build-section">
   <Heading class="build-section__heading">Build</Heading>
-  <div class="build-section__body" data-reveal>
+  <div class="build-section__body">
     {
-      media.type === 'image' ? (
-        <img class="build-section__media" src={media.image} alt={media.imageAlt} loading="lazy" />
-      ) : (
-        <Media
-          type="video"
-          class="build-section__media"
-          src={media.src}
-          poster={media.poster}
-          alt={media.alt}
-        />
-      )
+      blocks.map((block, i) => (
+        <div class="build-section__block" data-reveal style={`--reveal-delay: ${staggerDelay(i, 100)}`}>
+          {block.media.type === 'image' ? (
+            <img class="build-section__media" src={block.media.image} alt={block.media.imageAlt} loading="lazy" />
+          ) : (
+            <Media
+              type="video"
+              class="build-section__media"
+              src={block.media.src}
+              poster={block.media.poster}
+              alt={block.media.alt}
+            />
+          )}
+          <p class="build-section__caption">{block.text}</p>
+          {i === 0 && stats && (
+            <div class="build-section__stats">
+              {stats.map((stat) => (
+                <Stat value={stat.value} unit={stat.unit} label={stat.label} />
+              ))}
+            </div>
+          )}
+          {i === lastIndex && githubUrl && (
+            <Button type="outlined" href={githubUrl} class="build-section__button">
+              GitHub
+            </Button>
+          )}
+        </div>
+      ))
     }
-    <p class="build-section__caption">{caption}</p>
-    <div class="build-section__stats">
-      {stats.map((stat) => <Stat value={stat.value} unit={stat.unit} label={stat.label} />)}
-    </div>
   </div>
 </section>
 
@@ -60,7 +79,16 @@ const { media, caption, stats } = Astro.props;
     display: flex;
     min-width: 0;
     flex-direction: column;
+    /* 80px between stacked blocks — measured off the canvas (block 1 ends
+       y=992, block 2 starts y=1072 on CONNECTIS's Build). */
     gap: 80px;
+  }
+  .build-section__block {
+    display: flex;
+    flex-direction: column;
+    /* 64px media->text->stats/button rhythm, same as ContentSection's
+       blocks and consistent across both pages' canvases. */
+    gap: 64px;
   }
   /* Same box every other content media on this page uses (see
      ContentSection.astro) — no padding/bg-subtle frame anymore: that
@@ -81,10 +109,16 @@ const { media, caption, stats } = Astro.props;
     letter-spacing: -0.4px;
     font-weight: var(--font-weight-medium);
     color: var(--color-text-emphasis);
+    white-space: pre-line;
   }
   .build-section__stats {
     display: flex;
     gap: 40px;
+  }
+  /* Fixed 320px per Figma, same as Retrospective's Behance button — the
+     flex column would otherwise stretch it full-width. */
+  :global(.build-section__button) {
+    align-self: flex-start;
   }
 
   @media (max-width: 1023px) {

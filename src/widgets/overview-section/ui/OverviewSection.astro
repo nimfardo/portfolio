@@ -2,26 +2,59 @@
 // Heading + a big statement line + tag pills, no image — Figma split this
 // out of the old hero card once tags moved off the hero image (see
 // widgets/project-hero). Same 33/66 reference-column grid as ContentSection.
-import { Heading } from '@shared/ui';
+//
+// feat-033 additions, all optional so CONNECTIS renders unchanged: a
+// smaller description paragraph under the statement, a row of clickable
+// sub-brand LinkCards (defenceSystems's subBrandOne.example / subBrandTwo.example pair), and
+// tags may be omitted — defenceSystems's Challenge reuses this widget as a bare
+// statement + description section.
+import { Heading, Icon } from '@shared/ui';
+import type { LinkCard } from '@entities/project';
 
 interface Props {
   heading: string;
-  tags: string[];
+  tags?: string[];
+  description?: string;
+  linkCards?: LinkCard[];
   class?: string;
 }
 
-const { heading, tags, class: className } = Astro.props;
+const { heading, tags, description, linkCards, class: className } = Astro.props;
 ---
 
 <section class:list={['overview-section', className]}>
   <Heading class="overview-section__heading">{heading}</Heading>
   <div class="overview-section__body" data-reveal>
     <p class="overview-section__text"><slot /></p>
-    <ul class="overview-section__tags">
-      {tags.map((tag) => (
-        <li class="overview-section__tag">{tag}</li>
-      ))}
-    </ul>
+    {description && <p class="overview-section__description">{description}</p>}
+    {
+      linkCards && (
+        <ul class="overview-section__cards">
+          {linkCards.map((card) => (
+            <li class="overview-section__card-item">
+              <a class="overview-section__card" href={card.href} style={`background: ${card.background}`}>
+                <span class="overview-section__card-media">
+                  <img src={card.logo} alt={card.logoAlt} width={card.logoWidth} loading="lazy" />
+                </span>
+                <span class="overview-section__card-footer">
+                  <span class="overview-section__card-label">{card.label}</span>
+                  <Icon name="arrow-right" size={32} class="overview-section__card-arrow" />
+                </span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      )
+    }
+    {
+      tags && (
+        <ul class="overview-section__tags">
+          {tags.map((tag) => (
+            <li class="overview-section__tag">{tag}</li>
+          ))}
+        </ul>
+      )
+    }
   </div>
 </section>
 
@@ -55,6 +88,64 @@ const { heading, tags, class: className } = Astro.props;
     font-weight: var(--font-weight-medium);
     color: var(--color-text-emphasis);
   }
+  /* Figma text style Manrope/xl/regular-loose (node 2487:2264) — the
+     smaller paragraph defenceSystems runs under its statement lines. */
+  .overview-section__description {
+    margin: 0;
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-xl);
+    line-height: var(--font-line-height-3xl);
+    font-weight: var(--font-weight-regular);
+    color: var(--color-text-emphasis);
+    white-space: pre-line;
+  }
+  .overview-section__cards {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .overview-section__card {
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    /* Figma binds the card border to the obsidian-amber-950 primitive, not
+       a semantic border token — it sits on the card's own baked brand
+       background, so it must not flip with the theme. */
+    border: 1px solid var(--color-obsidian-amber-950);
+  }
+  .overview-section__card-media {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 320px;
+  }
+  .overview-section__card-media img {
+    display: block;
+    height: auto;
+  }
+  /* Divider + label + arrow sit directly on the card's brand background;
+     divider is bound to icon/emphasis, label to text/emphasis in Figma. */
+  .overview-section__card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 0 40px 40px;
+    padding-top: 40px;
+    border-top: 1px solid var(--color-icon-emphasis);
+  }
+  .overview-section__card-label {
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-xl);
+    line-height: var(--font-line-height-xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-text-emphasis);
+  }
+  :global(.overview-section__card-arrow) {
+    color: var(--color-icon-emphasis);
+  }
   .overview-section__tags {
     display: flex;
     flex-wrap: wrap;
@@ -86,6 +177,17 @@ const { heading, tags, class: className } = Astro.props;
     }
     .overview-section__body {
       grid-column: 1;
+    }
+  }
+  @media (max-width: 767px) {
+    /* Two 523px cards can't sit side by side on a phone — stack them.
+       Judgment call (no mobile mock for this page), same precedent as the
+       page-rhythm scaling in [slug].astro. */
+    .overview-section__cards {
+      grid-template-columns: 1fr;
+    }
+    .overview-section__card-media img {
+      max-width: 70%;
     }
   }
 </style>

@@ -99,6 +99,10 @@ const { heading, blocks, class: className } = Astro.props;
     letter-spacing: -0.4px;
     font-weight: var(--font-weight-medium);
     color: var(--color-text-emphasis);
+    /* defenceSystems's paragraphs carry a real newline after their lead-in sentence
+       (authored that way on canvas); CONNECTIS's single-line texts are
+       unaffected. */
+    white-space: pre-line;
   }
 
   @media (max-width: 1023px) {

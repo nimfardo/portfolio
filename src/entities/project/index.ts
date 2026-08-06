@@ -9,4 +9,9 @@ export type {
   ProcessStep,
   ProcessStepMedia,
   GalleryRow,
+  LinkCard,
+  StatementSection,
+  BlocksSection,
+  BuildData,
+  ProjectContent,
 } from './model/types';

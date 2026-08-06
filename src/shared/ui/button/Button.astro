@@ -19,7 +19,7 @@ const Tag = href ? 'a' : 'button';
   aria-disabled={href && disabled ? 'true' : undefined}
 >
   <span class="button__label"><slot /></span>
-  {type === 'solid' && <Icon name="arrow-right" size={28} class="button__icon" />}
+  <Icon name="arrow-right" size={28} class="button__icon" />
 </Tag>
 
 <style>

@@ -54,3 +54,75 @@ export interface ProcessStep {
 export type GalleryRow =
   | { type: 'full'; image: string }
   | { type: 'split'; tall: string; stack: string[] };
+
+/** A clickable sub-brand card in the overview (defenceSystems's subBrandOne.example /
+ * subBrandTwo.example pair, feat-033). The card face's background is a CSS
+ * value, not an exported image — Figma paints per-brand gradients/solids
+ * on the card itself and the divider/label/arrow sit directly on it, so
+ * only the logo lockup ships as an (transparent) image. */
+export interface LinkCard {
+  logo: string;
+  logoAlt: string;
+  /** Rendered logo width in px (the PNGs are @2x exports). */
+  logoWidth: number;
+  /** CSS background for the whole card face. */
+  background: string;
+  label: string;
+  href: string;
+}
+
+/** Heading + big statement + optional smaller paragraph, no media — the
+ * OverviewSection shape. defenceSystems's Challenge uses this; CONNECTIS's Challenge
+ * is a media block (BlocksSection) instead. */
+export interface StatementSection {
+  heading: string;
+  text: string;
+  description?: string;
+}
+
+/** Heading + one or more stacked media+paragraph blocks — ContentSection's
+ * input shape. */
+export interface BlocksSection {
+  heading: string;
+  blocks: ContentBlock[];
+}
+
+/** The Build section: media+text blocks, optional stats row (rendered after
+ * the first block's text), optional GitHub button (after the last block's
+ * text). Structurally StatData, but not imported from entities/stat —
+ * entities slices don't import each other. */
+export interface BuildData {
+  blocks: ContentBlock[];
+  stats?: { value: string; unit?: string; label: string }[];
+  githubUrl?: string;
+}
+
+/** Full case-study page content. Only hero + overview are universal;
+ * every other section renders when present — defenceSystems has no accordion, no
+ * video interstitial, and no gallery, while CONNECTIS has them all.
+ * `process` as an array = accordion steps; as a BlocksSection = a single
+ * media+paragraph section (defenceSystems). */
+export interface ProjectContent {
+  slug: string;
+  name: string;
+  hero: ProjectMedia;
+  overview: {
+    heading: string;
+    text: string;
+    description?: string;
+    linkCards?: LinkCard[];
+    tags?: string[];
+  };
+  challenge?: BlocksSection | StatementSection;
+  process?: ProcessStep[] | BlocksSection;
+  deliverables?: BlocksSection;
+  build?: BuildData;
+  video?: { src: string; poster: string; alt: string };
+  gallery?: GalleryRow[];
+  retrospective?: {
+    heading: string;
+    text: string;
+    /** Optional — defenceSystems's closing section has no Behance link. */
+    behanceUrl?: string;
+  };
+}

@@ -29,6 +29,17 @@ const { meta, content } = Astro.props;
 // Gating a project with no content yet would just be a password prompt
 // guarding an empty page — content readiness takes priority over access.
 const isGated = Boolean(content) && meta.access === 'nda';
+
+// ProjectContent's two structural variants (feat-033): challenge is either
+// a media block section (CONNECTIS) or a bare statement+description
+// (defenceSystems), and process is either accordion steps or a single content block.
+// Narrowed here so the template stays flat.
+const challenge = content?.challenge;
+const challengeBlocks = challenge && 'blocks' in challenge ? challenge : undefined;
+const challengeStatement = challenge && !('blocks' in challenge) ? challenge : undefined;
+const processSteps = Array.isArray(content?.process) ? content.process : undefined;
+const processBlocks =
+  content?.process && !Array.isArray(content.process) ? content.process : undefined;
 ---
 
 <Layout title={`${meta.name} — Max Shturma`}>
@@ -43,37 +54,72 @@ const isGated = Boolean(content) && meta.access === 'nda';
           <ProjectHero media={content.hero} scrollCue />
 
           <div class="project-page__sections">
-            <OverviewSection heading={content.overview.heading} tags={content.overview.tags}>
+            <OverviewSection
+              heading={content.overview.heading}
+              description={content.overview.description}
+              linkCards={content.overview.linkCards}
+              tags={content.overview.tags}
+            >
               {content.overview.text}
             </OverviewSection>
 
-            <ContentSection heading={content.challenge.heading} blocks={content.challenge.blocks} />
+            {challengeBlocks && (
+              <ContentSection heading={challengeBlocks.heading} blocks={challengeBlocks.blocks} />
+            )}
+            {challengeStatement && (
+              <OverviewSection
+                heading={challengeStatement.heading}
+                description={challengeStatement.description}
+              >
+                {challengeStatement.text}
+              </OverviewSection>
+            )}
 
-            <section class="project-page__process">
-              <Heading class="project-page__process-heading">Process</Heading>
-              <div class="project-page__process-body">
-                <ProcessAccordion steps={content.process} />
-              </div>
-            </section>
+            {processSteps && (
+              <section class="project-page__process">
+                <Heading class="project-page__process-heading">Process</Heading>
+                <div class="project-page__process-body">
+                  <ProcessAccordion steps={processSteps} />
+                </div>
+              </section>
+            )}
+            {processBlocks && (
+              <ContentSection heading={processBlocks.heading} blocks={processBlocks.blocks} />
+            )}
 
-            <ContentSection heading={content.deliverables.heading} blocks={content.deliverables.blocks} />
+            {content.deliverables && (
+              <ContentSection
+                heading={content.deliverables.heading}
+                blocks={content.deliverables.blocks}
+              />
+            )}
 
-            <BuildSection
-              media={content.build.media}
-              caption={content.build.caption}
-              stats={content.build.stats}
-            />
+            {content.build && (
+              <BuildSection
+                blocks={content.build.blocks}
+                stats={content.build.stats}
+                githubUrl={content.build.githubUrl}
+              />
+            )}
 
-            <VideoSection src={content.video.src} poster={content.video.poster} alt={content.video.alt} />
+            {content.video && (
+              <VideoSection
+                src={content.video.src}
+                poster={content.video.poster}
+                alt={content.video.alt}
+              />
+            )}
 
-            <ProjectGallery rows={content.gallery} />
+            {content.gallery && <ProjectGallery rows={content.gallery} />}
 
-            <Retrospective
-              heading={content.retrospective.heading}
-              behanceUrl={content.retrospective.behanceUrl}
-            >
-              {content.retrospective.text}
-            </Retrospective>
+            {content.retrospective && (
+              <Retrospective
+                heading={content.retrospective.heading}
+                behanceUrl={content.retrospective.behanceUrl}
+              >
+                {content.retrospective.text}
+              </Retrospective>
+            )}
           </div>
         </PasswordGate>
       )

@@ -4,7 +4,8 @@ import { Button, Icon, Heading } from '@shared/ui';
 
 interface Props {
   heading: string;
-  behanceUrl: string;
+  /** Optional since feat-033 — defenceSystems's closing section has no Behance link. */
+  behanceUrl?: string;
 }
 
 const { heading, behanceUrl } = Astro.props;
@@ -14,7 +15,13 @@ const { heading, behanceUrl } = Astro.props;
   <Heading class="retrospective__heading">{heading}</Heading>
   <div class="retrospective__body" data-reveal>
     <p class="retrospective__text"><slot /></p>
-    <Button type="solid" href={behanceUrl} class="retrospective__button">Check on Behance</Button>
+    {
+      behanceUrl && (
+        <Button type="solid" href={behanceUrl} class="retrospective__button">
+          Check on Behance
+        </Button>
+      )
+    }
     <div class="retrospective__smile">
       <span class="retrospective__smile-ring" set:html={circleDoodle} />
       <Icon name="smile" size={32} />
@@ -49,6 +56,10 @@ const { heading, behanceUrl } = Astro.props;
     letter-spacing: -0.4px;
     font-weight: var(--font-weight-medium);
     color: var(--color-text-emphasis);
+    /* defenceSystems's closing text carries a real newline after its lead-in
+       sentence (authored that way on canvas); single-line texts are
+       unaffected. */
+    white-space: pre-line;
   }
   /* :global() — class merges onto Button's own rendered <a>/<button>, which
      carries Button.astro's astro-cid, not this component's. Without this,
