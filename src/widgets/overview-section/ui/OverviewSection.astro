@@ -32,7 +32,13 @@ const { heading, tags, description, linkCards, class: className } = Astro.props;
         <ul class="overview-section__cards">
           {linkCards.map((card) => (
             <li class="overview-section__card-item">
-              <a class="overview-section__card" href={card.href} style={`background: ${card.background}`}>
+              <a
+                class="overview-section__card"
+                href={card.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={`background: ${card.background}`}
+              >
                 <span class="overview-section__card-media">
                   <img src={card.logo} alt={card.logoAlt} width={card.logoWidth} loading="lazy" />
                 </span>
@@ -115,6 +121,19 @@ const { heading, tags, description, linkCards, class: className } = Astro.props;
        a semantic border token — it sits on the card's own baked brand
        background, so it must not flip with the theme. */
     border: 1px solid var(--color-obsidian-amber-950);
+    transition: filter var(--duration-base) var(--ease-fade);
+  }
+  /* Minimal hover in the reference vocabulary (feat-034): a subtle
+     brightness lift on the card face + the arrow nudging along its own
+     glyph direction (up-right). Gated to real pointers so touch devices
+     never get a stuck hover state — same guard as ProjectCard's footer. */
+  @media (hover: hover) and (pointer: fine) {
+    .overview-section__card:hover {
+      filter: brightness(1.08);
+    }
+    .overview-section__card:hover :global(.overview-section__card-arrow) {
+      transform: translate(3px, -3px);
+    }
   }
   .overview-section__card-media {
     display: flex;
@@ -145,6 +164,13 @@ const { heading, tags, description, linkCards, class: className } = Astro.props;
   }
   :global(.overview-section__card-arrow) {
     color: var(--color-icon-emphasis);
+    transition: transform var(--duration-base) var(--ease-fade);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .overview-section__card,
+    :global(.overview-section__card-arrow) {
+      transition: none;
+    }
   }
   .overview-section__tags {
     display: flex;

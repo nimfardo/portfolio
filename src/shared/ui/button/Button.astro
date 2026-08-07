@@ -10,11 +10,16 @@ interface Props {
 
 const { type = 'solid', disabled = false, href, class: className } = Astro.props;
 const Tag = href ? 'a' : 'button';
+// External destinations (Behance, GitHub, ...) open in a new tab; internal
+// routes stay in-tab so ClientRouter transitions keep working (bug-038).
+const isExternal = href?.startsWith('http');
 ---
 
 <Tag
   class:list={['button', `button--${type}`, className]}
   href={href}
+  target={isExternal ? '_blank' : undefined}
+  rel={isExternal ? 'noopener noreferrer' : undefined}
   disabled={!href && disabled ? true : undefined}
   aria-disabled={href && disabled ? 'true' : undefined}
 >
