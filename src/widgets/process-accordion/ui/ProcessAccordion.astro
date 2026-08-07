@@ -108,7 +108,6 @@ const { steps } = Astro.props;
       summary.addEventListener('click', (event) => {
         event.preventDefault();
         const opening = !details.open;
-        details.style.overflow = 'hidden';
         if (opening && openStep && openStep !== details) {
           toggles.get(openStep)?.(false);
         }
@@ -133,6 +132,13 @@ const { steps } = Astro.props;
       // height), which setting `open` doesn't affect.
       function toggle(open: boolean) {
         animation?.cancel();
+        // Clip for the whole animated toggle, no matter who initiated it.
+        // This used to live in the click handler only, so a step closed
+        // *programmatically* by the single-open rule collapsed unclipped —
+        // its content painted over the step below for the duration of the
+        // close animation (bug-039, the "overlap flash" Max saw when
+        // switching steps). finish() clears it.
+        details.style.overflow = 'hidden';
         // Drives the +/- icon swap, decoupled from `details.open` on purpose:
         // closing must keep `open=true` for the whole collapse (native
         // <details> hides content the instant `open` is removed, which would
