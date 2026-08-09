@@ -104,7 +104,7 @@ export const connectis = {
           poster: `${M}/brand-development-poster.jpg`,
           alt: 'CONNECTIS brand identity — the connected-network monogram drawn on its geometric construction grid, the app icon sitting in a macOS dock, and the Michroma typeface specimen',
         },
-        text: 'Geometric precision: a Michroma wordmark, zero decoration, one connected network mark for the fleet.',
+        text: 'Geometric precision: a Michroma wordmark and one connected network mark for the fleet.',
       },
       {
         media: {
@@ -113,7 +113,7 @@ export const connectis = {
           poster: `${M}/design-system-poster.jpg`,
           alt: "CONNECTIS's token architecture — a radial map of the two tiers, then the reference layer's full colour ramps, then the semantic layer wired on top of them",
         },
-        text: 'A 2-tiered token system — a foundational reference layer feeding a semantic layer built for the product.',
+        text: 'A 2-tiered token system — reference layer feeding a semantic layer built for the product.',
       },
     ] satisfies ContentBlock[],
   },
@@ -140,7 +140,7 @@ export const connectis = {
           poster: '/media/shared/glacier-flow-poster.jpg',
           alt: "Glacier Flow's title card, then a scroll through the template's public GitHub README — core idea, folder map, and the gated task workflow",
         },
-        text: 'I use Glacier Flow, a Claude Code project template: folder-based routing, a markdown knowledge base, and XML task gates — no change lands without approval.',
+        text: 'I use Glacier Flow, a Claude Code template: folder routing, a knowledge base, and gated tasks.',
       },
     ] satisfies ContentBlock[],
     stats: [
@@ -169,7 +169,7 @@ export const connectis = {
   ] satisfies GalleryRow[],
   retrospective: {
     heading: "What I've Learned",
-    text: 'A production-ready PoC built, tested, and validated in record time — proving the value proposition before writing traditional code.',
+    text: 'A production-ready PoC built and validated in record time, proving the value before writing code.',
     behanceUrl: 'https://www.behance.net/gallery/251016127/CONNECTIS-Fleet-Intelligence-Platform',
   },
 } satisfies ProjectContent;
