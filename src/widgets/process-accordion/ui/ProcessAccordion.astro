@@ -167,6 +167,14 @@ const { steps } = Astro.props;
   .process-accordion {
     display: flex;
     flex-direction: column;
+    /* Opening a step while another is open runs two simultaneous WAAPI
+       height animations (the old one collapsing, the new one expanding).
+       Chrome's scroll anchoring tries to compensate scroll position for
+       layout shifts and gets confused by the two competing shifts,
+       landing the page at the wrong scroll position once both settle
+       (Max caught this live). Disabling anchoring here just leaves
+       scroll exactly where the user put it. */
+    overflow-anchor: none;
   }
   .process-step {
     border-bottom: 1px solid var(--color-border-default);
