@@ -128,7 +128,7 @@ export const connectis = {
           poster: `${M}/build-poster.jpg`,
           alt: 'Building CONNECTIS — a Claude Code session running in the terminal, then the dashboard it produced: fleet health score, live incident map, and the action-needed queue',
         },
-        text: 'Full auth and role-based access, sign-in to sign-out.',
+        text: 'Full auth and role-based access, sign-in to sign-out. Supabase simulates a fleet of 50+ vehicles.',
       },
       // The Glacier Flow block is shared with defenceSystems's Build section — same
       // video file (public/media/shared/), same text, synced from canvas
