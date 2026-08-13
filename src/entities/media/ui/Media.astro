@@ -137,6 +137,7 @@ const videoFallbackSrc = type === 'video' ? src.replace(/\.webm$/i, '.mp4') : un
     setMode: (mode: 'forward' | 'reverse') => void;
     play: () => void;
     setFrame: (frame: number) => void;
+    addEventListener?: (name: string, cb: () => void) => void;
     totalFrames?: number;
     duration?: number;
   };
@@ -147,10 +148,17 @@ const videoFallbackSrc = type === 'video' ? src.replace(/\.webm$/i, '.mp4') : un
   // it; if it never arrives (the WASM fetch failing is a real state — see
   // STATE.md) we simply never add `is-lottie-ready`, and the static fallback
   // stays visible forever, which is the intended degradation.
+  //
+  // "Ready" deliberately requires a non-zero `duration`, not just the
+  // instance: the instance appears before the animation data is parsed, and
+  // reading `duration` in that window returns 0. A 0 there silently
+  // truncated every playback leg by the real clip length, so the reverse
+  // pass stopped partway and the logo never finished un-drawing.
   function whenReady(el: DotLottieElement, cb: (dl: DotLottieInstance) => void, tries = 0) {
     if (!el.isConnected) return;
-    if (el.dotLottie) {
-      cb(el.dotLottie);
+    const dl = el.dotLottie;
+    if (dl && Number(dl.duration) > 0) {
+      cb(dl);
       return;
     }
     if (tries > 200) return; // ~10s
@@ -176,15 +184,30 @@ const videoFallbackSrc = type === 'video' ? src.replace(/\.webm$/i, '.mp4') : un
 
         // One leg = one forward or one reverse pass. `leg` is a sequence
         // guard: whichever of the `complete` event or the duration-based
-        // backup timer fires first advances the cycle, and the loser is
-        // ignored. The backup exists because `complete` firing at frame 0 in
-        // reverse mode is not guaranteed across dotlottie versions.
-        const durationMs = (dl.duration ?? 1) * 1000;
+        // timer fires first advances the cycle, and the loser is ignored.
+        //
+        // In practice the TIMER is the primary driver, not the event:
+        // dotlottie-wc does not re-dispatch `complete` as a DOM event on the
+        // custom element (verified live — zero `complete` events across
+        // multiple full cycles), so the element listener below is only
+        // belt-and-braces should a future version add it. The instance-level
+        // listener is attached when available, which is the one that can
+        // actually fire.
         const SLACK_MS = 400;
         let leg = 0;
         let direction: 'forward' | 'reverse' = 'forward';
         let holdTimer: ReturnType<typeof setTimeout>;
         let guardTimer: ReturnType<typeof setTimeout>;
+
+        // Re-read per leg rather than caching once: `duration` is only
+        // trustworthy after the animation data is parsed, and a stale 0 here
+        // truncates playback (see whenReady).
+        function legMs() {
+          const d = Number(dl.duration);
+          if (d > 0) return d * 1000;
+          const frames = Number(dl.totalFrames);
+          return frames > 0 ? (frames / 30) * 1000 : 1000;
+        }
 
         function playLeg() {
           if (!el.isConnected) return;
@@ -192,7 +215,7 @@ const videoFallbackSrc = type === 'video' ? src.replace(/\.webm$/i, '.mp4') : un
           dl.setMode(direction);
           dl.play();
           clearTimeout(guardTimer);
-          guardTimer = setTimeout(() => finishLeg(startedAt), durationMs + SLACK_MS);
+          guardTimer = setTimeout(() => finishLeg(startedAt), legMs() + SLACK_MS);
         }
 
         function finishLeg(startedAt: number) {
@@ -214,6 +237,7 @@ const videoFallbackSrc = type === 'video' ? src.replace(/\.webm$/i, '.mp4') : un
           }
         }
 
+        dl.addEventListener?.('complete', () => finishLeg(leg));
         el.addEventListener('complete', () => finishLeg(leg));
         playLeg();
       });
