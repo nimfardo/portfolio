@@ -56,6 +56,7 @@ const videoFallbackSrc = type === 'video' ? src.replace(/\.webm$/i, '.mp4') : un
         )}
         <dotlottie-wc
           src={src}
+          data-lottie
           autoplay={lottieMode === 'loop' || undefined}
           loop={lottieMode === 'loop' || undefined}
           data-lottie-pingpong={lottieMode === 'pingpong-hold' ? '' : undefined}
@@ -137,6 +138,7 @@ const videoFallbackSrc = type === 'video' ? src.replace(/\.webm$/i, '.mp4') : un
     setMode: (mode: 'forward' | 'reverse') => void;
     play: () => void;
     setFrame: (frame: number) => void;
+    resize?: () => void;
     addEventListener?: (name: string, cb: () => void) => void;
     totalFrames?: number;
     duration?: number;
@@ -165,6 +167,38 @@ const videoFallbackSrc = type === 'video' ? src.replace(/\.webm$/i, '.mp4') : un
     setTimeout(() => whenReady(el, cb, tries + 1), 50);
   }
 
+  // A Lottie whose canvas is created inside a `display: none` subtree can't
+  // measure its box, so it keeps the browser's DEFAULT 300x150 canvas backing
+  // store — and CSS then stretches that bitmap into whatever the real box is
+  // once the element is revealed. dotlottie-web has its own ResizeObserver but
+  // it does not correct this 0 -> N transition.
+  //
+  // The NDA password gate hits this every time: it hides project content with
+  // `.password-gate-wrapper:not([data-unlocked]) .password-gate__content
+  // { display: none }`, so unlocking without a reload showed medicalSoftware's hero
+  // logo stretched, while a refresh (content visible from first paint) looked
+  // correct. Re-measuring whenever the box changes to a non-zero size fixes
+  // it, and also keeps the backing store honest across later resizes.
+  function initLottieCanvasSize() {
+    document.querySelectorAll<DotLottieElement>('[data-lottie]').forEach((el) => {
+      let lastW = 0;
+      let lastH = 0;
+      const observer = new ResizeObserver(() => {
+        const w = el.clientWidth;
+        const h = el.clientHeight;
+        if (w === 0 || h === 0) return;
+        if (w === lastW && h === lastH) return;
+        lastW = w;
+        lastH = h;
+        // resize() only rewrites the canvas backing store, never the element's
+        // CSS box, so this can't feed back into the observer.
+        el.dotLottie?.resize?.();
+        el.closest('.media')?.classList.add('is-lottie-ready');
+      });
+      observer.observe(el);
+    });
+  }
+
   function initLottiePingpong() {
     const players = document.querySelectorAll<DotLottieElement>('[data-lottie-pingpong]');
 
@@ -172,6 +206,10 @@ const videoFallbackSrc = type === 'video' ? src.replace(/\.webm$/i, '.mp4') : un
       const holdMs = Number(el.dataset.lottieHoldMs ?? 3000);
 
       whenReady(el, (dl) => {
+        // Covers the reverse race to initLottieCanvasSize: if the box was
+        // already non-zero before the instance existed, the observer's
+        // resize() call was a no-op.
+        dl.resize?.();
         el.closest('.media')?.classList.add('is-lottie-ready');
 
         // Reduced motion: no cycle at all, and hold the LAST frame rather
@@ -244,6 +282,7 @@ const videoFallbackSrc = type === 'video' ? src.replace(/\.webm$/i, '.mp4') : un
     });
   }
 
+  document.addEventListener('astro:page-load', initLottieCanvasSize);
   document.addEventListener('astro:page-load', initLottiePingpong);
 </script>
 
