@@ -167,8 +167,14 @@ export const connectis = {
   gallery: [
     {
       type: 'split',
-      tall: `${M}/gallery-2.jpg`,
-      stack: [`${M}/gallery-3.jpg`, `${M}/gallery-4.jpg`],
+      // Every gallery slot is a ProjectMedia since feat-041 (Arvus needed a
+      // video in a tall slot). Gallery media is decorative on canvas, so
+      // imageAlt is deliberately empty — that renders alt="", unchanged.
+      tall: { type: 'image', image: `${M}/gallery-2.jpg`, imageAlt: '' },
+      stack: [
+        { type: 'image', image: `${M}/gallery-3.jpg`, imageAlt: '' },
+        { type: 'image', image: `${M}/gallery-4.jpg`, imageAlt: '' },
+      ],
     },
   ] satisfies GalleryRow[],
   retrospective: {

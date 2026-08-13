@@ -1,9 +1,22 @@
 ---
 // Project detail-page gallery — a sequence of rows, each either a
-// full-width image or a tall image + N stacked images (the two shapes
+// full-width slot or a tall slot + N stacked slots (the two shapes
 // that exist on the Figma canvas so far, see entities/project's
-// GalleryRow). Images are decorative on canvas (no per-image alt
-// authored), so every <img> renders alt="".
+// GalleryRow). Gallery media is decorative on canvas (no per-slot alt
+// authored), so configs pass `imageAlt: ''` and every <img> renders alt="".
+//
+// Every slot is a ProjectMedia now (feat-041), so any of them can be a
+// video — Arvus's tall slot is one. Image slots render a bare <img>, exactly
+// as before; video slots need a wrapper div because Media's Props are
+// explicit with no attribute pass-through, so `data-reveal` cannot land on
+// its root. That wrapper carries the sizing class and Media's own root is
+// stretched to fill it, the same arrangement VideoSection uses.
+//
+// All three branches are written inline rather than extracted to a shared
+// slot component on purpose: an <img> rendered from a child component would
+// carry that child's astro-cid, and this file's scoped `.project-gallery__*`
+// rules would stop matching it.
+import { Media } from '@entities/media';
 import { staggerDelay } from '@shared/lib';
 import type { GalleryRow } from '../model/types';
 
@@ -19,20 +32,68 @@ const { rows, class: className } = Astro.props;
   {
     rows.map((row) =>
       row.type === 'full' ? (
-        <img class="project-gallery__full" src={row.image} alt="" loading="lazy" data-reveal />
+        row.image.type === 'image' ? (
+          <img
+            class="project-gallery__full"
+            src={row.image.image}
+            alt={row.image.imageAlt}
+            loading="lazy"
+            data-reveal
+          />
+        ) : (
+          <div class="project-gallery__full" data-reveal>
+            <Media
+              type="video"
+              class="project-gallery__media"
+              src={row.image.src}
+              poster={row.image.poster}
+              alt={row.image.alt}
+            />
+          </div>
+        )
       ) : (
         <div class="project-gallery__row">
-          <img class="project-gallery__tall" src={row.tall} alt="" loading="lazy" data-reveal />
-          <div class="project-gallery__stack">
-            {row.stack.map((src, i) => (
-              <img
-                src={src}
-                alt=""
-                loading="lazy"
-                data-reveal
-                style={`--reveal-delay: ${staggerDelay(i, 100)}`}
+          {row.tall.type === 'image' ? (
+            <img
+              class="project-gallery__tall"
+              src={row.tall.image}
+              alt={row.tall.imageAlt}
+              loading="lazy"
+              data-reveal
+            />
+          ) : (
+            <div class="project-gallery__tall" data-reveal>
+              <Media
+                type="video"
+                class="project-gallery__media"
+                src={row.tall.src}
+                poster={row.tall.poster}
+                alt={row.tall.alt}
               />
-            ))}
+            </div>
+          )}
+          <div class="project-gallery__stack">
+            {row.stack.map((slot, i) =>
+              slot.type === 'image' ? (
+                <img
+                  src={slot.image}
+                  alt={slot.imageAlt}
+                  loading="lazy"
+                  data-reveal
+                  style={`--reveal-delay: ${staggerDelay(i, 100)}`}
+                />
+              ) : (
+                <div data-reveal style={`--reveal-delay: ${staggerDelay(i, 100)}`}>
+                  <Media
+                    type="video"
+                    class="project-gallery__media"
+                    src={slot.src}
+                    poster={slot.poster}
+                    alt={slot.alt}
+                  />
+                </div>
+              ),
+            )}
           </div>
         </div>
       ),
@@ -70,10 +131,21 @@ const { rows, class: className } = Astro.props;
     flex-direction: column;
     gap: 64px;
   }
-  .project-gallery__stack img {
+  /* `> *` rather than `> img`, so a video slot's wrapper div gets the same
+     box. object-fit is inert on the div and does the work on the <img>;
+     Media supplies its own object-fit: cover for the <video>. */
+  .project-gallery__stack > * {
     width: 100%;
     aspect-ratio: 791.5 / 468;
     object-fit: cover;
+  }
+  /* :global() — the class merges onto Media's own rendered root <div>, not a
+     descendant of this component (the classlist-merge pattern every Icon and
+     VideoSection consumer hits). Stretches Media to fill whichever sizing box
+     wraps it above. */
+  :global(.project-gallery__media) {
+    width: 100%;
+    height: 100%;
   }
 
   @media (max-width: 1023px) {

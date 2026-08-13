@@ -83,12 +83,22 @@ export interface ProcessStep {
 }
 
 /** One row of a project's detail-page gallery — the two layout shapes that
- * exist on the Figma canvas so far: a full-width single image, or a tall
- * image beside N stacked images. Gallery images are decorative on canvas
- * (no per-image caption/alt authored), so consumers render `alt=""`. */
+ * exist on the Figma canvas so far: a full-width slot, or a tall slot beside
+ * N stacked slots.
+ *
+ * Every slot is a `ProjectMedia`, the same image|video union already backing
+ * the hero, process steps, ContentSection and BuildSection (feat-041). Arvus's
+ * gallery puts a video in the tall slot, and a `string | ProjectMedia` shim
+ * would have left two representations of one thing — a plain path here and a
+ * discriminated union everywhere else — so the slots took the canonical type
+ * instead.
+ *
+ * Gallery media is decorative on canvas (no per-slot caption authored), so the
+ * image arm always carries `imageAlt: ''` and consumers render `alt=""`. That
+ * decision is unchanged; it is just explicit now rather than implied. */
 export type GalleryRow =
-  | { type: 'full'; image: string }
-  | { type: 'split'; tall: string; stack: string[] };
+  | { type: 'full'; image: ProjectMedia }
+  | { type: 'split'; tall: ProjectMedia; stack: ProjectMedia[] };
 
 /** A clickable sub-brand card in the overview (defenceSystems's subBrandOne.example /
  * subBrandTwo.example pair, feat-033). The card face's background is a CSS
