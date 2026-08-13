@@ -32,7 +32,11 @@ export const connectis = {
   } satisfies ProjectMedia,
   overview: {
     heading: 'Project Overview',
-    text: 'CONNECTIS is a command center for fleet operators — one dashboard replacing spreadsheets and phone calls.',
+    // 92 chars, measured at 3 lines at 1280px (copy-013). The previous
+    // wording was 105 and laid out at 4 — copy-009's "every body text at 3
+    // lines" pass covered the ContentSection captions and the retro, not this
+    // slot. Active voice also leads with the change rather than the category.
+    text: 'CONNECTIS replaces spreadsheets and phone calls with one command center for fleet operators.',
     tags: ['Logistics', 'Solo design engineer', 'Research · UX/UI · Brand · Prototype · Motion', '2026'],
   },
   // Figma reverted the per-step icons (feat-028) back to plain numbers, and
