@@ -1,5 +1,6 @@
 import type { ProjectContent } from '../model/types';
 import { connectis } from './connectis';
+import { medicalSoftware } from './medicalSoftware';
 import { defenceSystems } from './defenceSystems';
 
 /**
@@ -12,5 +13,6 @@ import { defenceSystems } from './defenceSystems';
  */
 export const PROJECT_CONTENT: Record<string, ProjectContent> = {
   connectis,
+  medicalSoftware,
   defenceSystems,
 };
