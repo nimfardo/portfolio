@@ -13,20 +13,10 @@ import type { Project } from '../model/types';
  */
 export const PROJECTS: Project[] = [
   {
-    slug: 'arvus',
-    name: 'Arvus',
-    category: 'Security · B2B',
-    tags: ['ux', 'ui', 'brand', 'motion'],
-    access: 'public',
-    thumbnail: '/media/arvus/thumbnail.jpg',
-  },
-  {
-    slug: 'defenceSystems',
-    name: 'defenceSystems',
-    category: 'Military',
-    tags: ['brand', 'ux', 'ui', 'motion'],
+    slug: 'medicalSoftware',
+    name: 'medicalSoftware',
     access: 'nda',
-    thumbnail: '/media/defenceSystems/thumbnail.jpg',
+    thumbnail: '/media/medicalSoftware/thumbnail.jpg',
   },
   {
     slug: 'connectis',
@@ -37,10 +27,20 @@ export const PROJECTS: Project[] = [
     thumbnail: '/media/connectis/thumbnail.jpg',
   },
   {
-    slug: 'medicalSoftware',
-    name: 'medicalSoftware',
+    slug: 'defenceSystems',
+    name: 'defenceSystems',
+    category: 'Military',
+    tags: ['brand', 'ux', 'ui', 'motion'],
     access: 'nda',
-    thumbnail: '/media/medicalSoftware/thumbnail.jpg',
+    thumbnail: '/media/defenceSystems/thumbnail.jpg',
+  },
+  {
+    slug: 'arvus',
+    name: 'Arvus',
+    category: 'Security · B2B',
+    tags: ['ux', 'ui', 'brand', 'motion'],
+    access: 'public',
+    thumbnail: '/media/arvus/thumbnail.jpg',
   },
   {
     slug: 'enterpriseIt',
