@@ -1,0 +1,131 @@
+---
+// A row of clickable sub-brand / deliverable cards: a logo lockup on the
+// card's own fixed brand background, with a label + arrow footer.
+//
+// Extracted from widgets/overview-section (where it was introduced for defenceSystems)
+// once medicalSoftware needed the same cards inside a ContentSection instead — the
+// markup plus its colour rules is too much to keep in two widgets, and every
+// pinned-colour lesson below would have had to be re-learned in the copy.
+//
+// Lives in entities/project rather than shared/ui because it renders the
+// LinkCard entity type; widgets -> entities and entities -> shared are both
+// legal FSD directions, whereas shared/ui importing the type would not be.
+import { Icon } from '@shared/ui';
+import type { LinkCard } from '../model/types';
+
+interface Props {
+  cards: LinkCard[];
+  class?: string;
+}
+
+const { cards, class: className } = Astro.props;
+---
+
+<ul class:list={['link-cards', className]}>
+  {
+    cards.map((card) => (
+      <li class="link-cards__item">
+        <a
+          class="link-cards__card"
+          href={card.href}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={`background: ${card.background}`}
+        >
+          <span class="link-cards__media">
+            <img src={card.logo} alt={card.logoAlt} width={card.logoWidth} loading="lazy" />
+          </span>
+          <span class="link-cards__footer">
+            <span class="link-cards__label">{card.label}</span>
+            <Icon name="arrow-right" size={32} class="link-cards__arrow" />
+          </span>
+        </a>
+      </li>
+    ))
+  }
+</ul>
+
+<style>
+  .link-cards {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .link-cards__card {
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    /* Figma binds the card border to the obsidian-amber-950 primitive, not
+       a semantic border token — it sits on the card's own baked brand
+       background, so it must not flip with the theme. */
+    border: 1px solid var(--color-obsidian-amber-950);
+    transition: filter var(--duration-base) var(--ease-fade);
+  }
+  /* Minimal hover in the reference vocabulary (feat-034): a subtle
+     brightness lift on the card face + the arrow nudging along its own
+     glyph direction (up-right). Gated to real pointers so touch devices
+     never get a stuck hover state — same guard as ProjectCard's footer. */
+  @media (hover: hover) and (pointer: fine) {
+    .link-cards__card:hover {
+      filter: brightness(1.08);
+    }
+    .link-cards__card:hover :global(.link-cards__arrow) {
+      transform: translate(3px, -3px);
+    }
+  }
+  .link-cards__media {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 320px;
+  }
+  .link-cards__media img {
+    display: block;
+    height: auto;
+  }
+  /* Divider + label + arrow sit directly on the card's fixed brand
+     background (same as the border above), so — bug found in light mode,
+     2026-08-09 — they must stay pinned to the cream primitive too instead
+     of the theme-flipping emphasis tokens; those tokens go near-black in
+     light mode and nearly disappear against the dark/blue card faces. */
+  .link-cards__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 0 40px 40px;
+    padding-top: 40px;
+    border-top: 1px solid var(--color-obsidian-amber-50);
+  }
+  .link-cards__label {
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-xl);
+    line-height: var(--font-line-height-xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-obsidian-amber-50);
+  }
+  :global(.link-cards__arrow) {
+    color: var(--color-obsidian-amber-50);
+    transition: transform var(--duration-base) var(--ease-fade);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .link-cards__card,
+    :global(.link-cards__arrow) {
+      transition: none;
+    }
+  }
+
+  @media (max-width: 767px) {
+    /* Two 523px cards can't sit side by side on a phone — stack them.
+       Judgment call (no mobile mock for this page), same precedent as the
+       page-rhythm scaling in [slug].astro. */
+    .link-cards {
+      grid-template-columns: 1fr;
+    }
+    .link-cards__media img {
+      max-width: 70%;
+    }
+  }
+</style>

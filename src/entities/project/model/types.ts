@@ -64,6 +64,11 @@ export type HeroMedia =
 export interface ContentBlock {
   media: ProjectMedia;
   text: string;
+  /** Optional cards between the media and the text — medicalSoftware's Deliverables
+   * puts its Prototype / Design System links there. On the block rather than
+   * the section because Figma nests them inside the block, between the two,
+   * not after the whole section. */
+  linkCards?: LinkCard[];
 }
 
 export interface ProcessStep {

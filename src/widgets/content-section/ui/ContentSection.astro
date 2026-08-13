@@ -8,6 +8,7 @@
 // be videos while Challenge stays a still.
 import { Heading } from '@shared/ui';
 import { Media } from '@entities/media';
+import { LinkCards } from '@entities/project';
 import { staggerDelay } from '@shared/lib';
 import type { ContentBlock } from '../model/types';
 
@@ -42,6 +43,9 @@ const { heading, blocks, class: className } = Astro.props;
               alt={block.media.alt}
             />
           )}
+          {/* Slots into the block's own 64px column gap, which is exactly
+              Figma's media -> links -> text rhythm. */}
+          {block.linkCards && <LinkCards cards={block.linkCards} />}
           <p class="content-section__text">{block.text}</p>
         </div>
       ))
