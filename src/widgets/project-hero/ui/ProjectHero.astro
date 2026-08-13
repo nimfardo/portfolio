@@ -1,7 +1,7 @@
 ---
 import { Divider, Icon } from '@shared/ui';
 import { Media } from '@entities/media';
-import type { ProjectMedia } from '@entities/project';
+import type { HeroMedia } from '@entities/project';
 
 // The top hero is now just a bare full-bleed image or video + a "Scroll
 // down" cue (Figma dropped the tags/eyebrow/headline card from it — tags
@@ -11,8 +11,9 @@ import type { ProjectMedia } from '@entities/project';
 // `blocks` prop (see STATE.md) — this component will lose the card
 // entirely once that lands, leaving just the bare-media+scroll-cue shape.
 interface Props {
-  /** Image or video — same discriminated union the process steps use. */
-  media: ProjectMedia;
+  /** Image, video, or a looping animation on a solid brand background —
+   * see HeroMedia for why the lottie arm is hero-only. */
+  media: HeroMedia;
   eyebrow?: string;
   headline?: string[];
   scrollCue?: boolean;
@@ -25,10 +26,9 @@ const hasCard = Boolean(eyebrow && headline);
 
 <section class:list={['project-hero', className]}>
   <div class:list={['project-hero__image-wrap', { 'project-hero__image-wrap--card': hasCard }]}>
+    {media.type === 'image' && <img class="project-hero__image" src={media.image} alt={media.imageAlt} />}
     {
-      media.type === 'image' ? (
-        <img class="project-hero__image" src={media.image} alt={media.imageAlt} />
-      ) : (
+      media.type === 'video' && (
         <Media
           type="video"
           src={media.src}
@@ -36,6 +36,23 @@ const hasCard = Boolean(eyebrow && headline);
           alt={media.alt}
           class="project-hero__image"
         />
+      )
+    }
+    {
+      media.type === 'lottie' && (
+        <div
+          class="project-hero__stage"
+          style={`background: ${media.background}; --hero-lottie-width: ${media.widthPct}%;`}
+        >
+          <Media
+            type="lottie"
+            src={media.src}
+            alt={media.alt}
+            lottieMode="pingpong-hold"
+            lottieFallback={media.fallback}
+            class="project-hero__lottie"
+          />
+        </div>
       )
     }
   </div>
@@ -102,6 +119,31 @@ const hasCard = Boolean(eyebrow && headline);
     width: 100%;
     height: 100%;
     object-fit: cover;
+  }
+
+  /* Lottie hero (medicalSoftware): a solid brand color with the logo animation
+     centred on it. On canvas this hero was already a solid #263D82 fill plus
+     a vector logo — not a raster image — so this renders what Figma always
+     described, instead of flattening it to an exported still. The background
+     comes in as an inline style because it's a fixed per-project brand
+     value, not a token. */
+  .project-hero__stage {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+  }
+  /* :global() — the class merges onto Media's own rendered root <div>, which
+     is a classlist merge rather than a descendant, so a scoped selector
+     would never match it (same reason .project-hero__image needs it).
+     Width carries Figma's own logo-to-hero ratio so it scales with the fluid
+     hero; the aspect-ratio is the Lottie's native 320x94, which derives the
+     height without distorting the artwork. */
+  :global(.project-hero__lottie) {
+    width: var(--hero-lottie-width, 27.3%);
+    aspect-ratio: 320 / 94;
+    height: auto;
   }
 
   .project-hero__scroll-cue {

@@ -28,6 +28,36 @@ export type ProjectMedia =
  * identical now that the hero shares the same union. */
 export type ProcessStepMedia = ProjectMedia;
 
+/** What a page hero can hold: anything ProjectMedia can, plus a looping
+ * animation on a solid brand background (medicalSoftware).
+ *
+ * Deliberately a hero-only union rather than a third arm on ProjectMedia:
+ * ContentSection and ProcessAccordion discriminate their media with a binary
+ * `type === 'image' ? … : <video>` ternary, so widening ProjectMedia would
+ * make every one of them silently render a Lottie through the video branch.
+ * Keeping the extra arm here means those consumers stay exhaustive and the
+ * compiler keeps checking them. */
+export type HeroMedia =
+  | ProjectMedia
+  | {
+      type: 'lottie';
+      /** The .json animation, played by entities/media. */
+      src: string;
+      alt: string;
+      /** Still shown until the animation renders, and permanently if it
+       * never loads. Required here (unlike Media's optional prop) because a
+       * hero Lottie is alone in its box with nothing else to fall back to. */
+      fallback: string;
+      /** CSS background behind the animation. A fixed brand color, NOT a
+       * theme token — so anything drawn on top must be fixed too, or it
+       * goes near-invisible in one theme (bug-040). */
+      background: string;
+      /** Animation width as a percentage of hero width, carrying Figma's own
+       * ratio so it scales with the fluid hero instead of being pinned to a
+       * px size. */
+      widthPct: number;
+    };
+
 /** One media+paragraph block inside a ContentSection (Challenge's single
  * block, Deliverables' two). Same image|video union as the hero and the
  * process steps — Deliverables' blocks are both videos as of feat-032. */
@@ -105,7 +135,7 @@ export interface BuildData {
 export interface ProjectContent {
   slug: string;
   name: string;
-  hero: ProjectMedia;
+  hero: HeroMedia;
   overview: {
     heading: string;
     text: string;

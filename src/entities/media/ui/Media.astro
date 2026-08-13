@@ -5,9 +5,41 @@ interface Props extends MediaAsset {
   class?: string;
   width?: number;
   height?: number;
+  /**
+   * How a `lottie` asset plays.
+   *  - `loop` (default): plain forward loop, the original behaviour.
+   *  - `pingpong-hold`: forward, hold at the last frame for `lottieHoldMs`,
+   *    reverse back to the start, then straight into forward again with no
+   *    hold. Built for build-on animations (medicalSoftware's logo draws itself in,
+   *    so frame 0 is blank) — the pause belongs on the assembled end frame,
+   *    and pausing at the start would just hold an empty box.
+   */
+  lottieMode?: 'loop' | 'pingpong-hold';
+  /** Hold at the end frame, in ms. Only used by `pingpong-hold`. */
+  lottieHoldMs?: number;
+  /**
+   * Still shown until the animation is actually rendering, and left in place
+   * permanently if it never loads. Worth passing whenever a Lottie is the
+   * only thing in its box: the runtime still pulls its WASM from a CDN
+   * despite `setWasmUrl` (see STATE.md), so "never loads" is a real state,
+   * and for a build-on animation the un-animated box is blank rather than
+   * merely static.
+   */
+  lottieFallback?: string;
 }
 
-const { type, src, poster, alt, class: className, width, height } = Astro.props;
+const {
+  type,
+  src,
+  poster,
+  alt,
+  class: className,
+  width,
+  height,
+  lottieMode = 'loop',
+  lottieHoldMs = 3000,
+  lottieFallback,
+} = Astro.props;
 
 const videoFallbackSrc = type === 'video' ? src.replace(/\.webm$/i, '.mp4') : undefined;
 ---
@@ -19,11 +51,17 @@ const videoFallbackSrc = type === 'video' ? src.replace(/\.webm$/i, '.mp4') : un
   {
     type === 'lottie' && (
       <>
-        <dotlottie-wc src={src} autoplay loop aria-label={alt} />
-        <script>
-          import {setWasmUrl} from '@lottiefiles/dotlottie-wc';
-          setWasmUrl('/wasm/dotlottie-player.wasm');
-        </script>
+        {lottieFallback && (
+          <img class="media__lottie-fallback" src={lottieFallback} alt="" aria-hidden="true" />
+        )}
+        <dotlottie-wc
+          src={src}
+          autoplay={lottieMode === 'loop' || undefined}
+          loop={lottieMode === 'loop' || undefined}
+          data-lottie-pingpong={lottieMode === 'pingpong-hold' ? '' : undefined}
+          data-lottie-hold-ms={lottieMode === 'pingpong-hold' ? String(lottieHoldMs) : undefined}
+          aria-label={alt}
+        />
       </>
     )
   }
@@ -87,11 +125,122 @@ const videoFallbackSrc = type === 'video' ? src.replace(/\.webm$/i, '.mp4') : un
   document.addEventListener('astro:page-load', initMediaVideoAutoplay);
 </script>
 
+<script>
+  import { setWasmUrl } from '@lottiefiles/dotlottie-wc';
+  setWasmUrl('/wasm/dotlottie-player.wasm');
+</script>
+
+<script>
+  import { prefersReducedMotion } from '@shared/lib';
+
+  type DotLottieInstance = {
+    setMode: (mode: 'forward' | 'reverse') => void;
+    play: () => void;
+    setFrame: (frame: number) => void;
+    totalFrames?: number;
+    duration?: number;
+  };
+  type DotLottieElement = HTMLElement & { dotLottie?: DotLottieInstance };
+
+  // The custom element upgrades and loads its animation asynchronously, so
+  // `el.dotLottie` isn't there on first tick. Poll briefly rather than racing
+  // it; if it never arrives (the WASM fetch failing is a real state — see
+  // STATE.md) we simply never add `is-lottie-ready`, and the static fallback
+  // stays visible forever, which is the intended degradation.
+  function whenReady(el: DotLottieElement, cb: (dl: DotLottieInstance) => void, tries = 0) {
+    if (!el.isConnected) return;
+    if (el.dotLottie) {
+      cb(el.dotLottie);
+      return;
+    }
+    if (tries > 200) return; // ~10s
+    setTimeout(() => whenReady(el, cb, tries + 1), 50);
+  }
+
+  function initLottiePingpong() {
+    const players = document.querySelectorAll<DotLottieElement>('[data-lottie-pingpong]');
+
+    players.forEach((el) => {
+      const holdMs = Number(el.dataset.lottieHoldMs ?? 3000);
+
+      whenReady(el, (dl) => {
+        el.closest('.media')?.classList.add('is-lottie-ready');
+
+        // Reduced motion: no cycle at all, and hold the LAST frame rather
+        // than the first — this is a build-on animation, so frame 0 is blank.
+        if (prefersReducedMotion()) {
+          const last = (dl.totalFrames ?? 1) - 1;
+          dl.setFrame(Math.max(0, last));
+          return;
+        }
+
+        // One leg = one forward or one reverse pass. `leg` is a sequence
+        // guard: whichever of the `complete` event or the duration-based
+        // backup timer fires first advances the cycle, and the loser is
+        // ignored. The backup exists because `complete` firing at frame 0 in
+        // reverse mode is not guaranteed across dotlottie versions.
+        const durationMs = (dl.duration ?? 1) * 1000;
+        const SLACK_MS = 400;
+        let leg = 0;
+        let direction: 'forward' | 'reverse' = 'forward';
+        let holdTimer: ReturnType<typeof setTimeout>;
+        let guardTimer: ReturnType<typeof setTimeout>;
+
+        function playLeg() {
+          if (!el.isConnected) return;
+          const startedAt = leg;
+          dl.setMode(direction);
+          dl.play();
+          clearTimeout(guardTimer);
+          guardTimer = setTimeout(() => finishLeg(startedAt), durationMs + SLACK_MS);
+        }
+
+        function finishLeg(startedAt: number) {
+          if (startedAt !== leg) return; // already advanced by the other trigger
+          if (!el.isConnected) {
+            clearTimeout(guardTimer);
+            clearTimeout(holdTimer);
+            return;
+          }
+          leg += 1;
+          clearTimeout(guardTimer);
+
+          if (direction === 'forward') {
+            direction = 'reverse';
+            holdTimer = setTimeout(playLeg, holdMs); // hold the assembled logo
+          } else {
+            direction = 'forward';
+            playLeg(); // no hold — frame 0 is blank
+          }
+        }
+
+        el.addEventListener('complete', () => finishLeg(leg));
+        playLeg();
+      });
+    });
+  }
+
+  document.addEventListener('astro:page-load', initLottiePingpong);
+</script>
+
 <style>
   .media {
     position: relative;
     display: block;
     overflow: hidden;
+  }
+  /* The fallback and the animation are both inside Media, so this swap is a
+     plain scoped rule — no :global() and no cross-component specificity race
+     (the classlist-merge trap from bug-002/bug-004). */
+  .media__lottie-fallback {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+  .media.is-lottie-ready .media__lottie-fallback {
+    opacity: 0;
   }
   .media--lottie dotlottie-wc,
   .media--video video,
