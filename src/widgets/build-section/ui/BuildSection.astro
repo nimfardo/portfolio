@@ -26,9 +26,9 @@ const { blocks, stats, githubUrl } = Astro.props;
 const lastIndex = blocks.length - 1;
 ---
 
-<section class="build-section">
-  <Heading class="build-section__heading">Build</Heading>
-  <div class="build-section__body">
+<section class="section-grid build-section">
+  <Heading class="section-grid__aside build-section__heading">Build</Heading>
+  <div class="section-grid__body build-section__body">
     {
       blocks.map((block, i) => (
         <div class="build-section__block" data-reveal style={`--reveal-delay: ${staggerDelay(i, 100)}`}>
@@ -43,7 +43,7 @@ const lastIndex = blocks.length - 1;
               alt={block.media.alt}
             />
           )}
-          <p class="build-section__caption">{block.text}</p>
+          <p class="section-prose build-section__caption">{block.text}</p>
           {i === 0 && stats && (
             <div class="build-section__stats">
               {stats.map((stat) => (
@@ -63,21 +63,10 @@ const lastIndex = blocks.length - 1;
 </section>
 
 <style>
-  .build-section {
-    display: grid;
-    /* 33/66 proportional split — see ContentSection.astro for the Figma
-       reference-column rationale. */
-    grid-template-columns: repeat(3, 1fr);
-    column-gap: 80px;
-    align-items: start;
-  }
-  :global(.build-section__heading) {
-    grid-column: 1 / 2;
-  }
+  /* Grid, column spans and the 1023px collapse come from .section-grid in
+     global.css (ref-005). */
   .build-section__body {
-    grid-column: 2 / 4;
     display: flex;
-    min-width: 0;
     flex-direction: column;
     /* 80px between stacked blocks — measured off the canvas (block 1 ends
        y=992, block 2 starts y=1072 on CONNECTIS's Build). */
@@ -101,14 +90,8 @@ const lastIndex = blocks.length - 1;
     aspect-ratio: 1071 / 630;
     object-fit: cover;
   }
+  /* Type ramp comes from .section-prose in global.css. */
   .build-section__caption {
-    margin: 0;
-    font-family: var(--font-family-body);
-    font-size: var(--font-size-4xl);
-    line-height: var(--font-line-height-5xl);
-    letter-spacing: -0.4px;
-    font-weight: var(--font-weight-medium);
-    color: var(--color-text-emphasis);
     white-space: pre-line;
   }
   .build-section__stats {
@@ -121,18 +104,6 @@ const lastIndex = blocks.length - 1;
     align-self: flex-start;
   }
 
-  @media (max-width: 1023px) {
-    .build-section {
-      grid-template-columns: 1fr;
-      gap: var(--spacing-xl);
-    }
-    :global(.build-section__heading) {
-      grid-column: 1;
-    }
-    .build-section__body {
-      grid-column: 1;
-    }
-  }
   @media (max-width: 480px) {
     .build-section__stats {
       flex-direction: column;

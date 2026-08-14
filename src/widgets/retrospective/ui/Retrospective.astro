@@ -11,10 +11,10 @@ interface Props {
 const { heading, behanceUrl } = Astro.props;
 ---
 
-<section class="retrospective">
-  <Heading class="retrospective__heading">{heading}</Heading>
-  <div class="retrospective__body" data-reveal>
-    <p class="retrospective__text"><slot /></p>
+<section class="section-grid retrospective">
+  <Heading class="section-grid__aside retrospective__heading">{heading}</Heading>
+  <div class="section-grid__body retrospective__body" data-reveal>
+    <p class="section-prose retrospective__text"><slot /></p>
     {
       behanceUrl && (
         <Button type="solid" href={behanceUrl} class="retrospective__button">
@@ -30,32 +30,14 @@ const { heading, behanceUrl } = Astro.props;
 </section>
 
 <style>
-  .retrospective {
-    display: grid;
-    /* 33/66 proportional split — see ContentSection.astro for the Figma
-       reference-column rationale. */
-    grid-template-columns: repeat(3, 1fr);
-    column-gap: 80px;
-    align-items: start;
-  }
-  :global(.retrospective__heading) {
-    grid-column: 1 / 2;
-  }
+  /* Grid, column spans and the 1023px collapse come from .section-grid in
+     global.css; the type ramp from .section-prose there (ref-005). */
   .retrospective__body {
-    grid-column: 2 / 4;
     display: flex;
-    min-width: 0;
     flex-direction: column;
     gap: 80px;
   }
   .retrospective__text {
-    margin: 0;
-    font-family: var(--font-family-body);
-    font-size: var(--font-size-4xl);
-    line-height: var(--font-line-height-5xl);
-    letter-spacing: -0.4px;
-    font-weight: var(--font-weight-medium);
-    color: var(--color-text-emphasis);
     /* defenceSystems's closing text carries a real newline after its lead-in
        sentence (authored that way on canvas); single-line texts are
        unaffected. */
@@ -104,16 +86,4 @@ const { heading, behanceUrl } = Astro.props;
     }
   }
 
-  @media (max-width: 1023px) {
-    .retrospective {
-      grid-template-columns: 1fr;
-      gap: var(--spacing-xl);
-    }
-    :global(.retrospective__heading) {
-      grid-column: 1;
-    }
-    .retrospective__body {
-      grid-column: 1;
-    }
-  }
 </style>

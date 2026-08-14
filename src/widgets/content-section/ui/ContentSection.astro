@@ -21,9 +21,9 @@ interface Props {
 const { heading, blocks, class: className } = Astro.props;
 ---
 
-<section class:list={['content-section', className]}>
-  <Heading class="content-section__heading">{heading}</Heading>
-  <div class="content-section__body">
+<section class:list={['section-grid', 'content-section', className]}>
+  <Heading class="section-grid__aside content-section__heading">{heading}</Heading>
+  <div class="section-grid__body content-section__body">
     {
       blocks.map((block, i) => (
         <div class="content-section__block" data-reveal style={`--reveal-delay: ${staggerDelay(i, 100)}`}>
@@ -46,7 +46,7 @@ const { heading, blocks, class: className } = Astro.props;
           {/* Slots into the block's own 64px column gap, which is exactly
               Figma's media -> links -> text rhythm. */}
           {block.linkCards && <LinkCards cards={block.linkCards} />}
-          <p class="content-section__text">{block.text}</p>
+          <p class="section-prose content-section__text">{block.text}</p>
         </div>
       ))
     }
@@ -54,25 +54,10 @@ const { heading, blocks, class: className } = Astro.props;
 </section>
 
 <style>
-  .content-section {
-    display: grid;
-    /* Max's Figma reference columns: 3 equal tracks + 80px gutters. Heading
-       spans track 1 (33%), body spans tracks 2-3 + the gutter between them
-       (66%) — proportional, not a fixed px split, so it holds at any
-       container width instead of skewing as the viewport shrinks. */
-    grid-template-columns: repeat(3, 1fr);
-    column-gap: 80px;
-    align-items: start;
-  }
-  /* :global() — class merges onto Heading's own rendered <h2>, which
-     carries Heading.astro's astro-cid, not this component's. */
-  :global(.content-section__heading) {
-    grid-column: 1 / 2;
-  }
+  /* Grid, column spans and the 1023px collapse come from .section-grid in
+     global.css — shared with the four other case-study sections (ref-005). */
   .content-section__body {
-    grid-column: 2 / 4;
     display: flex;
-    min-width: 0;
     flex-direction: column;
     /* 160px between stacked blocks (Deliverables' 2 blocks) — matches the
        page's own section rhythm, per Figma. */
@@ -95,30 +80,11 @@ const { heading, blocks, class: className } = Astro.props;
     aspect-ratio: 1071 / 630;
     object-fit: cover;
   }
+  /* Type ramp comes from .section-prose in global.css. */
   .content-section__text {
-    margin: 0;
-    font-family: var(--font-family-body);
-    font-size: var(--font-size-4xl);
-    line-height: var(--font-line-height-5xl);
-    letter-spacing: -0.4px;
-    font-weight: var(--font-weight-medium);
-    color: var(--color-text-emphasis);
     /* defenceSystems's paragraphs carry a real newline after their lead-in sentence
        (authored that way on canvas); CONNECTIS's single-line texts are
        unaffected. */
     white-space: pre-line;
-  }
-
-  @media (max-width: 1023px) {
-    .content-section {
-      grid-template-columns: 1fr;
-      gap: var(--spacing-xl);
-    }
-    :global(.content-section__heading) {
-      grid-column: 1;
-    }
-    .content-section__body {
-      grid-column: 1;
-    }
   }
 </style>

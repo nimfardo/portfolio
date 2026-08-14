@@ -76,6 +76,61 @@ svg {
   }
 }
 
+/* Case-study section layout — the "reference column" grid Max added in Figma
+   (node 2165:3): 3 equal tracks with 80px gutters, the section heading
+   spanning track 1 (33%) and the body spanning tracks 2-3 plus the gutter
+   between them (66%). Proportional rather than a fixed px split, so it holds
+   at any container width instead of skewing as the viewport shrinks.
+
+   Lives here because five section widgets carried this identical block —
+   ContentSection, BuildSection, OverviewSection, Retrospective and the
+   project page's own Process section (ref-005). Each still owns its body's
+   `display: flex` and its own stacking gap; those genuinely differ per
+   section (64 / 80 / 160px) and stay scoped to the component.
+
+   Specificity note: Astro's scoped rules carry an extra [data-astro-cid-*]
+   attribute selector, so a component's own rule always outranks these — a
+   section that needs to deviate can still just say so locally. */
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  column-gap: 80px;
+  align-items: start;
+}
+.section-grid__aside {
+  grid-column: 1 / 2;
+}
+.section-grid__body {
+  grid-column: 2 / 4;
+  min-width: 0;
+}
+@media (max-width: 1023px) {
+  .section-grid {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-xl);
+  }
+  .section-grid__aside,
+  .section-grid__body {
+    grid-column: 1;
+  }
+}
+
+/* The big body paragraph shared by every case-study section — Challenge and
+   Deliverables captions, the Build caption, the overview statement and the
+   retrospective's closing line all render at this exact ramp. `white-space:
+   pre-line` is deliberately NOT here: three of the five want it (their copy
+   carries authored newlines) and the overview statement does not, so each
+   consumer keeps that one declaration scoped (ref-005). */
+.section-prose {
+  margin: 0;
+  font-family: var(--font-family-body);
+  font-size: var(--font-size-4xl);
+  line-height: var(--font-line-height-5xl);
+  letter-spacing: -0.4px;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-emphasis);
+}
+
 /* Scroll-reveal primitive (shared/lib/scroll-reveal.ts), adapted from
    wearemotto.com/work's line/element reveal pattern — see
    wiki/concepts/motto-motion-patterns.md. `--reveal-delay` lets a consumer

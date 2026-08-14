@@ -76,9 +76,9 @@ const processBlocks =
             )}
 
             {processSteps && (
-              <section class="project-page__process">
-                <Heading class="project-page__process-heading">Process</Heading>
-                <div class="project-page__process-body">
+              <section class="section-grid project-page__process">
+                <Heading class="section-grid__aside project-page__process-heading">Process</Heading>
+                <div class="section-grid__body project-page__process-body">
                   <ProcessAccordion steps={processSteps} />
                 </div>
               </section>
@@ -148,34 +148,11 @@ const processBlocks =
     gap: 160px;
     padding: 160px 40px;
   }
-  .project-page__process {
-    display: grid;
-    /* 33/66 proportional split — Max added reference columns in Figma
-       (node 2165:3): 3 equal tracks with 80px gutters, heading spans
-       track 1, content spans tracks 2-3. Same pattern as ContentSection,
-       BuildSection, Retrospective. */
-    grid-template-columns: repeat(3, 1fr);
-    column-gap: 80px;
-    align-items: start;
-  }
-  :global(.project-page__process-heading) {
-    grid-column: 1 / 2;
-  }
-  .project-page__process-body {
-    grid-column: 2 / 4;
-    min-width: 0;
-  }
+  /* The Process section's 33/66 grid, column spans and 1023px collapse all
+     come from .section-grid in global.css, shared with the four section
+     widgets that had the identical block (ref-005). It carries no other
+     layout of its own, so there is no scoped rule for it here. */
   @media (max-width: 1023px) {
-    .project-page__process {
-      grid-template-columns: 1fr;
-      gap: var(--spacing-xl);
-    }
-    :global(.project-page__process-heading) {
-      grid-column: 1;
-    }
-    .project-page__process-body {
-      grid-column: 1;
-    }
     /* 160px top/bottom rhythm was measured off Figma's desktop frame only
        (no mobile/tablet mock exists for this page) — left unreduced, it's
        a huge amount of empty space stacked between every section on a
