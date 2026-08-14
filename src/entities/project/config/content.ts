@@ -1,4 +1,5 @@
 import type { ProjectContent } from '../model/types';
+import { artAnnanolli } from './art-annanolli';
 import { arvus } from './arvus';
 import { connectis } from './connectis';
 import { medicalSoftware } from './medicalSoftware';
@@ -13,6 +14,7 @@ import { defenceSystems } from './defenceSystems';
  * only when present.
  */
 export const PROJECT_CONTENT: Record<string, ProjectContent> = {
+  'art-annanolli': artAnnanolli,
   arvus,
   connectis,
   medicalSoftware,
