@@ -1,0 +1,36 @@
+---
+// The nav has linked to /process since copy-003, but the route never existed —
+// this page closes that 404. (/about is still outstanding.)
+import Layout from '@app/layouts/Layout.astro';
+import { PageHeader } from '@widgets/page-header';
+import { ProcessRail } from '@widgets/process-rail';
+---
+
+<Layout title="Design Process — Max Shturma">
+  <main class="process">
+    <PageHeader title="Design Process" class="process__header" />
+    <ProcessRail />
+  </main>
+</Layout>
+
+<style>
+  /* :global() — the class merges onto PageHeader's own rendered element, which
+     carries PageHeader.astro's astro-cid, not this page's. Matches the padding
+     the rail's own sections use so the title lines up with the cards. */
+  :global(.process__header) {
+    padding: 0 40px;
+  }
+  .process {
+    padding-top: var(--spacing-4xl);
+    padding-bottom: 160px;
+  }
+
+  @media (max-width: 767px) {
+    :global(.process__header) {
+      padding: 0 24px;
+    }
+    .process {
+      padding-bottom: var(--spacing-4xl);
+    }
+  }
+</style>

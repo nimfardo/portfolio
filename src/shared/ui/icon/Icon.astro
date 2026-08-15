@@ -17,6 +17,18 @@ import iconScroll from './svg/scroll.svg?raw';
 import iconSmile from './svg/smile.svg?raw';
 import iconTree from './svg/tree.svg?raw';
 import iconWaves from './svg/waves.svg?raw';
+import iconSearch from './svg/search.svg?raw';
+import iconPersonas from './svg/personas.svg?raw';
+import iconSitemap from './svg/sitemap.svg?raw';
+import iconWireframe from './svg/wireframe.svg?raw';
+import iconSpeech from './svg/speech.svg?raw';
+import iconPalette from './svg/palette.svg?raw';
+import iconLayers from './svg/layers.svg?raw';
+import iconTokens from './svg/tokens.svg?raw';
+import iconSystem from './svg/system.svg?raw';
+import iconResponsive from './svg/responsive.svg?raw';
+import iconMotion from './svg/motion.svg?raw';
+import iconCode from './svg/code.svg?raw';
 
 const icons = {
   'arrow-right': iconArrowRight,
@@ -37,6 +49,20 @@ const icons = {
   smile: iconSmile,
   tree: iconTree,
   waves: iconWaves,
+  // The 12-step process icons (comp-011) — all built on the same 28x28
+  // frame as the rest of the set, so none belong in FRAME_32_ICONS.
+  search: iconSearch,
+  personas: iconPersonas,
+  sitemap: iconSitemap,
+  wireframe: iconWireframe,
+  speech: iconSpeech,
+  palette: iconPalette,
+  layers: iconLayers,
+  tokens: iconTokens,
+  system: iconSystem,
+  responsive: iconResponsive,
+  motion: iconMotion,
+  code: iconCode,
 } as const;
 
 export type IconName = keyof typeof icons;

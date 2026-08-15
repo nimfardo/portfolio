@@ -1,0 +1,328 @@
+---
+// The 12-step workflow as a horizontally-scrolled rail: four cards visible at
+// desktop, the rest reached by scrolling. The active card drives the detail
+// panel, the counter and the progress bar below.
+//
+// Adapted from Codrops' "Horizontal Smooth Scroll Layout" demo 2 (Max's
+// reference): ghost numeral behind the title, a framed slot, and tag words
+// under each item. Two things that demo does are deliberately NOT copied — it
+// tilts its images a few degrees and floats a circular button over them. This
+// system is rigidly rectilinear (bug-028 stripped corner radii from the icons
+// for exactly that reason), so a tilt would fight it.
+//
+// No new dependency: the reference uses Locomotive Scroll, this uses native
+// overflow-x + scroll-snap and an IntersectionObserver, matching how
+// shared/lib/scroll-reveal.ts already works.
+import { Icon, Tag } from '@shared/ui';
+import { PROCESS_STEPS } from '../model/steps';
+
+const first = PROCESS_STEPS[0];
+---
+
+<section class="rail-section">
+  <div class="rail" data-process-rail role="list">
+    {
+      PROCESS_STEPS.map((step, i) => (
+        <article
+          class:list={['step', i === 0 && 'is-active']}
+          role="listitem"
+          data-step={i}
+          data-action={step.action}
+          data-number={step.number}
+        >
+          <span class="step__ghost" aria-hidden="true">
+            {step.number}
+          </span>
+          <h2 class="step__title">{step.title}</h2>
+          <div class="step__box">
+            <Icon name={step.icon} size={72} class="step__icon" />
+          </div>
+          <ul class="step__outputs">
+            {step.outputs.map((out) => (
+              <li>
+                <Tag>{out}</Tag>
+              </li>
+            ))}
+          </ul>
+        </article>
+      ))
+    }
+  </div>
+
+  <div class="rail-axis">
+    <span class="rail-axis__progress" data-process-progress></span>
+  </div>
+
+  <p class="rail-meta">
+    <span data-process-counter>{first.number} / {String(PROCESS_STEPS.length).padStart(2, '0')}</span>
+    <span class="rail-meta__sep">·</span>
+    <span>The 12-Step AI-Design Workflow</span>
+  </p>
+
+  <div class="rail-detail">
+    <p class="rail-detail__label">Action</p>
+    <p class="rail-detail__text" data-process-action>{first.action}</p>
+  </div>
+</section>
+
+<script>
+  function initProcessRail() {
+    document.querySelectorAll<HTMLElement>('[data-process-rail]').forEach((rail) => {
+      const steps = [...rail.querySelectorAll<HTMLElement>('.step')];
+      if (!steps.length) return;
+      const section = rail.closest('.rail-section');
+      if (!section) return;
+      const actionEl = section.querySelector<HTMLElement>('[data-process-action]');
+      const counterEl = section.querySelector<HTMLElement>('[data-process-counter]');
+      const progressEl = section.querySelector<HTMLElement>('[data-process-progress]');
+      const total = steps.length;
+
+      progressEl?.style.setProperty('--rail-progress', `${100 / total}%`);
+
+      let active = -1;
+      const setActive = (index: number) => {
+        if (index === active || index < 0 || index >= total) return;
+        active = index;
+        steps.forEach((s, i) => s.classList.toggle('is-active', i === index));
+        const step = steps[index];
+        if (actionEl) actionEl.textContent = step.dataset.action ?? '';
+        if (counterEl) {
+          counterEl.textContent = `${step.dataset.number} / ${String(total).padStart(2, '0')}`;
+        }
+        if (progressEl) {
+          progressEl.style.transform = `translateX(${index * 100}%)`;
+        }
+      };
+
+      // The leading card — the left-most one still fully in view — is the
+      // active one. Watching intersection against the rail itself rather than
+      // the viewport keeps this correct however the page is scrolled.
+      const observer = new IntersectionObserver(
+        (entries) => {
+          const visible = entries
+            .filter((e) => e.isIntersecting)
+            .map((e) => Number((e.target as HTMLElement).dataset.step))
+            .sort((a, b) => a - b);
+          if (visible.length) setActive(visible[0]);
+        },
+        { root: rail, threshold: 0.85 },
+      );
+      steps.forEach((s) => observer.observe(s));
+      setActive(0);
+    });
+  }
+
+  // Not inside a transition:persist region, so this re-runs cleanly on every
+  // navigation — same as ProcessAccordion and PasswordGate. No resize handling
+  // needed: the observer's root is the rail itself, so it re-evaluates on its
+  // own when the breakpoint changes the card width.
+  document.addEventListener('astro:page-load', initProcessRail);
+</script>
+
+<style>
+  .rail-section {
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Full-bleed to the right so the rail runs off the edge rather than stopping
+     at the content column — that overflow is what signals "there is more". */
+  .rail {
+    display: flex;
+    gap: 56px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-padding-left: 40px;
+    padding: 0 40px;
+    /* hide the native bar; the axis below is the affordance */
+    scrollbar-width: none;
+  }
+  .rail::-webkit-scrollbar {
+    display: none;
+  }
+
+  .step {
+    position: relative;
+    flex: 0 0 392px;
+    width: 392px;
+    padding-top: 46px;
+    scroll-snap-align: start;
+    opacity: 0.42;
+    transition: opacity var(--duration-slow) var(--ease-fade);
+  }
+  .step.is-active {
+    opacity: 1;
+  }
+
+  .step__ghost {
+    position: absolute;
+    top: 0;
+    left: -14px;
+    font-family: var(--font-family-body);
+    font-size: 104px;
+    line-height: 89px;
+    font-weight: var(--font-weight-bold);
+    letter-spacing: -5px;
+    color: var(--color-text-primary);
+    opacity: 0.1;
+  }
+
+  .step__title {
+    position: relative;
+    margin: 0 0 24px;
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-3xl);
+    line-height: 33px;
+    letter-spacing: -0.4px;
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-emphasis);
+  }
+
+  .step__box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 200px;
+    border: 1px solid var(--color-border-default);
+    background: var(--color-bg-subtle);
+    transition:
+      border-color var(--duration-slow) var(--ease-fade),
+      background-color var(--duration-slow) var(--ease-fade);
+  }
+  .step.is-active .step__box {
+    border-color: var(--color-border-emphasis);
+  }
+  /* :global() — the class merges onto Icon's own rendered <span>, which
+     carries Icon.astro's astro-cid, not this component's. Omitting `color`
+     from a competing rule is deliberate (bug-004): the consumer's colour must
+     be the only declaration on that element. */
+  :global(.step__icon) {
+    color: var(--color-icon-default);
+  }
+  .step.is-active :global(.step__icon) {
+    color: var(--color-text-emphasis);
+  }
+
+  .step__outputs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 20px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .rail-axis {
+    position: relative;
+    height: 1px;
+    margin: 84px 40px 0;
+    background: var(--color-border-default);
+  }
+  .rail-axis__progress {
+    position: absolute;
+    top: -1px;
+    left: 0;
+    height: 3px;
+    width: var(--rail-progress, 8.3333%);
+    background: var(--color-text-emphasis);
+    transition: transform var(--duration-slow) var(--ease-reveal);
+  }
+
+  .rail-meta {
+    margin: 26px 0 0;
+    padding: 0 40px;
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-xs);
+    line-height: var(--font-line-height-xs);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-text-primary);
+    opacity: 0.45;
+  }
+  .rail-meta__sep {
+    margin: 0 10px;
+  }
+
+  .rail-detail {
+    margin-top: 70px;
+    padding: 0 40px;
+    text-align: right;
+  }
+  .rail-detail__label {
+    margin: 0 0 16px;
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-xs);
+    line-height: var(--font-line-height-xs);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-text-primary);
+    opacity: 0.4;
+  }
+  .rail-detail__text {
+    margin: 0 0 0 auto;
+    max-width: 1240px;
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-4xl);
+    line-height: var(--font-line-height-5xl);
+    letter-spacing: -0.5px;
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-emphasis);
+  }
+
+  @media (max-width: 1023px) {
+    .step {
+      flex-basis: 340px;
+      width: 340px;
+    }
+    .rail {
+      gap: 40px;
+    }
+    .rail-axis {
+      margin-top: 64px;
+    }
+    .rail-detail {
+      margin-top: 56px;
+    }
+  }
+
+  @media (max-width: 767px) {
+    /* One card plus a peek of the next, so the rail still reads as scrollable
+       on a phone — a fixed 392px card would overflow a 375px viewport. */
+    .step {
+      flex-basis: 78vw;
+      width: 78vw;
+      padding-top: 38px;
+    }
+    .rail,
+    .rail-axis,
+    .rail-meta,
+    .rail-detail {
+      padding-left: 24px;
+      padding-right: 24px;
+    }
+    .rail-axis {
+      margin-left: 24px;
+      margin-right: 24px;
+      padding: 0;
+    }
+    .step__ghost {
+      font-size: 76px;
+      line-height: 64px;
+      letter-spacing: -3px;
+    }
+    .step__box {
+      height: 168px;
+    }
+    .rail-detail {
+      text-align: left;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .step,
+    .step__box,
+    .rail-axis__progress {
+      transition: none;
+    }
+  }
+</style>
