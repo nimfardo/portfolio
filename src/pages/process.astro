@@ -1,32 +1,96 @@
 ---
 // The nav has linked to /process since copy-003, but the route never existed —
 // this page closes that 404. (/about is still outstanding.)
+//
+// Structure follows Max's Figma frame (node 2124:1834): a lead statement in
+// the 66% column, the 12-step rail, then the Build section. BuildSection is
+// reused verbatim from the case-study pages — it already renders a hardcoded
+// "Build" heading, one media+text block and an optional GitHub button, which
+// is exactly what the canvas has.
 import Layout from '@app/layouts/Layout.astro';
 import { PageHeader } from '@widgets/page-header';
 import { ProcessRail } from '@widgets/process-rail';
+import { BuildSection } from '@widgets/build-section';
+import type { ContentBlock } from '@entities/project';
+
+const buildBlocks: ContentBlock[] = [
+  {
+    media: {
+      type: 'image',
+      image: '/media/process/build.jpg',
+      imageAlt:
+        "Glacier Flow's README open in an editor: the workspace routing map, then a First-Time Bootstrap checklist stepping through project identity, STATE.md, non-negotiable rules, voice and architecture",
+    },
+    text: 'I use Glacier Flow, a Claude Code project template: folder-based routing, a markdown knowledge base, and XML task gates — no change lands without approval.',
+  },
+];
 ---
 
 <Layout title="Design Process — Max Shturma">
   <main class="process">
     <PageHeader title="Design Process" class="process__header" />
+
+    <div class="process__lead section-grid">
+      <p class="process__lead-text section-grid__body">
+        Twelve steps from a blank repo to a living design system. Every asset is markdown, script
+        or HTML — versioned in git, never exported. Claude Code is the analyst, the architect and
+        the design engineer.
+      </p>
+    </div>
+
     <ProcessRail />
+
+    <div class="process__build">
+      <BuildSection blocks={buildBlocks} githubUrl="https://github.com/nimfardo/glacier-flow" />
+    </div>
   </main>
 </Layout>
 
 <style>
   /* :global() — the class merges onto PageHeader's own rendered element, which
-     carries PageHeader.astro's astro-cid, not this page's. Matches the padding
-     the rail's own sections use so the title lines up with the cards. */
+     carries PageHeader.astro's astro-cid, not this page's. */
   :global(.process__header) {
     padding: 0 40px;
   }
+
   .process {
-    padding-top: var(--spacing-4xl);
     padding-bottom: 160px;
+  }
+
+  /* Reuses the shared 33/66 reference grid (ref-005). No aside here — the
+     statement sits in the body column with the left track empty, matching
+     the canvas, where it starts at x=769 (193 + 576). */
+  .process__lead {
+    padding: 0 40px;
+    margin-top: var(--spacing-4xl);
+  }
+  .process__lead-text {
+    margin: 0;
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-4xl);
+    line-height: var(--font-line-height-5xl);
+    letter-spacing: -0.4px;
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-emphasis);
+  }
+
+  .process__build {
+    padding: 0 40px;
+    margin-top: 160px;
+  }
+
+  @media (max-width: 1023px) {
+    .process__build {
+      margin-top: var(--spacing-4xl);
+    }
   }
 
   @media (max-width: 767px) {
     :global(.process__header) {
+      padding: 0 24px;
+    }
+    .process__lead,
+    .process__build {
       padding: 0 24px;
     }
     .process {

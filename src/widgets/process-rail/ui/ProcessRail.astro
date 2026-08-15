@@ -1,48 +1,40 @@
 ---
-// The 12-step workflow as a horizontally-scrolled rail. The active step drives
-// the detail panel, the counter and the progress bar below.
+// The 12-step workflow as a horizontally-scrolled rail — four cards visible at
+// desktop, the rest reached by scrolling sideways.
 //
-// Structure adapted from Codrops' "Horizontal Smooth Scroll Layout" demo 2
-// (Max's reference) — a windowed rail where items bleed off the right edge.
-// The styling deliberately does NOT follow it: that demo frames a photograph
-// per item, tilts it, and floats a circular button over it. There are no
-// photographs here, so a frame would enclose nothing and read as a broken
-// image. Each step is an index entry instead — a hairline rule, a small number
-// and icon, the title, and its outputs as plain text.
+// Synced to Max's Figma restyle (node 2124:1834): a hairline rule per step
+// that thickens to 2px when active, a 32px icon above the title, and the
+// step's outputs as pill tags. There is no step number on the card and no
+// detail panel below — both were in an earlier pass and he removed them.
 //
-// Outputs are deliberately NOT pills. They are metadata; in bordered capsules
-// they out-shouted the step titles, and the uppercase treatment mangled
-// filenames into README.MD. As middot-separated text they recede and keep
-// their real casing.
+// The pills use OverviewSection's tag treatment rather than a shared atom.
+// The `Tag` atom that used to exist was stale — it rendered
+// --color-text-secondary (orange) while the Figma master is cream — and had
+// no consumers, so it was deleted in feat-045. Two copies of this treatment
+// now exist (here and OverviewSection); a third would justify extracting it.
 //
-// No new dependency: the reference uses Locomotive Scroll, this uses native
-// overflow-x + scroll-snap and an IntersectionObserver, the same primitive
-// shared/lib/scroll-reveal.ts already uses.
+// No new dependency: the Codrops reference this is adapted from uses
+// Locomotive Scroll, this uses native overflow-x plus an IntersectionObserver,
+// the same primitive shared/lib/scroll-reveal.ts already uses.
 import { Icon } from '@shared/ui';
 import { PROCESS_STEPS } from '../model/steps';
-
-const first = PROCESS_STEPS[0];
-const total = String(PROCESS_STEPS.length).padStart(2, '0');
 ---
 
 <section class="rail-section">
   <div class="rail" data-process-rail role="list">
     {
       PROCESS_STEPS.map((step, i) => (
-        <article
-          class:list={['step', i === 0 && 'is-active']}
-          role="listitem"
-          data-step={i}
-          data-action={step.action}
-          data-number={step.number}
-        >
+        <article class:list={['step', i === 0 && 'is-active']} role="listitem" data-step={i}>
           <span class="step__rule" aria-hidden="true" />
-          <div class="step__top">
-            <span class="step__number">{step.number}</span>
-            <Icon name={step.icon} size={22} class="step__icon" />
+          <div class="step__body">
+            <Icon name={step.icon} size={32} class="step__icon" />
+            <h2 class="step__title">{step.title}</h2>
           </div>
-          <h2 class="step__title">{step.title}</h2>
-          <p class="step__outputs">{step.outputs.join(' · ')}</p>
+          <ul class="step__outputs">
+            {step.outputs.map((out) => (
+              <li class="step__output">{out}</li>
+            ))}
+          </ul>
         </article>
       ))
     }
@@ -50,17 +42,6 @@ const total = String(PROCESS_STEPS.length).padStart(2, '0');
 
   <div class="rail-axis">
     <span class="rail-axis__progress" data-process-progress></span>
-  </div>
-
-  <p class="rail-meta">
-    <span data-process-counter>{first.number} / {total}</span>
-    <span class="rail-meta__sep">·</span>
-    <span>The 12-Step AI-Design Workflow</span>
-  </p>
-
-  <div class="rail-detail">
-    <p class="rail-detail__label">Action</p>
-    <p class="rail-detail__text" data-process-action>{first.action}</p>
   </div>
 </section>
 
@@ -70,10 +51,7 @@ const total = String(PROCESS_STEPS.length).padStart(2, '0');
       const steps = [...rail.querySelectorAll<HTMLElement>('.step')];
       if (!steps.length) return;
       const section = rail.closest('.rail-section');
-      if (!section) return;
-      const actionEl = section.querySelector<HTMLElement>('[data-process-action]');
-      const counterEl = section.querySelector<HTMLElement>('[data-process-counter]');
-      const progressEl = section.querySelector<HTMLElement>('[data-process-progress]');
+      const progressEl = section?.querySelector<HTMLElement>('[data-process-progress]');
       const total = steps.length;
 
       progressEl?.style.setProperty('--rail-progress', `${100 / total}%`);
@@ -83,17 +61,12 @@ const total = String(PROCESS_STEPS.length).padStart(2, '0');
         if (index === active || index < 0 || index >= total) return;
         active = index;
         steps.forEach((s, i) => s.classList.toggle('is-active', i === index));
-        const step = steps[index];
-        if (actionEl) actionEl.textContent = step.dataset.action ?? '';
-        if (counterEl) {
-          counterEl.textContent = `${step.dataset.number} / ${String(total).padStart(2, '0')}`;
-        }
         if (progressEl) progressEl.style.transform = `translateX(${index * 100}%)`;
       };
 
       // The leading card — the left-most one still fully in view — is active.
       // Observing against the rail rather than the viewport keeps that correct
-      // however far down the page the user has scrolled.
+      // however far down the page the reader has scrolled vertically.
       const observer = new IntersectionObserver(
         (entries) => {
           const visible = entries
@@ -110,33 +83,34 @@ const total = String(PROCESS_STEPS.length).padStart(2, '0');
   }
 
   // Not inside a transition:persist region, so this re-runs cleanly on every
-  // navigation — same as ProcessAccordion and PasswordGate. No resize handling
-  // needed: the observer's root is the rail itself, so it re-evaluates on its
-  // own when a breakpoint changes the card width.
+  // navigation — same as ProcessAccordion and PasswordGate.
   document.addEventListener('astro:page-load', initProcessRail);
 </script>
 
 <style>
-  .rail-section {
-    display: flex;
-    flex-direction: column;
-  }
-
   .rail {
     display: flex;
     gap: 48px;
     overflow-x: auto;
-    scroll-snap-type: x mandatory;
+    /* `proximity`, not `mandatory`: this rail sits between a lead paragraph
+       and the Build section, so a mandatory snap fights vertical page
+       scrolling on trackpads that emit both axes at once. */
+    scroll-snap-type: x proximity;
     scroll-padding-left: 40px;
     padding: 0 40px;
     /* hidden deliberately — the axis below is the scroll affordance */
     scrollbar-width: none;
+    /* keep sideways swipes in the rail from triggering browser back-nav */
+    overscroll-behavior-x: contain;
   }
   .rail::-webkit-scrollbar {
     display: none;
   }
 
   .step {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
     flex: 0 0 392px;
     width: 392px;
     scroll-snap-align: start;
@@ -147,12 +121,11 @@ const total = String(PROCESS_STEPS.length).padStart(2, '0');
     opacity: 1;
   }
 
-  /* The rule is the whole frame. A 2px active state rather than a colour-only
-     change so it still reads at a glance in both themes. */
+  /* The rule is the whole frame. A thickness change as well as a colour change
+     so the active step still reads at a glance in both themes. */
   .step__rule {
     display: block;
     height: 1px;
-    margin-bottom: 22px;
     background: var(--color-border-default);
     transition:
       background-color var(--duration-slow) var(--ease-fade),
@@ -160,25 +133,16 @@ const total = String(PROCESS_STEPS.length).padStart(2, '0');
   }
   .step.is-active .step__rule {
     height: 2px;
-    margin-bottom: 21px;
     background: var(--color-border-emphasis);
   }
 
-  .step__top {
+  .step__body {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 20px;
+    flex-direction: column;
+    gap: 16px;
   }
-  .step__number {
-    font-family: var(--font-family-body);
-    font-size: var(--font-size-xs);
-    line-height: var(--font-line-height-xs);
-    letter-spacing: 0.12em;
-    color: var(--color-text-primary);
-  }
-  /* :global() — the class merges onto Icon's own rendered <span>, which carries
-     Icon.astro's astro-cid, not this component's. Icon deliberately declares no
+  /* :global() — the class merges onto Icon's own rendered <span>, which
+     carries Icon.astro's astro-cid, not this component's. Icon declares no
      colour of its own (bug-004), so this is the only declaration on it. */
   :global(.step__icon) {
     color: var(--color-icon-default);
@@ -188,10 +152,7 @@ const total = String(PROCESS_STEPS.length).padStart(2, '0');
   }
 
   .step__title {
-    /* Two lines' worth, so single-line titles still push the outputs down to a
-       shared baseline across the rail. */
-    min-height: 63px;
-    margin: 0 0 26px;
+    margin: 0;
     font-family: var(--font-family-body);
     font-size: var(--font-size-3xl);
     line-height: 31px;
@@ -201,16 +162,26 @@ const total = String(PROCESS_STEPS.length).padStart(2, '0');
   }
 
   .step__outputs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
     margin: 0;
-    font-family: var(--font-family-body);
-    font-size: var(--font-size-sm);
-    line-height: var(--font-line-height-sm);
-    letter-spacing: 0.02em;
-    color: var(--color-text-primary);
-    opacity: 0.62;
+    padding: 0;
+    list-style: none;
   }
-  .step.is-active .step__outputs {
-    opacity: 0.9;
+  /* Matches the Figma tag master (node 2119:1692) and OverviewSection's tags:
+     cream border and text, not the stale orange the old Tag atom used. */
+  .step__output {
+    padding: 8px 14px;
+    border: 1px solid var(--color-border-emphasis);
+    border-radius: var(--radius-full);
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-xs);
+    line-height: var(--font-line-height-xs);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--color-text-emphasis);
+    white-space: nowrap;
   }
 
   .rail-axis {
@@ -229,47 +200,6 @@ const total = String(PROCESS_STEPS.length).padStart(2, '0');
     transition: transform var(--duration-slow) var(--ease-reveal);
   }
 
-  .rail-meta {
-    margin: 26px 0 0;
-    padding: 0 40px;
-    font-family: var(--font-family-body);
-    font-size: var(--font-size-xs);
-    line-height: var(--font-line-height-xs);
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--color-text-primary);
-    opacity: 0.45;
-  }
-  .rail-meta__sep {
-    margin: 0 10px;
-  }
-
-  .rail-detail {
-    margin-top: 80px;
-    padding: 0 40px;
-    text-align: right;
-  }
-  .rail-detail__label {
-    margin: 0 0 16px;
-    font-family: var(--font-family-body);
-    font-size: var(--font-size-xs);
-    line-height: var(--font-line-height-xs);
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--color-text-primary);
-    opacity: 0.4;
-  }
-  .rail-detail__text {
-    margin: 0 0 0 auto;
-    max-width: 1240px;
-    font-family: var(--font-family-body);
-    font-size: var(--font-size-4xl);
-    line-height: var(--font-line-height-5xl);
-    letter-spacing: -0.5px;
-    font-weight: var(--font-weight-medium);
-    color: var(--color-text-emphasis);
-  }
-
   @media (max-width: 1023px) {
     .step {
       flex-basis: 340px;
@@ -281,9 +211,6 @@ const total = String(PROCESS_STEPS.length).padStart(2, '0');
     .rail-axis {
       margin-top: 72px;
     }
-    .rail-detail {
-      margin-top: 60px;
-    }
   }
 
   @media (max-width: 767px) {
@@ -293,9 +220,7 @@ const total = String(PROCESS_STEPS.length).padStart(2, '0');
       flex-basis: 78vw;
       width: 78vw;
     }
-    .rail,
-    .rail-meta,
-    .rail-detail {
+    .rail {
       padding-left: 24px;
       padding-right: 24px;
     }
@@ -303,11 +228,10 @@ const total = String(PROCESS_STEPS.length).padStart(2, '0');
       margin-left: 24px;
       margin-right: 24px;
     }
-    .step__title {
-      min-height: 0;
-    }
-    .rail-detail {
-      text-align: left;
+    /* A single nowrap pill can be wider than a phone screen — same fix
+       OverviewSection needed at this breakpoint (feat-033). */
+    .step__output {
+      white-space: normal;
     }
   }
 
