@@ -11,6 +11,7 @@ import Layout from '@app/layouts/Layout.astro';
 import { PageHeader } from '@widgets/page-header';
 import { ProcessRail } from '@widgets/process-rail';
 import { BuildSection } from '@widgets/build-section';
+import { Heading } from '@shared/ui';
 import type { ContentBlock } from '@entities/project';
 
 const buildBlocks: ContentBlock[] = [
@@ -28,6 +29,10 @@ const buildBlocks: ContentBlock[] = [
 
 <Layout title="Design Process — Max Shturma">
   <main class="process">
+    {/* PageHeader's title is a <span>, and it's display:none below 1024px —
+        so without this the page has no h1 at any width. */}
+    <h1 class="visually-hidden">Design Process</h1>
+
     <PageHeader title="Design Process" class="process__header" />
 
     <div class="process__lead section-grid">
@@ -36,6 +41,10 @@ const buildBlocks: ContentBlock[] = [
         or HTML — versioned in git, never exported. Claude Code is the analyst, the architect and
         the design engineer.
       </p>
+    </div>
+
+    <div class="process__rail-heading section-grid">
+      <Heading class="section-grid__aside">The 12-Step Workflow</Heading>
     </div>
 
     <ProcessRail />
@@ -74,12 +83,21 @@ const buildBlocks: ContentBlock[] = [
     color: var(--color-text-emphasis);
   }
 
+  /* Sits in the same 33% track as every case-study section heading, so the
+     rail is announced rather than starting straight under the lead sentence. */
+  .process__rail-heading {
+    padding: 0 40px;
+    margin-top: 160px;
+    margin-bottom: 40px;
+  }
+
   .process__build {
     padding: 0 40px;
     margin-top: 160px;
   }
 
   @media (max-width: 1023px) {
+    .process__rail-heading,
     .process__build {
       margin-top: var(--spacing-4xl);
     }
@@ -90,6 +108,7 @@ const buildBlocks: ContentBlock[] = [
       padding: 0 24px;
     }
     .process__lead,
+    .process__rail-heading,
     .process__build {
       padding: 0 24px;
     }

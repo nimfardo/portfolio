@@ -4,8 +4,15 @@
 //
 // Synced to Max's Figma restyle (node 2124:1834): a hairline rule per step
 // that thickens to 2px when active, a 32px icon above the title, and the
-// step's outputs as pill tags. There is no step number on the card and no
-// detail panel below — both were in an earlier pass and he removed them.
+// step's outputs as pill tags.
+//
+// The step number and the step's one-line action are back on the card
+// (feat-047). feat-046 had removed both to match canvas, which left every
+// card as a title plus two filenames — a numbered process rendered without
+// numbers, and no answer anywhere on the page to "what actually happens at
+// this step". The `action` strings were already written and sitting unused
+// in the model. Canvas is still the source of truth for this widget, so
+// node 2659:1752 owes a resync.
 //
 // The pills use OverviewSection's tag treatment rather than a shared atom.
 // The `Tag` atom that used to exist was stale — it rendered
@@ -21,24 +28,26 @@ import { PROCESS_STEPS } from '../model/steps';
 ---
 
 <section class="rail-section">
-  <div class="rail" data-process-rail role="list">
+  <ol class="rail" data-process-rail>
     {
       PROCESS_STEPS.map((step, i) => (
-        <article class:list={['step', i === 0 && 'is-active']} role="listitem" data-step={i}>
+        <li class:list={['step', i === 0 && 'is-active']} data-step={i}>
           <span class="step__rule" aria-hidden="true" />
           <div class="step__body">
+            <span class="step__number">{step.number}</span>
             <Icon name={step.icon} size={32} class="step__icon" />
-            <h2 class="step__title">{step.title}</h2>
+            <h3 class="step__title">{step.title}</h3>
+            <p class="step__action">{step.action}</p>
           </div>
           <ul class="step__outputs">
             {step.outputs.map((out) => (
               <li class="step__output">{out}</li>
             ))}
           </ul>
-        </article>
+        </li>
       ))
     }
-  </div>
+  </ol>
 
   <div class="rail-axis">
     <span class="rail-axis__progress" data-process-progress></span>
@@ -91,6 +100,8 @@ import { PROCESS_STEPS } from '../model/steps';
   .rail {
     display: flex;
     gap: 48px;
+    margin: 0;
+    list-style: none;
     overflow-x: auto;
     /* `proximity`, not `mandatory`: this rail sits between a lead paragraph
        and the Build section, so a mandatory snap fights vertical page
@@ -114,7 +125,10 @@ import { PROCESS_STEPS } from '../model/steps';
     flex: 0 0 392px;
     width: 392px;
     scroll-snap-align: start;
-    opacity: 0.42;
+    /* 0.65, not feat-046's 0.42: cream at 0.42 on this background falls under
+       4.5:1, and with three cards on screen at once it dimmed two thirds of
+       the section hard enough to read as disabled rather than as not-current. */
+    opacity: 0.65;
     transition: opacity var(--duration-slow) var(--ease-fade);
   }
   .step.is-active {
@@ -151,6 +165,16 @@ import { PROCESS_STEPS } from '../model/steps';
     color: var(--color-text-emphasis);
   }
 
+  /* Same label treatment as the output pills below, minus the uppercase
+     transform — these are digits. */
+  .step__number {
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-xs);
+    line-height: var(--font-line-height-xs);
+    letter-spacing: 0.04em;
+    color: var(--color-text-primary);
+  }
+
   .step__title {
     margin: 0;
     font-family: var(--font-family-body);
@@ -161,11 +185,22 @@ import { PROCESS_STEPS } from '../model/steps';
     color: var(--color-text-emphasis);
   }
 
+  .step__action {
+    margin: 0;
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-base);
+    line-height: var(--font-line-height-base);
+    color: var(--color-text-primary);
+  }
+
   .step__outputs {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
-    margin: 0;
+    /* Pinned to the card's bottom edge rather than flowing straight after the
+       action text — the actions run one to three lines depending on the step,
+       and without this the pills sit at a different height on every card. */
+    margin: auto 0 0;
     padding: 0;
     list-style: none;
   }
