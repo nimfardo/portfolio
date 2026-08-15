@@ -11,7 +11,6 @@ import Layout from '@app/layouts/Layout.astro';
 import { PageHeader } from '@widgets/page-header';
 import { ProcessRail } from '@widgets/process-rail';
 import { BuildSection } from '@widgets/build-section';
-import { Heading } from '@shared/ui';
 import type { ContentBlock } from '@entities/project';
 
 const buildBlocks: ContentBlock[] = [
@@ -43,10 +42,6 @@ const buildBlocks: ContentBlock[] = [
         HTML — versioned in git, never exported. Claude Code is the analyst, the architect and the
         design engineer.
       </p>
-    </div>
-
-    <div class="process__rail-heading section-grid">
-      <Heading class="section-grid__aside">The 12-Step Workflow</Heading>
     </div>
 
     <ProcessRail />
@@ -85,14 +80,6 @@ const buildBlocks: ContentBlock[] = [
     color: var(--color-text-emphasis);
   }
 
-  /* Sits in the same 33% track as every case-study section heading, so the
-     rail is announced rather than starting straight under the lead sentence. */
-  .process__rail-heading {
-    padding: 0 40px;
-    margin-top: 160px;
-    margin-bottom: 40px;
-  }
-
   /* 96px, not the 160px every other section on this site uses: the pinned
      rail releases flush with the viewport bottom, so the old gap stacked on
      top of a screen's worth of empty space. */
@@ -101,19 +88,11 @@ const buildBlocks: ContentBlock[] = [
     margin-top: var(--spacing-4xl);
   }
 
-  @media (max-width: 1023px) {
-    .process__rail-heading,
-    .process__build {
-      margin-top: var(--spacing-4xl);
-    }
-  }
-
   @media (max-width: 767px) {
     :global(.process__header) {
       padding: 0 24px;
     }
     .process__lead,
-    .process__rail-heading,
     .process__build {
       padding: 0 24px;
     }
