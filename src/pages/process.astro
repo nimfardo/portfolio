@@ -29,17 +29,19 @@ const buildBlocks: ContentBlock[] = [
 
 <Layout title="Design Process — Max Shturma">
   <main class="process">
-    {/* PageHeader's title is a <span>, and it's display:none below 1024px —
-        so without this the page has no h1 at any width. */}
+    {
+      /* PageHeader's title is a <span>, and it's display:none below 1024px —
+        so without this the page has no h1 at any width. */
+    }
     <h1 class="visually-hidden">Design Process</h1>
 
     <PageHeader title="Design Process" class="process__header" />
 
     <div class="process__lead section-grid">
       <p class="process__lead-text section-grid__body">
-        Twelve steps from a blank repo to a living design system. Every asset is markdown, script
-        or HTML — versioned in git, never exported. Claude Code is the analyst, the architect and
-        the design engineer.
+        Twelve steps from a blank repo to a living design system. Every asset is markdown, script or
+        HTML — versioned in git, never exported. Claude Code is the analyst, the architect and the
+        design engineer.
       </p>
     </div>
 
@@ -91,9 +93,12 @@ const buildBlocks: ContentBlock[] = [
     margin-bottom: 40px;
   }
 
+  /* 96px, not the 160px every other section on this site uses: the pinned
+     rail releases flush with the viewport bottom, so the old gap stacked on
+     top of a screen's worth of empty space. */
   .process__build {
     padding: 0 40px;
-    margin-top: 160px;
+    margin-top: var(--spacing-4xl);
   }
 
   @media (max-width: 1023px) {

@@ -1,6 +1,14 @@
 ---
-// The 12-step workflow as a horizontally-scrolled rail — four cards visible at
-// desktop, the rest reached by scrolling sideways.
+// The 12-step workflow as a rail of cards.
+//
+// Two layouts, one markup. At >=1024px with motion allowed the section is
+// pinned: it stands as tall as the track is wide, the viewport sticks for
+// that distance, and the track slides sideways 1:1 with the reader's vertical
+// scroll (feat-048). Everywhere else — narrow viewports, reduced motion, or
+// no JS at all — it is a plain vertical stack of 12 entries. The stack is the
+// base stylesheet and pinning is a script-added class on top of it, so the
+// fallback is what you get by default rather than what you get after a
+// failure.
 //
 // Synced to Max's Figma restyle (node 2124:1834): a hairline rule per step
 // that thickens to 2px when active, a 32px icon above the title, and the
@@ -20,74 +28,149 @@
 // no consumers, so it was deleted in feat-045. Two copies of this treatment
 // now exist (here and OverviewSection); a third would justify extracting it.
 //
-// No new dependency: the Codrops reference this is adapted from uses
-// Locomotive Scroll, this uses native overflow-x plus an IntersectionObserver,
-// the same primitive shared/lib/scroll-reveal.ts already uses.
+// Still no new dependency: the Codrops reference this is adapted from uses
+// Locomotive Scroll; this is a sticky element and one rAF-throttled scroll
+// listener.
 import { Icon } from '@shared/ui';
 import { PROCESS_STEPS } from '../model/steps';
 ---
 
-<section class="rail-section">
-  <ol class="rail" data-process-rail>
-    {
-      PROCESS_STEPS.map((step, i) => (
-        <li class:list={['step', i === 0 && 'is-active']} data-step={i}>
-          <span class="step__rule" aria-hidden="true" />
-          <div class="step__body">
-            <span class="step__number">{step.number}</span>
-            <Icon name={step.icon} size={32} class="step__icon" />
-            <h3 class="step__title">{step.title}</h3>
-            <p class="step__action">{step.action}</p>
-          </div>
-          <ul class="step__outputs">
-            {step.outputs.map((out) => (
-              <li class="step__output">{out}</li>
-            ))}
-          </ul>
-        </li>
-      ))
-    }
-  </ol>
+<section class="rail-section" data-rail-section>
+  <div class="rail-viewport" data-rail-viewport>
+    <ol class="rail" data-process-rail>
+      {
+        PROCESS_STEPS.map((step, i) => (
+          <li class:list={['step', i === 0 && 'is-active']} data-step={i}>
+            <span class="step__rule" aria-hidden="true" />
+            <div class="step__body">
+              <span class="step__number">{step.number}</span>
+              <Icon name={step.icon} size={32} class="step__icon" />
+              <h3 class="step__title">{step.title}</h3>
+              <p class="step__action">{step.action}</p>
+            </div>
+            <ul class="step__outputs">
+              {step.outputs.map((out) => (
+                <li class="step__output">{out}</li>
+              ))}
+            </ul>
+          </li>
+        ))
+      }
+    </ol>
 
-  <div class="rail-axis">
-    <span class="rail-axis__progress" data-process-progress></span>
+    <div class="rail-axis">
+      <span class="rail-axis__progress" data-process-progress></span>
+    </div>
   </div>
 </section>
 
 <script>
   function initProcessRail() {
-    document.querySelectorAll<HTMLElement>('[data-process-rail]').forEach((rail) => {
+    const sections = document.querySelectorAll<HTMLElement>('[data-rail-section]');
+    if (!sections.length) return;
+
+    // ClientRouter swaps the DOM without a page unload, so a scroll listener
+    // bound here outlives the page it belongs to and keeps writing transforms
+    // to detached nodes. One controller per init, aborted on the way out.
+    const controller = new AbortController();
+    const { signal } = controller;
+    document.addEventListener('astro:before-swap', () => controller.abort(), { once: true });
+
+    sections.forEach((section) => {
+      const viewport = section.querySelector<HTMLElement>('[data-rail-viewport]');
+      const rail = section.querySelector<HTMLElement>('[data-process-rail]');
+      const progressEl = section.querySelector<HTMLElement>('[data-process-progress]');
+      if (!viewport || !rail) return;
       const steps = [...rail.querySelectorAll<HTMLElement>('.step')];
       if (!steps.length) return;
-      const section = rail.closest('.rail-section');
-      const progressEl = section?.querySelector<HTMLElement>('[data-process-progress]');
       const total = steps.length;
 
       progressEl?.style.setProperty('--rail-progress', `${100 / total}%`);
 
+      const wide = window.matchMedia('(min-width: 1024px)');
+      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+      const canPin = () => wide.matches && !reduced.matches;
+
+      let travel = 0;
+      let lastWidth = -1;
       let active = -1;
+
       const setActive = (index: number) => {
-        if (index === active || index < 0 || index >= total) return;
+        if (index === active) return;
         active = index;
         steps.forEach((s, i) => s.classList.toggle('is-active', i === index));
         if (progressEl) progressEl.style.transform = `translateX(${index * 100}%)`;
       };
 
-      // The leading card — the left-most one still fully in view — is active.
-      // Observing against the rail rather than the viewport keeps that correct
-      // however far down the page the reader has scrolled vertically.
-      const observer = new IntersectionObserver(
-        (entries) => {
-          const visible = entries
-            .filter((e) => e.isIntersecting)
-            .map((e) => Number((e.target as HTMLElement).dataset.step))
-            .sort((a, b) => a - b);
-          if (visible.length) setActive(visible[0]);
-        },
-        { root: rail, threshold: 0.85 },
-      );
-      steps.forEach((s) => observer.observe(s));
-      setActive(0);
+      // p is derived from the section's own rect rather than a cached document
+      // offset: while the viewport is stuck, rect.top runs from 0 down to
+      // -travel by construction (section height = viewport height + travel),
+      // so this stays correct without knowing where the section sits.
+      const update = () => {
+        if (travel <= 0) return;
+        const p = Math.min(1, Math.max(0, -section.getBoundingClientRect().top / travel));
+        rail.style.transform = `translate3d(${-p * travel}px, 0, 0)`;
+        // Active is keyed to progress through the section, NOT to whichever
+        // card sits at the left gutter. The track stops once the last card's
+        // right edge meets the viewport edge, so the final ~3 cards never
+        // reach the gutter — feat-044's leading-card rule left steps 11 and 12
+        // permanently dim and the axis permanently short of full. Keying it to
+        // p makes both ends exact, and the highlight is provably always on
+        // and the leading card index at p is p*travel/cardPitch, which is
+        // strictly below p*(total-1) for any rail wider than one viewport.
+        setActive(Math.round(p * (total - 1)));
+      };
+
+      const measure = () => {
+        if (!canPin()) {
+          section.classList.remove('is-pinned');
+          section.style.height = '';
+          rail.style.transform = '';
+          steps.forEach((s) => s.classList.remove('is-active'));
+          travel = 0;
+          active = -1;
+          lastWidth = -1;
+          return;
+        }
+        section.classList.add('is-pinned');
+        rail.style.transform = 'translate3d(0, 0, 0)';
+
+        const vp = viewport.getBoundingClientRect();
+        const last = steps[total - 1].getBoundingClientRect();
+        const padRight = parseFloat(getComputedStyle(rail).paddingRight) || 0;
+        // Measured off the real card boxes, not `scrollWidth` — the cards
+        // overflow a container that no longer scrolls, where scrollWidth
+        // isn't dependable.
+        travel = Math.max(0, last.right - vp.left + padRight - vp.width);
+        lastWidth = vp.width;
+        section.style.height = `${viewport.clientHeight + travel}px`;
+        update();
+      };
+
+      let ticking = false;
+      const onScroll = () => {
+        if (ticking) return;
+        ticking = true;
+        requestAnimationFrame(() => {
+          ticking = false;
+          update();
+        });
+      };
+
+      window.addEventListener('scroll', onScroll, { passive: true, signal });
+      window.addEventListener('resize', measure, { signal });
+      wide.addEventListener('change', measure, { signal });
+      reduced.addEventListener('change', measure, { signal });
+
+      // Setting the section's height can make the page tall enough to gain a
+      // scrollbar, which narrows the viewport and changes `travel` with no
+      // window resize event behind it. Guarded on width so the two can't
+      // oscillate off each other.
+      new ResizeObserver(() => {
+        if (canPin() && viewport.getBoundingClientRect().width !== lastWidth) measure();
+      }).observe(viewport);
+
+      measure();
     });
   }
 
@@ -97,46 +180,28 @@ import { PROCESS_STEPS } from '../model/steps';
 </script>
 
 <style>
+  /* Base state is the stacked vertical list — one entry after another, no
+     clipping, no transform, nothing for the script to do. Pinning is layered
+     on top of it and only ever added by the script, so a JS failure or a
+     no-JS reader lands on the layout that always works rather than on a row
+     of cards clipped at the viewport edge with no way to reach them. */
   .rail {
     display: flex;
-    gap: 48px;
+    flex-direction: column;
+    gap: 64px;
     margin: 0;
+    padding: 0 24px;
     list-style: none;
-    overflow-x: auto;
-    /* `proximity`, not `mandatory`: this rail sits between a lead paragraph
-       and the Build section, so a mandatory snap fights vertical page
-       scrolling on trackpads that emit both axes at once. */
-    scroll-snap-type: x proximity;
-    scroll-padding-left: 40px;
-    padding: 0 40px;
-    /* hidden deliberately — the axis below is the scroll affordance */
-    scrollbar-width: none;
-    /* keep sideways swipes in the rail from triggering browser back-nav */
-    overscroll-behavior-x: contain;
-  }
-  .rail::-webkit-scrollbar {
-    display: none;
   }
 
   .step {
     display: flex;
     flex-direction: column;
     gap: 40px;
-    flex: 0 0 392px;
-    width: 392px;
-    scroll-snap-align: start;
-    /* 0.65, not feat-046's 0.42: cream at 0.42 on this background falls under
-       4.5:1, and with three cards on screen at once it dimmed two thirds of
-       the section hard enough to read as disabled rather than as not-current. */
-    opacity: 0.65;
-    transition: opacity var(--duration-slow) var(--ease-fade);
-  }
-  .step.is-active {
-    opacity: 1;
   }
 
-  /* The rule is the whole frame. A thickness change as well as a colour change
-     so the active step still reads at a glance in both themes. */
+  /* The rule is the whole frame — a divider between entries when stacked, and
+     the active indicator when pinned. */
   .step__rule {
     display: block;
     height: 1px;
@@ -145,9 +210,10 @@ import { PROCESS_STEPS } from '../model/steps';
       background-color var(--duration-slow) var(--ease-fade),
       height var(--duration-slow) var(--ease-fade);
   }
-  .step.is-active .step__rule {
-    height: 2px;
-    background: var(--color-border-emphasis);
+
+  /* Meaningless without a horizontal position to report. */
+  .rail-axis {
+    display: none;
   }
 
   .step__body {
@@ -197,10 +263,7 @@ import { PROCESS_STEPS } from '../model/steps';
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
-    /* Pinned to the card's bottom edge rather than flowing straight after the
-       action text — the actions run one to three lines depending on the step,
-       and without this the pills sit at a different height on every card. */
-    margin: auto 0 0;
+    margin: 0;
     padding: 0;
     list-style: none;
   }
@@ -219,62 +282,90 @@ import { PROCESS_STEPS } from '../model/steps';
     white-space: nowrap;
   }
 
-  .rail-axis {
-    position: relative;
-    height: 1px;
-    margin: 96px 40px 0;
-    background: var(--color-border-default);
-  }
-  .rail-axis__progress {
-    position: absolute;
-    top: -1px;
-    left: 0;
-    height: 3px;
-    width: var(--rail-progress, 8.3333%);
-    background: var(--color-text-emphasis);
-    transition: transform var(--duration-slow) var(--ease-reveal);
-  }
-
-  @media (max-width: 1023px) {
-    .step {
-      flex-basis: 340px;
-      width: 340px;
-    }
-    .rail {
-      gap: 40px;
-    }
-    .rail-axis {
-      margin-top: 72px;
-    }
-  }
-
+  /* A single nowrap pill can be wider than a phone screen — same fix
+     OverviewSection needed at this breakpoint (feat-033). */
   @media (max-width: 767px) {
-    /* One card plus a peek of the next, so the rail still reads as scrollable
-       on a phone — a fixed 392px card would overflow a 375px viewport. */
-    .step {
-      flex-basis: 78vw;
-      width: 78vw;
-    }
-    .rail {
-      padding-left: 24px;
-      padding-right: 24px;
-    }
-    .rail-axis {
-      margin-left: 24px;
-      margin-right: 24px;
-    }
-    /* A single nowrap pill can be wider than a phone screen — same fix
-       OverviewSection needed at this breakpoint (feat-033). */
     .step__output {
       white-space: normal;
     }
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    .step,
-    .step__rule,
-    .rail-axis__progress {
-      transition: none;
+  /* ── Pinned mode ──────────────────────────────────────────────────────────
+     feat-048. The rail used to be a second scroll container sitting inside a
+     322px band: 12 steps and 5312px of content behind a sideways gesture the
+     page gave no reason to expect, with a hidden scrollbar and an axis 96px
+     below the cards that read as a section divider. It now advances off the
+     vertical scroll the reader is already making — the section is as tall as
+     the track is wide, the viewport sticks for that distance, and the track
+     translates 1:1 with progress through it. One gesture, nothing hidden.
+
+     Gated on both the class (script-added) and the query, so neither alone
+     can pin a phone or a reader who has asked for less motion. */
+  @media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
+    .rail-section.is-pinned .rail-viewport {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .rail-section.is-pinned .rail {
+      flex-direction: row;
+      gap: 48px;
+      padding: 0 40px;
+      /* No transition — the transform has to track the wheel exactly, or the
+         rail lags behind the gesture driving it. */
+      will-change: transform;
+    }
+
+    .rail-section.is-pinned .step {
+      flex: 0 0 392px;
+      width: 392px;
+      /* 0.65, not feat-046's 0.42: cream at 0.42 on this background falls
+         under 4.5:1, and with three cards on screen it dimmed two thirds of
+         the section hard enough to read as disabled rather than as
+         not-current. */
+      opacity: 0.65;
+      transition: opacity var(--duration-slow) var(--ease-fade);
+    }
+    .rail-section.is-pinned .step.is-active {
+      opacity: 1;
+    }
+
+    /* Thickness as well as colour, so the active step still reads at a glance
+       in both themes. */
+    .rail-section.is-pinned .step.is-active .step__rule {
+      height: 2px;
+      background: var(--color-border-emphasis);
+    }
+
+    /* Pinned to the card's bottom edge rather than flowing straight after the
+       action text — the actions run one to three lines depending on the step,
+       and without this the pills sit at a different height on every card. */
+    .rail-section.is-pinned .step__outputs {
+      margin-top: auto;
+    }
+
+    .rail-section.is-pinned .rail-axis {
+      display: block;
+      position: relative;
+      height: 1px;
+      /* 32px, not feat-044's 96px — at 96px it reads as the divider between
+         two sections rather than as this rail's own progress track. */
+      margin: 32px 40px 0;
+      background: var(--color-border-default);
+    }
+    .rail-section.is-pinned .rail-axis__progress {
+      position: absolute;
+      top: -1px;
+      left: 0;
+      height: 3px;
+      width: var(--rail-progress, 8.3333%);
+      background: var(--color-text-emphasis);
+      transition: transform var(--duration-slow) var(--ease-reveal);
     }
   }
 </style>
