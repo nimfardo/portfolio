@@ -2,11 +2,10 @@ import type { IconName } from '@shared/ui';
 
 /** One step of the 12-step AI-design workflow.
  *
- * `outputs` are the real artifacts each step commits to the repo — they render
- * through the shared `Tag` atom, which force-uppercases (see ProcessRail for
- * why that matters for filenames). */
+ * `outputs` are the real artifacts each step commits to the repo. They render
+ * as plain middot-separated text, not pills — see ProcessRail for why. */
 export interface ProcessStepItem {
-  /** Zero-padded, shown as the ghost numeral behind the title. */
+  /** Zero-padded; shown small above the title and in the step counter. */
   number: string;
   title: string;
   icon: IconName;

@@ -1,22 +1,28 @@
 ---
-// The 12-step workflow as a horizontally-scrolled rail: four cards visible at
-// desktop, the rest reached by scrolling. The active card drives the detail
-// panel, the counter and the progress bar below.
+// The 12-step workflow as a horizontally-scrolled rail. The active step drives
+// the detail panel, the counter and the progress bar below.
 //
-// Adapted from Codrops' "Horizontal Smooth Scroll Layout" demo 2 (Max's
-// reference): ghost numeral behind the title, a framed slot, and tag words
-// under each item. Two things that demo does are deliberately NOT copied — it
-// tilts its images a few degrees and floats a circular button over them. This
-// system is rigidly rectilinear (bug-028 stripped corner radii from the icons
-// for exactly that reason), so a tilt would fight it.
+// Structure adapted from Codrops' "Horizontal Smooth Scroll Layout" demo 2
+// (Max's reference) — a windowed rail where items bleed off the right edge.
+// The styling deliberately does NOT follow it: that demo frames a photograph
+// per item, tilts it, and floats a circular button over it. There are no
+// photographs here, so a frame would enclose nothing and read as a broken
+// image. Each step is an index entry instead — a hairline rule, a small number
+// and icon, the title, and its outputs as plain text.
+//
+// Outputs are deliberately NOT pills. They are metadata; in bordered capsules
+// they out-shouted the step titles, and the uppercase treatment mangled
+// filenames into README.MD. As middot-separated text they recede and keep
+// their real casing.
 //
 // No new dependency: the reference uses Locomotive Scroll, this uses native
-// overflow-x + scroll-snap and an IntersectionObserver, matching how
-// shared/lib/scroll-reveal.ts already works.
-import { Icon, Tag } from '@shared/ui';
+// overflow-x + scroll-snap and an IntersectionObserver, the same primitive
+// shared/lib/scroll-reveal.ts already uses.
+import { Icon } from '@shared/ui';
 import { PROCESS_STEPS } from '../model/steps';
 
 const first = PROCESS_STEPS[0];
+const total = String(PROCESS_STEPS.length).padStart(2, '0');
 ---
 
 <section class="rail-section">
@@ -30,20 +36,13 @@ const first = PROCESS_STEPS[0];
           data-action={step.action}
           data-number={step.number}
         >
-          <span class="step__ghost" aria-hidden="true">
-            {step.number}
-          </span>
-          <h2 class="step__title">{step.title}</h2>
-          <div class="step__box">
-            <Icon name={step.icon} size={72} class="step__icon" />
+          <span class="step__rule" aria-hidden="true" />
+          <div class="step__top">
+            <span class="step__number">{step.number}</span>
+            <Icon name={step.icon} size={22} class="step__icon" />
           </div>
-          <ul class="step__outputs">
-            {step.outputs.map((out) => (
-              <li>
-                <Tag>{out}</Tag>
-              </li>
-            ))}
-          </ul>
+          <h2 class="step__title">{step.title}</h2>
+          <p class="step__outputs">{step.outputs.join(' · ')}</p>
         </article>
       ))
     }
@@ -54,7 +53,7 @@ const first = PROCESS_STEPS[0];
   </div>
 
   <p class="rail-meta">
-    <span data-process-counter>{first.number} / {String(PROCESS_STEPS.length).padStart(2, '0')}</span>
+    <span data-process-counter>{first.number} / {total}</span>
     <span class="rail-meta__sep">·</span>
     <span>The 12-Step AI-Design Workflow</span>
   </p>
@@ -89,14 +88,12 @@ const first = PROCESS_STEPS[0];
         if (counterEl) {
           counterEl.textContent = `${step.dataset.number} / ${String(total).padStart(2, '0')}`;
         }
-        if (progressEl) {
-          progressEl.style.transform = `translateX(${index * 100}%)`;
-        }
+        if (progressEl) progressEl.style.transform = `translateX(${index * 100}%)`;
       };
 
-      // The leading card — the left-most one still fully in view — is the
-      // active one. Watching intersection against the rail itself rather than
-      // the viewport keeps this correct however the page is scrolled.
+      // The leading card — the left-most one still fully in view — is active.
+      // Observing against the rail rather than the viewport keeps that correct
+      // however far down the page the user has scrolled.
       const observer = new IntersectionObserver(
         (entries) => {
           const visible = entries
@@ -115,7 +112,7 @@ const first = PROCESS_STEPS[0];
   // Not inside a transition:persist region, so this re-runs cleanly on every
   // navigation — same as ProcessAccordion and PasswordGate. No resize handling
   // needed: the observer's root is the rail itself, so it re-evaluates on its
-  // own when the breakpoint changes the card width.
+  // own when a breakpoint changes the card width.
   document.addEventListener('astro:page-load', initProcessRail);
 </script>
 
@@ -125,16 +122,14 @@ const first = PROCESS_STEPS[0];
     flex-direction: column;
   }
 
-  /* Full-bleed to the right so the rail runs off the edge rather than stopping
-     at the content column — that overflow is what signals "there is more". */
   .rail {
     display: flex;
-    gap: 56px;
+    gap: 48px;
     overflow-x: auto;
     scroll-snap-type: x mandatory;
     scroll-padding-left: 40px;
     padding: 0 40px;
-    /* hide the native bar; the axis below is the affordance */
+    /* hidden deliberately — the axis below is the scroll affordance */
     scrollbar-width: none;
   }
   .rail::-webkit-scrollbar {
@@ -142,10 +137,8 @@ const first = PROCESS_STEPS[0];
   }
 
   .step {
-    position: relative;
     flex: 0 0 392px;
     width: 392px;
-    padding-top: 46px;
     scroll-snap-align: start;
     opacity: 0.42;
     transition: opacity var(--duration-slow) var(--ease-fade);
@@ -154,48 +147,39 @@ const first = PROCESS_STEPS[0];
     opacity: 1;
   }
 
-  .step__ghost {
-    position: absolute;
-    top: 0;
-    left: -14px;
-    font-family: var(--font-family-body);
-    font-size: 104px;
-    line-height: 89px;
-    font-weight: var(--font-weight-bold);
-    letter-spacing: -5px;
-    color: var(--color-text-primary);
-    opacity: 0.1;
+  /* The rule is the whole frame. A 2px active state rather than a colour-only
+     change so it still reads at a glance in both themes. */
+  .step__rule {
+    display: block;
+    height: 1px;
+    margin-bottom: 22px;
+    background: var(--color-border-default);
+    transition:
+      background-color var(--duration-slow) var(--ease-fade),
+      height var(--duration-slow) var(--ease-fade);
+  }
+  .step.is-active .step__rule {
+    height: 2px;
+    margin-bottom: 21px;
+    background: var(--color-border-emphasis);
   }
 
-  .step__title {
-    position: relative;
-    margin: 0 0 24px;
-    font-family: var(--font-family-body);
-    font-size: var(--font-size-3xl);
-    line-height: 33px;
-    letter-spacing: -0.4px;
-    font-weight: var(--font-weight-medium);
-    color: var(--color-text-emphasis);
-  }
-
-  .step__box {
+  .step__top {
     display: flex;
     align-items: center;
-    justify-content: center;
-    height: 200px;
-    border: 1px solid var(--color-border-default);
-    background: var(--color-bg-subtle);
-    transition:
-      border-color var(--duration-slow) var(--ease-fade),
-      background-color var(--duration-slow) var(--ease-fade);
+    justify-content: space-between;
+    margin-bottom: 20px;
   }
-  .step.is-active .step__box {
-    border-color: var(--color-border-emphasis);
+  .step__number {
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-xs);
+    line-height: var(--font-line-height-xs);
+    letter-spacing: 0.12em;
+    color: var(--color-text-primary);
   }
-  /* :global() — the class merges onto Icon's own rendered <span>, which
-     carries Icon.astro's astro-cid, not this component's. Omitting `color`
-     from a competing rule is deliberate (bug-004): the consumer's colour must
-     be the only declaration on that element. */
+  /* :global() — the class merges onto Icon's own rendered <span>, which carries
+     Icon.astro's astro-cid, not this component's. Icon deliberately declares no
+     colour of its own (bug-004), so this is the only declaration on it. */
   :global(.step__icon) {
     color: var(--color-icon-default);
   }
@@ -203,19 +187,36 @@ const first = PROCESS_STEPS[0];
     color: var(--color-text-emphasis);
   }
 
+  .step__title {
+    /* Two lines' worth, so single-line titles still push the outputs down to a
+       shared baseline across the rail. */
+    min-height: 63px;
+    margin: 0 0 26px;
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-3xl);
+    line-height: 31px;
+    letter-spacing: -0.4px;
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-emphasis);
+  }
+
   .step__outputs {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin: 20px 0 0;
-    padding: 0;
-    list-style: none;
+    margin: 0;
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-sm);
+    line-height: var(--font-line-height-sm);
+    letter-spacing: 0.02em;
+    color: var(--color-text-primary);
+    opacity: 0.62;
+  }
+  .step.is-active .step__outputs {
+    opacity: 0.9;
   }
 
   .rail-axis {
     position: relative;
     height: 1px;
-    margin: 84px 40px 0;
+    margin: 96px 40px 0;
     background: var(--color-border-default);
   }
   .rail-axis__progress {
@@ -244,7 +245,7 @@ const first = PROCESS_STEPS[0];
   }
 
   .rail-detail {
-    margin-top: 70px;
+    margin-top: 80px;
     padding: 0 40px;
     text-align: right;
   }
@@ -278,10 +279,10 @@ const first = PROCESS_STEPS[0];
       gap: 40px;
     }
     .rail-axis {
-      margin-top: 64px;
+      margin-top: 72px;
     }
     .rail-detail {
-      margin-top: 56px;
+      margin-top: 60px;
     }
   }
 
@@ -291,10 +292,8 @@ const first = PROCESS_STEPS[0];
     .step {
       flex-basis: 78vw;
       width: 78vw;
-      padding-top: 38px;
     }
     .rail,
-    .rail-axis,
     .rail-meta,
     .rail-detail {
       padding-left: 24px;
@@ -303,15 +302,9 @@ const first = PROCESS_STEPS[0];
     .rail-axis {
       margin-left: 24px;
       margin-right: 24px;
-      padding: 0;
     }
-    .step__ghost {
-      font-size: 76px;
-      line-height: 64px;
-      letter-spacing: -3px;
-    }
-    .step__box {
-      height: 168px;
+    .step__title {
+      min-height: 0;
     }
     .rail-detail {
       text-align: left;
@@ -320,7 +313,7 @@ const first = PROCESS_STEPS[0];
 
   @media (prefers-reduced-motion: reduce) {
     .step,
-    .step__box,
+    .step__rule,
     .rail-axis__progress {
       transition: none;
     }
