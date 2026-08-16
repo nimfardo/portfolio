@@ -181,6 +181,34 @@ import { PROCESS_STEPS } from '../model/steps';
         });
       };
 
+      // A sideways trackpad swipe over the rail is the gesture the old
+      // overflow-x rail accepted, and it stayed muscle memory after feat-048
+      // moved the rail onto vertical scroll — so honour both.
+      //
+      // Horizontal delta is translated into *page scroll*, not into the
+      // transform directly. Scroll position stays the single source of truth,
+      // the existing rAF update() does the work, and the two gestures can
+      // never disagree about where the rail is. It also means both ends
+      // behave identically: scrollBy clamps, so swiping back at p=0 carries
+      // on up out of the section exactly as a vertical scroll would.
+      //
+      // Non-passive because it has to preventDefault — which is also what
+      // suppresses the macOS two-finger back-navigation gesture.
+      const onWheel = (e: WheelEvent) => {
+        if (!canPin() || travel <= 0) return;
+        // Vertical-dominant input is left entirely to the browser.
+        if (Math.abs(e.deltaY) >= Math.abs(e.deltaX)) return;
+        const dx =
+          e.deltaMode === 1
+            ? e.deltaX * 16 // DOM_DELTA_LINE
+            : e.deltaMode === 2
+              ? e.deltaX * viewport.clientHeight // DOM_DELTA_PAGE
+              : e.deltaX;
+        e.preventDefault();
+        window.scrollBy(0, dx);
+      };
+      viewport.addEventListener('wheel', onWheel, { passive: false, signal });
+
       window.addEventListener('scroll', onScroll, { passive: true, signal });
       window.addEventListener('resize', measure, { signal });
       roomy.addEventListener('change', measure, { signal });
