@@ -2,8 +2,17 @@ import type { IconName } from '@shared/ui';
 
 /** One step of the 12-step AI-design workflow.
  *
- * `outputs` are the real artifacts each step commits to the repo. They render
- * as plain middot-separated text, not pills — see ProcessRail for why. */
+ * `outputs` are the real artifacts each step commits to the repo, and they are
+ * deliberately one vocabulary: a file (`name.ext`) or a directory (`/name`),
+ * never a description. The lead's claim is that nothing is ever exported, and
+ * a filename is what backs that — "3 concepts" or "HTML docs site" restated
+ * the step's own title instead (copy-018).
+ *
+ * NOTE for Max: five of these names are inferred rather than taken from your
+ * repos — `/concepts`, `/screens`, `/styleguide`, `breakpoints.css`,
+ * `motion.css`. Correct any that don't match what you actually produce; they
+ * are one-line edits here and on canvas. `flows.mmd` follows the real `.mmd`
+ * files in reference/design-system/diagrams/. */
 export interface ProcessStepItem {
   /** Zero-padded; shown small above the title and in the step counter. */
   number: string;
@@ -49,7 +58,7 @@ export const PROCESS_STEPS: ProcessStepItem[] = [
     title: 'Information Architecture',
     icon: 'sitemap',
     action: 'Translate jobs and personas into flows and structural maps in code, not Figma.',
-    outputs: ['sitemap.md', 'navigation.md', 'mermaid'],
+    outputs: ['sitemap.md', 'navigation.md', 'flows.mmd'],
   },
   {
     number: '04',
@@ -70,42 +79,42 @@ export const PROCESS_STEPS: ProcessStepItem[] = [
     title: 'Visual Concept',
     icon: 'palette',
     action: 'Deconstruct references and build two or three directional moods directly in code.',
-    outputs: ['3 concepts'],
+    outputs: ['/concepts'],
   },
   {
     number: '07',
     title: 'UI Assembly',
     icon: 'layers',
     action: 'Inject real graphics and icons into the chosen concept, straight from the workspace.',
-    outputs: ['UI screens'],
+    outputs: ['/screens'],
   },
   {
     number: '08',
     title: 'Design Tokens',
     icon: 'tokens',
     action: 'Extract colour, type and spacing from the concept code into structured variables.',
-    outputs: ['tokens.css', '5–7 components'],
+    outputs: ['tokens.css', '/components'],
   },
   {
     number: '09',
     title: 'Living Design System',
     icon: 'system',
     action: 'Compile components into a living, code-based style guide — the single source of truth.',
-    outputs: ['HTML docs site'],
+    outputs: ['/styleguide'],
   },
   {
     number: '10',
     title: 'Responsiveness',
     icon: 'responsive',
     action: 'Prompt layout transformations and breakpoint behaviour mathematically, without manual resizing.',
-    outputs: ['Mobile', 'Tablet', 'Desktop'],
+    outputs: ['breakpoints.css'],
   },
   {
     number: '11',
     title: 'Motion & Micro-interactions',
     icon: 'motion',
     action: 'Apply one animation language — timing, easing, sequencing — across the whole system.',
-    outputs: ['Animated states'],
+    outputs: ['motion.css'],
   },
   {
     number: '12',
