@@ -120,6 +120,7 @@ import { PROCESS_STEPS } from '../model/steps';
 
       let travel = 0;
       let scrollSpan = 0;
+      let stickOffset = 0;
       let lastWidth = -1;
       let active = -1;
 
@@ -136,7 +137,13 @@ import { PROCESS_STEPS } from '../model/steps';
       // so this stays correct without knowing where the section sits.
       const update = () => {
         if (travel <= 0 || scrollSpan <= 0) return;
-        const p = Math.min(1, Math.max(0, -section.getBoundingClientRect().top / scrollSpan));
+        // Measured from the stick point, not from 0 — the band centres itself
+        // in the window (feat-055), so `rect.top` runs from stickOffset down
+        // to stickOffset - scrollSpan rather than from 0.
+        const p = Math.min(
+          1,
+          Math.max(0, (stickOffset - section.getBoundingClientRect().top) / scrollSpan)
+        );
         rail.style.transform = `translate3d(${-p * travel}px, 0, 0)`;
         // Fills continuously off p rather than stepping a one-twelfth segment
         // by whole cards — the counter beside it already carries the discrete
@@ -168,6 +175,7 @@ import { PROCESS_STEPS } from '../model/steps';
         if (!canPin()) {
           section.classList.remove('is-pinned');
           section.style.height = '';
+          viewport.style.top = '';
           rail.style.transform = '';
           if (progressEl) progressEl.style.width = '';
           steps.forEach((s) => s.classList.remove('is-active'));
@@ -199,6 +207,25 @@ import { PROCESS_STEPS } from '../model/steps';
         travel = Math.max(0, pitch * (total - 1));
         scrollSpan = travel * SCROLL_RATIO;
         lastWidth = vp.width;
+
+        // Centre the band in the window while it's stuck. Sized to its content
+        // it is 563px in a 900px window, so a third of the screen sat empty
+        // below it for the whole section. This offsets the STICK POINT and
+        // leaves the box's own height alone, which is what keeps it different
+        // from the centring feat-050 removed: that one made the viewport 100vh
+        // and centred inside it, inflating the lead-to-cards distance in the
+        // document by ~227px. Nothing here moves in flow — only where the band
+        // locks on screen. The padding is subtracted because it sits inside
+        // clientHeight but isn't visible content, so centring on the raw box
+        // would push the cards low.
+        const padTop = parseFloat(getComputedStyle(viewport).paddingTop) || 0;
+        const contentH = viewport.clientHeight - padTop;
+        stickOffset = Math.max(0, Math.round((window.innerHeight - contentH) / 2 - padTop));
+        viewport.style.top = `${stickOffset}px`;
+
+        // The stuck distance is section.height - viewport.height regardless of
+        // the offset, so the travel maths is indifferent to it: the band still
+        // bottoms out exactly at p == 1.
         section.style.height = `${viewport.clientHeight + scrollSpan}px`;
         update();
       };
