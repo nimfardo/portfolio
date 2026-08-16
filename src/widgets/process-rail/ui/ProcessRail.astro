@@ -297,12 +297,24 @@ import { PROCESS_STEPS } from '../model/steps';
     color: var(--color-text-primary);
   }
 
+  /* Bound to the Figma text style `Manrope/3xl/medium` — 32/48/-1% — rather
+     than the hardcoded 31px line-height and -0.4px tracking it carried before
+     (comp-013). Those were left over from a 27px canvas title that had no
+     style bound at all and sat off the type scale entirely.
+
+     The line-height is deliberately cross-paired from 4xl: this system's
+     scale has one line-height per size step (`--font-line-height-3xl` is
+     40px) while Figma's styles differ by weight (3xl/medium is 48, 3xl/bold
+     is 40). 4xl's 48px is the exact value the medium style specifies, and
+     global.css already documents cross-pairing as the way to hold a ratio
+     across breakpoints. Retargeting the 3xl token itself would have moved
+     OverviewSection and ProjectHero too. */
   .step__title {
     margin: 0;
     font-family: var(--font-family-body);
     font-size: var(--font-size-3xl);
-    line-height: 31px;
-    letter-spacing: -0.4px;
+    line-height: var(--font-line-height-4xl);
+    letter-spacing: -0.01em;
     font-weight: var(--font-weight-medium);
     color: var(--color-text-emphasis);
   }
