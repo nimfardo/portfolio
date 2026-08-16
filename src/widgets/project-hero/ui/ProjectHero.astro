@@ -12,8 +12,15 @@ import type { HeroMedia } from '@entities/project';
 // entirely once that lands, leaving just the bare-media+scroll-cue shape.
 interface Props {
   /** Image, video, or a looping animation on a solid brand background —
-   * see HeroMedia for why the lottie arm is hero-only. */
-  media: HeroMedia;
+   * see HeroMedia for why the lottie arm is hero-only.
+   *
+   * Optional because /process ships its hero before the video exists and
+   * renders the placeholder box Figma shows (node 2712:2272). Deliberately
+   * an absent prop rather than a fourth HeroMedia arm: ProjectContent.hero
+   * is typed HeroMedia, so a placeholder arm would let a real case study
+   * ship a blank hero. [slug].astro still passes content.hero, which stays
+   * required — those pages can't lose their media silently. */
+  media?: HeroMedia;
   eyebrow?: string;
   headline?: string[];
   scrollCue?: boolean;
@@ -25,10 +32,18 @@ const hasCard = Boolean(eyebrow && headline);
 ---
 
 <section class:list={['project-hero', className]}>
-  <div class:list={['project-hero__image-wrap', { 'project-hero__image-wrap--card': hasCard }]}>
-    {media.type === 'image' && <img class="project-hero__image" src={media.image} alt={media.imageAlt} />}
+  <div
+    class:list={[
+      'project-hero__image-wrap',
+      {
+        'project-hero__image-wrap--card': hasCard,
+        'project-hero__image-wrap--placeholder': !media,
+      },
+    ]}
+  >
+    {media?.type === 'image' && <img class="project-hero__image" src={media.image} alt={media.imageAlt} />}
     {
-      media.type === 'video' && (
+      media?.type === 'video' && (
         <Media
           type="video"
           src={media.src}
@@ -39,7 +54,7 @@ const hasCard = Boolean(eyebrow && headline);
       )
     }
     {
-      media.type === 'lottie' && (
+      media?.type === 'lottie' && (
         <div
           class="project-hero__stage"
           style={`background: ${media.background}; --hero-lottie-width: ${media.widthPct}%;`}
@@ -107,6 +122,15 @@ const hasCard = Boolean(eyebrow && headline);
     aspect-ratio: auto;
     height: 800px;
     margin-bottom: -230px;
+  }
+  /* No media yet (/process, node 2712:2272): on canvas that hero holds an
+     unset project-hero-image instance, which renders as a flat
+     --color-bg-muted rectangle. The wrap's own aspect-ratio already reserves
+     the 1647x800 box, so the placeholder is a fill and nothing else — no
+     extra element, and passing a real `media` retires it with no other
+     change. */
+  .project-hero__image-wrap--placeholder {
+    background: var(--color-bg-muted);
   }
   /* :global() — the class lands on a plain <img> in the image branch, but
      on Media's own rendered root <div> in the video branch (classlist-merge,

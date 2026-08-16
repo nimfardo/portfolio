@@ -9,6 +9,7 @@
 // is exactly what the canvas has.
 import Layout from '@app/layouts/Layout.astro';
 import { PageHeader } from '@widgets/page-header';
+import { ProjectHero } from '@widgets/project-hero';
 import { ProcessRail } from '@widgets/process-rail';
 import { BuildSection } from '@widgets/build-section';
 import type { ContentBlock } from '@entities/project';
@@ -44,6 +45,14 @@ const buildBlocks: ContentBlock[] = [
 
     <PageHeader title="Design Process" class="process__header" />
 
+    {
+      /* Max added this hero to the canvas on 2026-08-16 (node 2712:2272) —
+        the same bare media + "Scroll down" shape every case-study page
+        opens with, so it's ProjectHero verbatim. No `media`: the video
+        isn't shot yet, and the canvas shows the unset placeholder box. */
+    }
+    <ProjectHero scrollCue />
+
     <div class="process__lead section-grid">
       <p class="process__lead-text section-grid__body">
         Twelve steps from a blank repo to a living design system, run in Claude Code. Nothing is
@@ -75,7 +84,11 @@ const buildBlocks: ContentBlock[] = [
      the canvas, where it starts at x=769 (193 + 576). */
   .process__lead {
     padding: 0 40px;
-    margin-top: var(--spacing-4xl);
+    /* 160px below the hero, measured off the canvas (Hero-section ends at
+       y=1028, lead starts at y=1188) — the same section rhythm the
+       case-study pages use between the hero and everything under it. Was
+       96px when the lead sat directly under the header. */
+    margin-top: 160px;
   }
   .process__lead-text {
     margin: 0;
@@ -97,6 +110,9 @@ const buildBlocks: ContentBlock[] = [
   }
 
   @media (max-width: 1023px) {
+    /* Same scale-down [slug].astro applies to its own 160px rhythm — that
+       much empty space between sections is desktop-only. */
+    .process__lead,
     .process__build {
       margin-top: var(--spacing-4xl);
     }
