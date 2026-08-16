@@ -77,6 +77,20 @@ import { PROCESS_STEPS } from '../model/steps';
       <p class="rail-counter" aria-hidden="true">
         <span data-process-counter>01</span> / {String(PROCESS_STEPS.length).padStart(2, '0')}
       </p>
+      {
+        /* When the band locks, vertical scrolling stops paying out vertical
+        movement — the moment that reads as "is this stuck?". This nudges
+        sideways to say where the movement went, and retires itself once the
+        reader has passed step 1 and clearly knows. Same vocabulary as the
+        hero's bouncing scroll cue, turned 90°. Decorative: the counter it sits
+        beside is aria-hidden for the same reason. */
+      }
+      <span class="rail-hint" aria-hidden="true">
+        {/* Wrapped because Icon's Props are explicit with no attribute
+        pass-through, so aria-hidden on the component itself is dropped —
+        the same reason VideoSection wraps Media (feat-041). */}
+        <Icon name="arrow-right" size={16} class="rail-hint__icon" />
+      </span>
     </div>
   </div>
 </section>
@@ -129,6 +143,14 @@ import { PROCESS_STEPS } from '../model/steps';
         active = index;
         steps.forEach((s, i) => s.classList.toggle('is-active', i === index));
         if (counterEl) counterEl.textContent = String(index + 1).padStart(2, '0');
+        // Past steps dim harder than upcoming ones, so the rail reads
+        // forward instead of spotlighting one card in a uniform haze
+        // (feat-058).
+        steps.forEach((s, i) => s.classList.toggle('is-past', i < index));
+        // The sideways hint retires once the reader is clearly moving. Not at
+        // step 1: that boundary is only ~145px of scroll past the lock, so the
+        // hint began fading before it could be read.
+        section.classList.toggle('is-advanced', index > 1);
       };
 
       // p is derived from the section's own rect rather than a cached document
@@ -178,7 +200,8 @@ import { PROCESS_STEPS } from '../model/steps';
           viewport.style.top = '';
           rail.style.transform = '';
           if (progressEl) progressEl.style.width = '';
-          steps.forEach((s) => s.classList.remove('is-active'));
+          steps.forEach((s) => s.classList.remove('is-active', 'is-past'));
+          section.classList.remove('is-advanced');
           travel = 0;
           scrollSpan = 0;
           active = -1;
@@ -382,6 +405,11 @@ import { PROCESS_STEPS } from '../model/steps';
     display: none;
   }
 
+  /* Only ever shown in pinned mode, where the handoff it explains happens. */
+  .rail-hint {
+    display: none;
+  }
+
   .step__body {
     display: flex;
     flex-direction: column;
@@ -545,15 +573,21 @@ import { PROCESS_STEPS } from '../model/steps';
       will-change: transform;
     }
 
+    /* Three levels, not two — a process reads forward, and dimming every
+       non-current card equally made the two thirds of the screen the reader
+       is scrolling TOWARD as faint as the part they had already finished.
+       Upcoming steps stay bright enough to read ahead; only what's behind
+       recedes. 0.65 remains the floor set in feat-047 (cream at 0.42 falls
+       under 4.5:1 here; at 0.65 it measures 8.3:1, so this was never a
+       contrast problem — it was an attention one). */
     .rail-section.is-pinned .step {
       flex: 0 0 392px;
       width: 392px;
-      /* 0.65, not feat-046's 0.42: cream at 0.42 on this background falls
-         under 4.5:1, and with three cards on screen it dimmed two thirds of
-         the section hard enough to read as disabled rather than as
-         not-current. */
-      opacity: 0.65;
+      opacity: 0.85;
       transition: opacity var(--duration-slow) var(--ease-fade);
+    }
+    .rail-section.is-pinned .step.is-past {
+      opacity: 0.65;
     }
     .rail-section.is-pinned .step.is-active {
       opacity: 1;
@@ -622,6 +656,40 @@ import { PROCESS_STEPS } from '../model/steps';
     }
     .rail-section.is-pinned .rail-counter span {
       color: var(--color-text-emphasis);
+    }
+
+    /* The moment the band locks, vertical scrolling stops paying out vertical
+       movement. This says where the movement went, in the same language the
+       hero's scroll cue uses — a slow nudge along the axis of travel — and
+       then gets out of the way for good once the reader is past step 1. */
+    .rail-section.is-pinned .rail-hint {
+      display: flex;
+      align-items: center;
+      color: var(--color-icon-default);
+      opacity: 1;
+      transition: opacity var(--duration-slow) var(--ease-fade);
+    }
+    .rail-section.is-pinned.is-advanced .rail-hint {
+      opacity: 0;
+    }
+    @keyframes rail-hint-nudge {
+      0%,
+      100% {
+        transform: translateX(0);
+      }
+      50% {
+        transform: translateX(6px);
+      }
+    }
+    /* :global() — the class merges onto Icon's own rendered <span>, which
+       carries Icon.astro's astro-cid rather than this component's. */
+    :global(.rail-hint__icon) {
+      animation: rail-hint-nudge 3s ease-in-out infinite;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      :global(.rail-hint__icon) {
+        animation: none;
+      }
     }
   }
 </style>
