@@ -49,7 +49,13 @@ import { PROCESS_STEPS } from '../model/steps';
             <li class:list={['step', i === 0 && 'is-active']}>
               <span class="step__rule" aria-hidden="true" />
               <div class="step__body">
-                <span class="step__number">{step.number}</span>
+                <span class="step__number">
+                  {step.number}
+                  <span class="step__number-total">
+                    {' / '}
+                    {String(PROCESS_STEPS.length).padStart(2, '0')}
+                  </span>
+                </span>
                 <Icon name={step.icon} size={32} class="step__icon" />
                 <h2 class="step__title">{step.title}</h2>
                 <p class="step__action">{step.action}</p>
@@ -433,6 +439,22 @@ import { PROCESS_STEPS } from '../model/steps';
     line-height: var(--font-line-height-xs);
     letter-spacing: 0.04em;
     color: var(--color-text-primary);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* The axis and counter only exist in pinned mode, so a stacked reader had
+     nothing at all telling them how far through twelve steps they were —
+     4520px of list at 375px wide, no position anywhere. Each entry carries
+     its own instead, in the counter's own `01 / 12` format.
+
+     Keyed to :not(.is-pinned) rather than to a width, because stacked is also
+     what a reduced-motion reader and a short window get at desktop widths —
+     every case where the counter is absent, and only those. */
+  .step__number-total {
+    display: none;
+  }
+  .rail-section:not(.is-pinned) .step__number-total {
+    display: inline;
   }
 
   /* Bound to the Figma text style `Manrope/3xl/medium` — 32/48/-1% — rather
