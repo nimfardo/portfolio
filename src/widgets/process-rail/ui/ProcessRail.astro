@@ -110,7 +110,16 @@ import { PROCESS_STEPS } from '../model/steps';
       const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
       const canPin = () => roomy.matches && !reduced.matches;
 
+      // Page scroll spent per pixel of track movement. At 1:1 the rail cost
+      // 4588px — 67% of the whole document — to deliver twelve short cards,
+      // ~368px of scrolling each. The track still crosses its full width and
+      // still tracks progress exactly; only the price in wheel-turns changes.
+      const SCROLL_RATIO = 0.6;
+      // How late the highlight hands over, in card-widths. See update().
+      const ACTIVE_BIAS = 0.25;
+
       let travel = 0;
+      let scrollSpan = 0;
       let lastWidth = -1;
       let active = -1;
 
@@ -126,22 +135,33 @@ import { PROCESS_STEPS } from '../model/steps';
       // -travel by construction (section height = viewport height + travel),
       // so this stays correct without knowing where the section sits.
       const update = () => {
-        if (travel <= 0) return;
-        const p = Math.min(1, Math.max(0, -section.getBoundingClientRect().top / travel));
+        if (travel <= 0 || scrollSpan <= 0) return;
+        const p = Math.min(1, Math.max(0, -section.getBoundingClientRect().top / scrollSpan));
         rail.style.transform = `translate3d(${-p * travel}px, 0, 0)`;
         // Fills continuously off p rather than stepping a one-twelfth segment
         // by whole cards — the counter beside it already carries the discrete
         // reading, so the bar is free to track the gesture itself.
         if (progressEl) progressEl.style.width = `${p * 100}%`;
-        // Active is keyed to progress through the section, NOT to whichever
-        // card sits at the left gutter. The track stops once the last card's
-        // right edge meets the viewport edge, so the final ~3 cards never
-        // reach the gutter — feat-044's leading-card rule left steps 11 and 12
-        // permanently dim and the axis permanently short of full. Keying it to
-        // p makes both ends exact, and the highlighted card is provably always
-        // on screen: the leading card index at p is p*travel/cardPitch, which
-        // stays below p*(total-1) for any rail wider than one viewport.
-        setActive(Math.round(p * (total - 1)));
+        // With travel == (total - 1) * pitch, this expression IS the card at
+        // the focus gutter — index at the gutter is p*travel/pitch, which is
+        // exactly p*(total - 1). Before feat-054 travel stopped at the
+        // content's right edge instead, so the two diverged and the current
+        // card slid across the screen as you scrolled: it began at the left
+        // gutter and finished 809px to the right, never twice in the same
+        // place. Both readings agree now, so the highlight holds still and
+        // steps 11 and 12 stay reachable (the feat-048 defect) by
+        // construction rather than by keying around the geometry.
+        //
+        // The quarter-step bias shifts WHERE that stable anchor sits. A
+        // discrete highlight against continuous motion always slides one full
+        // pitch before handing over; unbiased, that slide is centred on the
+        // gutter, so the current card spends the back half of its turn cut by
+        // the left edge — measured 173px into the clip at worst. Biasing the
+        // hand-over a quarter-step later moves the window to roughly
+        // [-70, +370], so the highlighted card stays at least 82% visible for
+        // its whole turn. Both endpoints stay exact: round(0.25) is 0 and
+        // round(11.25) is 11.
+        setActive(Math.round(p * (total - 1) + ACTIVE_BIAS));
       };
 
       const measure = () => {
@@ -152,6 +172,7 @@ import { PROCESS_STEPS } from '../model/steps';
           if (progressEl) progressEl.style.width = '';
           steps.forEach((s) => s.classList.remove('is-active'));
           travel = 0;
+          scrollSpan = 0;
           active = -1;
           lastWidth = -1;
           return;
@@ -160,14 +181,25 @@ import { PROCESS_STEPS } from '../model/steps';
         rail.style.transform = 'translate3d(0, 0, 0)';
 
         const vp = viewport.getBoundingClientRect();
-        const last = steps[total - 1].getBoundingClientRect();
-        const padRight = parseFloat(getComputedStyle(rail).paddingRight) || 0;
-        // Measured off the real card boxes, not `scrollWidth` — the cards
-        // overflow a container that no longer scrolls, where scrollWidth
-        // isn't dependable.
-        travel = Math.max(0, last.right - vp.left + padRight - vp.width);
+        // One card-pitch measured off two real card boxes, not from the CSS
+        // values — the same reason the old code measured boxes rather than
+        // trusting scrollWidth on a container that no longer scrolls.
+        const pitch =
+          total > 1
+            ? steps[1].getBoundingClientRect().left - steps[0].getBoundingClientRect().left
+            : 0;
+        // The track runs until the LAST card reaches the position the FIRST
+        // one started from, so every card gets its turn at the focus gutter.
+        // It used to stop as soon as the last card's right edge met the
+        // viewport edge, which meant the final cards never reached the gutter
+        // at all — the root cause of both the wandering highlight and
+        // feat-048's unreachable steps 11 and 12. The cost is roughly one
+        // viewport of empty track past the last card, which reads as the end
+        // of the sequence rather than as missing content.
+        travel = Math.max(0, pitch * (total - 1));
+        scrollSpan = travel * SCROLL_RATIO;
         lastWidth = vp.width;
-        section.style.height = `${viewport.clientHeight + travel}px`;
+        section.style.height = `${viewport.clientHeight + scrollSpan}px`;
         update();
       };
 
