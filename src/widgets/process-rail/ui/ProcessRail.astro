@@ -600,6 +600,16 @@ import { PROCESS_STEPS } from '../model/steps';
       background: var(--color-border-emphasis);
     }
 
+    /* Two lines reserved, so every action starts on the same baseline. Eleven
+       titles wrap to one line and "Motion & Micro-interactions" wraps to two,
+       which pushed that card's action and pills 48px below its neighbours' —
+       invisible in a stacked list, obvious when cards stand side by side.
+       Pinned mode only: stacked, there is nothing to align against and this
+       would just be dead space. */
+    .rail-section.is-pinned .step__title {
+      min-height: calc(var(--font-line-height-4xl) * 2);
+    }
+
     /* Pinned to the card's bottom edge rather than flowing straight after the
        action text — the actions run one to three lines depending on the step,
        and without this the pills sit at a different height on every card. */
