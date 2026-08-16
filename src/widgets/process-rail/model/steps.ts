@@ -21,7 +21,14 @@ export interface ProcessStepItem {
  * workflow is named "The 12-Step AI-Design Workflow", and the old `Claude Code
  * Setup` (00) and `Retrospective` (13) were dropped. `icon/terminal` and
  * `icon/retro` were built for those two and are now unused — they stay in the
- * Figma library and out of the code icon set. */
+ * Figma library and out of the code icon set.
+ *
+ * comp-012 redrew three of these glyphs. `sitemap`, `palette` and `code` were
+ * the ones comp-011 found already in Figma and reused instead of building to
+ * the new construction, so they were the only three that never got the set's
+ * 2px outline treatment — which is exactly the three Max picked out by eye.
+ * `code` became `handoff`: step 12 produces documentation *about* code, and a
+ * key named for the wrong thing is how the next person gets misled. */
 export const PROCESS_STEPS: ProcessStepItem[] = [
   {
     number: '01',
@@ -103,7 +110,7 @@ export const PROCESS_STEPS: ProcessStepItem[] = [
   {
     number: '12',
     title: 'Handoff & Developer Docs',
-    icon: 'code',
+    icon: 'handoff',
     action: 'Generate the whole handoff package automatically, straight from the repo files.',
     outputs: ['README.md', '/handoff'],
   },
