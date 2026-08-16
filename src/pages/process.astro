@@ -8,6 +8,7 @@
 // "Build" heading, one media+text block and an optional GitHub button, which
 // is exactly what the canvas has.
 import Layout from '@app/layouts/Layout.astro';
+import { Heading } from '@shared/ui';
 import { PageHeader } from '@widgets/page-header';
 import { ProjectHero } from '@widgets/project-hero';
 import { ProcessRail } from '@widgets/process-rail';
@@ -54,6 +55,13 @@ const buildBlocks: ContentBlock[] = [
     <ProjectHero scrollCue />
 
     <div class="process__lead section-grid">
+      {
+        /* Labels the lead + rail as one section, the way "Build" labels the
+          block below it. "Workflow" rather than "Process" — the page title
+          is already "Design Process", and this names what the 12 steps
+          actually are. */
+      }
+      <Heading class="section-grid__aside">Workflow</Heading>
       <p class="process__lead-text section-grid__body">
         Twelve steps from a blank repo to a living design system, run in Claude Code. Nothing is
         ever exported.
@@ -79,9 +87,10 @@ const buildBlocks: ContentBlock[] = [
     padding-bottom: 160px;
   }
 
-  /* Reuses the shared 33/66 reference grid (ref-005). No aside here — the
-     statement sits in the body column with the left track empty, matching
-     the canvas, where it starts at x=769 (193 + 576). */
+  /* Reuses the shared 33/66 reference grid (ref-005): the "Workflow" label
+     in the left track, the statement in the body column starting at x=769
+     (193 + 576) exactly as on canvas. The grid carries the columns and the
+     <=1023px stack on its own, so there is nothing to add here. */
   .process__lead {
     padding: 0 40px;
     /* 160px below the hero, measured off the canvas (Hero-section ends at
