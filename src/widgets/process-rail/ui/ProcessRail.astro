@@ -31,18 +31,17 @@
 // Still no new dependency: the Codrops reference this is adapted from uses
 // Locomotive Scroll; this is a sticky element and one rAF-throttled scroll
 // listener.
-import { Heading, Icon } from '@shared/ui';
+import { Icon } from '@shared/ui';
 import { PROCESS_STEPS } from '../model/steps';
 ---
 
 <!-- A <section> with an accessible name is a `region` landmark on its own; no
-  explicit role needed. -->
+  explicit role needed. It is also the *only* thing naming this group now that
+  Max has taken the visible "The 12-Step Workflow" heading off the page
+  (feat-050) — which is why the step titles are h2 rather than h3: with no
+  parent heading left, h3 would skip a level under the page's h1. -->
 <section class="rail-section" aria-label="The 12-step AI-design workflow" data-rail-section>
   <div class="rail-viewport" data-rail-viewport>
-    <div class="rail-header">
-      <Heading>The 12-Step Workflow</Heading>
-    </div>
-
     <div class="rail-clip">
       <ol class="rail" data-process-rail>
         {
@@ -52,7 +51,7 @@ import { PROCESS_STEPS } from '../model/steps';
               <div class="step__body">
                 <span class="step__number">{step.number}</span>
                 <Icon name={step.icon} size={32} class="step__icon" />
-                <h3 class="step__title">{step.title}</h3>
+                <h2 class="step__title">{step.title}</h2>
                 <p class="step__action">{step.action}</p>
               </div>
               <ul class="step__outputs">
@@ -211,11 +210,6 @@ import { PROCESS_STEPS } from '../model/steps';
     margin-top: var(--spacing-4xl);
   }
 
-  .rail-header {
-    padding: 0 24px;
-    margin-bottom: 48px;
-  }
-
   .rail {
     display: flex;
     flex-direction: column;
@@ -333,21 +327,23 @@ import { PROCESS_STEPS } from '../model/steps';
      Gated on both the class (script-added) and the query, so neither alone
      can pin a phone or a reader who has asked for less motion. */
   @media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
+    /* The section carries no top margin here: the gap to the lead statement
+       is the viewport's own padding-top instead, so it stays 160px — the
+       same rhythm every case-study section uses — whether the viewport is
+       still flowing or already stuck. Centring the content in 100vh (which
+       this did until feat-050) added roughly another 227px of dead air above
+       the cards on entry, on top of the margin. */
+    .rail-section.is-pinned {
+      margin-top: 0;
+    }
     .rail-section.is-pinned .rail-viewport {
       position: sticky;
       top: 0;
       height: 100vh;
       display: flex;
       flex-direction: column;
-      justify-content: center;
-    }
-
-    /* Heading, axis and counter live inside the stuck viewport so they hold
-       still while the track moves under them — the reader keeps the label and
-       their position in the sequence for the whole length of the section. */
-    .rail-section.is-pinned .rail-header {
-      padding: 0 40px;
-      margin-bottom: 64px;
+      justify-content: flex-start;
+      padding-top: 160px;
     }
 
     /* The clip is a separate box from the viewport so the mask only ever
@@ -407,6 +403,9 @@ import { PROCESS_STEPS } from '../model/steps';
       margin-top: auto;
     }
 
+    /* Axis and counter live inside the stuck viewport so they hold still
+       while the track moves under them — the reader keeps their position in
+       the sequence for the whole length of the section. */
     .rail-section.is-pinned .rail-progress {
       display: flex;
       align-items: center;

@@ -13,15 +13,23 @@ import { ProcessRail } from '@widgets/process-rail';
 import { BuildSection } from '@widgets/build-section';
 import type { ContentBlock } from '@entities/project';
 
+// The shared Glacier Flow block, byte-identical to the one defenceSystems, CONNECTIS and
+// medicalSoftware carry — one video file in public/media/shared/, one caption. feat-046
+// had built this page its own still instead, which also meant it shipped the
+// *stale* pre-copy-008 caption while every case study carried the approved
+// short one. Reusing the block resolves both (feat-050).
+//
+// `/media/process/build.jpg` is unreferenced as of this change and awaiting
+// Max's call on deleting it.
 const buildBlocks: ContentBlock[] = [
   {
     media: {
-      type: 'image',
-      image: '/media/process/build.jpg',
-      imageAlt:
-        "Glacier Flow's README open in an editor: the workspace routing map, then a First-Time Bootstrap checklist stepping through project identity, STATE.md, non-negotiable rules, voice and architecture",
+      type: 'video',
+      src: '/media/shared/glacier-flow.webm',
+      poster: '/media/shared/glacier-flow-poster.jpg',
+      alt: "Glacier Flow's title card, then a scroll through the template's public GitHub README — core idea, folder map, and the gated task workflow",
     },
-    text: 'I use Glacier Flow, a Claude Code project template: folder-based routing, a markdown knowledge base, and XML task gates — no change lands without approval.',
+    text: 'I use Glacier Flow, a Claude Code template: folder routing, a knowledge base, and gated tasks.',
   },
 ];
 ---
