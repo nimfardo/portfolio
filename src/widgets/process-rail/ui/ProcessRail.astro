@@ -66,7 +66,7 @@ import { PROCESS_STEPS } from '../model/steps';
     </div>
 
     <div class="rail-progress">
-      <div class="rail-axis">
+      <div class="rail-axis" data-process-axis>
         <span class="rail-axis__progress" data-process-progress></span>
       </div>
       {
@@ -267,6 +267,57 @@ import { PROCESS_STEPS } from '../model/steps';
         window.scrollBy(0, dx);
       };
       viewport.addEventListener('wheel', onWheel, { passive: false, signal });
+
+      // The axis looks exactly like a progress bar, and progress bars get
+      // clicked. Without this the only way past the rail is to keep scrolling
+      // through all twelve steps. Same trick as the wheel handler: it moves
+      // the PAGE, so scroll position stays the single source of truth and the
+      // existing rAF update() does the rendering.
+      //
+      // Deliberately not focusable and not a real slider control. The counter
+      // beside it is already aria-hidden for the same reason (feat-049): every
+      // step is reachable by ordinary scrolling in DOM order, which is the
+      // keyboard and screen-reader path, so this is a pointer affordance for
+      // sighted readers rather than a second way to navigate that would need
+      // its own semantics.
+      const axisEl = section.querySelector<HTMLElement>('[data-process-axis]');
+      if (axisEl) {
+        const scrubTo = (clientX: number) => {
+          const r = axisEl.getBoundingClientRect();
+          if (r.width <= 0) return;
+          const ratio = Math.min(1, Math.max(0, (clientX - r.left) / r.width));
+          const sectionTop = section.getBoundingClientRect().top + window.scrollY;
+          window.scrollTo(0, Math.round(sectionTop - stickOffset + ratio * scrollSpan));
+        };
+        axisEl.addEventListener(
+          'pointerdown',
+          (e) => {
+            if (!canPin() || scrollSpan <= 0) return;
+            // bug-024 hit a silent throw here that killed the whole gesture.
+            try {
+              axisEl.setPointerCapture(e.pointerId);
+            } catch {
+              /* capture is an optimisation; scrubbing still works without it */
+            }
+            e.preventDefault();
+            scrubTo(e.clientX);
+          },
+          { signal }
+        );
+        axisEl.addEventListener(
+          'pointermove',
+          (e) => {
+            if (!axisEl.hasPointerCapture(e.pointerId)) return;
+            scrubTo(e.clientX);
+          },
+          { signal }
+        );
+        const release = (e: PointerEvent) => {
+          if (axisEl.hasPointerCapture(e.pointerId)) axisEl.releasePointerCapture(e.pointerId);
+        };
+        axisEl.addEventListener('pointerup', release, { signal });
+        axisEl.addEventListener('pointercancel', release, { signal });
+      }
 
       window.addEventListener('scroll', onScroll, { passive: true, signal });
       window.addEventListener('resize', measure, { signal });
@@ -539,6 +590,17 @@ import { PROCESS_STEPS } from '../model/steps';
       flex: 1;
       height: 1px;
       background: var(--color-border-default);
+      cursor: pointer;
+      /* The drag must not also scroll the page on a touch device. */
+      touch-action: none;
+    }
+    /* A 1px line is unclickable. This lifts the hit area to 25px without
+       moving anything — the pseudo-element is absolutely positioned, so it
+       adds no height, and pointer events on it belong to the axis. */
+    .rail-section.is-pinned .rail-axis::before {
+      content: '';
+      position: absolute;
+      inset: -12px 0;
     }
     .rail-section.is-pinned .rail-axis__progress {
       position: absolute;
