@@ -336,7 +336,15 @@ import { PROCESS_STEPS } from '../model/steps';
     list-style: none;
   }
   /* Matches the Figma tag master (node 2119:1692) and OverviewSection's tags:
-     cream border and text, not the stale orange the old Tag atom used. */
+     cream border and text, not the stale orange the old Tag atom used.
+
+     No `text-transform` here, unlike OverviewSection's tags — these are real
+     paths, and uppercasing them printed `README.MD` for a file named
+     `README.md`. The page's whole claim is that these artifacts exist in a
+     repo, so a filename that couldn't be checked out undercuts it. Mixed case
+     also reads faster at 12px. feat-045 had already retired this by dropping
+     the pills entirely; feat-046 brought the pills back and the transform with
+     them (bug-048). */
   .step__output {
     padding: 8px 14px;
     border: 1px solid var(--color-border-emphasis);
@@ -345,7 +353,6 @@ import { PROCESS_STEPS } from '../model/steps';
     font-size: var(--font-size-xs);
     line-height: var(--font-line-height-xs);
     letter-spacing: 0.04em;
-    text-transform: uppercase;
     color: var(--color-text-emphasis);
     white-space: nowrap;
   }
