@@ -103,9 +103,12 @@ import { PROCESS_STEPS } from '../model/steps';
       if (!steps.length) return;
       const total = steps.length;
 
-      const wide = window.matchMedia('(min-width: 1024px)');
+      // Mirrors the pinned-mode media query exactly, `min-height` included —
+      // the viewport is sized to its content, so a window shorter than the
+      // band would pin rows that can never be scrolled into view.
+      const roomy = window.matchMedia('(min-width: 1024px) and (min-height: 700px)');
       const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
-      const canPin = () => wide.matches && !reduced.matches;
+      const canPin = () => roomy.matches && !reduced.matches;
 
       let travel = 0;
       let lastWidth = -1;
@@ -180,7 +183,7 @@ import { PROCESS_STEPS } from '../model/steps';
 
       window.addEventListener('scroll', onScroll, { passive: true, signal });
       window.addEventListener('resize', measure, { signal });
-      wide.addEventListener('change', measure, { signal });
+      roomy.addEventListener('change', measure, { signal });
       reduced.addEventListener('change', measure, { signal });
 
       // Setting the section's height can make the page tall enough to gain a
@@ -325,8 +328,12 @@ import { PROCESS_STEPS } from '../model/steps';
      translates 1:1 with progress through it. One gesture, nothing hidden.
 
      Gated on both the class (script-added) and the query, so neither alone
-     can pin a phone or a reader who has asked for less motion. */
-  @media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
+     can pin a phone or a reader who has asked for less motion. The
+     `min-height` floor matters because the viewport is sized to its content
+     (see below): in a window shorter than the band, sticking it to the top
+     would pin content that can never be scrolled into view. Below the floor
+     the stacked list takes over, which always works. */
+  @media (min-width: 1024px) and (min-height: 700px) and (prefers-reduced-motion: no-preference) {
     /* The section carries no top margin here: the gap to the lead statement
        is the viewport's own padding-top instead, so it stays 160px — the
        same rhythm every case-study section uses — whether the viewport is
@@ -336,13 +343,19 @@ import { PROCESS_STEPS } from '../model/steps';
     .rail-section.is-pinned {
       margin-top: 0;
     }
+    /* Height is the content's, not 100vh. At 100vh the band's own slack —
+       371px in a 900px window, 551px in a 1080px one — sat inside the section
+       below the axis, and Build's margin stacked on top of it, so the gap to
+       Build measured 467px/647px and *grew with window height*. Sized to
+       content, the only thing between the axis and Build is Build's own
+       160px margin, at any window height. The travel maths is indifferent:
+       `section.height = viewport.clientHeight + travel` means the sticky
+       release still lands at `rect.top === -travel` by construction. */
     .rail-section.is-pinned .rail-viewport {
       position: sticky;
       top: 0;
-      height: 100vh;
       display: flex;
       flex-direction: column;
-      justify-content: flex-start;
       padding-top: 160px;
     }
 

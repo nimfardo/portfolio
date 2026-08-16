@@ -87,12 +87,19 @@ const buildBlocks: ContentBlock[] = [
     color: var(--color-text-emphasis);
   }
 
-  /* 96px, not the 160px every other section on this site uses: the pinned
-     rail releases flush with the viewport bottom, so the old gap stacked on
-     top of a screen's worth of empty space. */
+  /* Back to the site's standard 160px section gap. feat-048 had cut this to
+     96px to compensate for the pinned rail's own slack; feat-051 removed that
+     slack at the source (the viewport is sized to its content now), so this
+     margin is once again the only thing between the rail and Build. */
   .process__build {
     padding: 0 40px;
-    margin-top: var(--spacing-4xl);
+    margin-top: 160px;
+  }
+
+  @media (max-width: 1023px) {
+    .process__build {
+      margin-top: var(--spacing-4xl);
+    }
   }
 
   @media (max-width: 767px) {
