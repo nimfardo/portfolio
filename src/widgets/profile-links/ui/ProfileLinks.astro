@@ -108,6 +108,38 @@ const { cards, class: className } = Astro.props;
     font-size: var(--font-size-xl);
     line-height: var(--font-line-height-xl);
     font-weight: var(--font-weight-bold);
+    /* One line, as the canvas shows on every card. Bare nowrap is not enough:
+       "Download CV" is ~125px at xl/bold, and in the /about profile grid the
+       footer's inner column drops below that under a ~1550px viewport — the
+       label wrapped there while the identical Contact card stayed on one line.
+       The container queries below keep it to one line by giving ground in the
+       footer (gap, then one type step) before ever allowing a wrap. */
+    white-space: nowrap;
+  }
+  /* The card, not the viewport, is what actually narrows — the same widget
+     renders at three different column widths on one page. */
+  .profile-links__item {
+    container-type: inline-size;
+  }
+  /* Card ≤ 300px (profile grid under ~1750px viewport): the 40px footer gap is
+     canvas luxury the width no longer affords; one type step down keeps the
+     label + 32px icon inside the footer down to a ~240px card. */
+  @container (max-width: 300px) {
+    .profile-links__footer {
+      gap: var(--spacing-md);
+    }
+    .profile-links__label {
+      font-size: var(--font-size-lg);
+      line-height: var(--font-line-height-lg);
+    }
+  }
+  /* Card ≤ 240px (the 1024–1300px band, where a 2x2 grid squeezes cards to
+     150–200px): nothing one-line fits any more, so wrapping returns as the
+     least-bad option — which is also what shipped there before this rule. */
+  @container (max-width: 240px) {
+    .profile-links__label {
+      white-space: normal;
+    }
   }
 
   /* Ink is set on the card so the divider (`currentColor`), the label and both

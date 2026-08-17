@@ -48,8 +48,9 @@ const links: ProfileLink[] = [
 ];
 
 // The close repeats the primary action beside the fastest way to reach him.
+// CV first — canvas 2729:1908 leads with the accent card (Max reordered it
+// from LinkedIn-first himself; see STATE.md's copy-019 notes).
 const contactLinks: ProfileLink[] = [
-  { label: 'LinkedIn', icon: 'linkedin', href: LINKEDIN_URL },
   {
     label: 'Download CV',
     icon: 'cv',
@@ -57,6 +58,7 @@ const contactLinks: ProfileLink[] = [
     variant: 'accent',
     download: true,
   },
+  { label: 'LinkedIn', icon: 'linkedin', href: LINKEDIN_URL },
 ];
 
 const EMAIL = 'max.shturma@gmail.com';
@@ -220,16 +222,20 @@ const EMAIL = 'max.shturma@gmail.com';
   }
 
   .about__contact {
+    /* Canvas 2729:1908: statement -> email and email -> cards are both 64px. */
     display: flex;
     flex-direction: column;
-    gap: 40px;
+    gap: var(--spacing-3xl);
   }
   .about__email {
     font-family: var(--font-family-body);
     font-size: var(--font-size-3xl);
-    line-height: var(--font-line-height-3xl);
+    /* Cross-paired on purpose: the canvas text is Manrope/3xl/medium (32/48),
+       and this scale carries one line-height per size step (3xl = 40) — the
+       same 3xl-size/4xl-line-height pairing the process card title uses. */
+    line-height: var(--font-line-height-4xl);
     font-weight: var(--font-weight-medium);
-    color: var(--color-text-secondary);
+    color: var(--color-text-primary);
     text-decoration: none;
     /* Same animated underline vocabulary as the nav (feat-015): a wipe rather
        than a static rule, so it reads as part of the system. */
