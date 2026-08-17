@@ -99,15 +99,24 @@ const EMAIL = 'max.shturma@gmail.com';
         that is what makes the two columns end level. */
     }
     <section class="about__section about__profile">
-      <img
-        class="about__portrait"
-        src="/media/about/portrait.jpg"
-        alt="Max Shturma outdoors in a green beanie, holding a tabby cat that is nuzzling his beard"
-        width="1583"
-        height="2000"
-        loading="lazy"
-        data-reveal
-      />
+      {
+        /* The wrapper is what suppresses the raggedness: as a bare grid item the
+          <img>'s own intrinsic height drove the row (1025px at a 1920 column
+          against the cards' 1000px), so stretching alone left 25px of slack
+          inside the card column. An empty positioned box has no intrinsic
+          height, so the card column decides the row at every width and the
+          image fills it. */
+      }
+      <div class="about__portrait-wrap" data-reveal>
+        <img
+          class="about__portrait"
+          src="/media/about/portrait.jpg"
+          alt="Max Shturma outdoors in a green beanie, holding a tabby cat that is nuzzling his beard"
+          width="1583"
+          height="2000"
+          loading="lazy"
+        />
+      </div>
       <ProfileLinks cards={links} class="about__links" />
     </section>
 
@@ -167,8 +176,19 @@ const EMAIL = 'max.shturma@gmail.com';
     padding-bottom: 160px;
   }
 
-  /* The site's 160px section rhythm, same schedule process.astro uses. */
-  .about__section {
+  /* The site's 160px section rhythm, same schedule process.astro uses.
+     :global() for the same reason as .about__header above, and this one was a
+     real bug: `about__section` is passed as a prop to <OverviewSection>, whose
+     root element carries OverviewSection's astro-cid rather than this page's,
+     so a scoped rule never matched it. That one miss produced four visible
+     defects at once — the overview bled to the viewport edge (padding-left 0
+     against every other section's 40px), its aside label sat 40px left of the
+     other four, its body column started 13px left of theirs and ran 53px
+     wider, and the hero-to-overview gap was 0px where every other gap was
+     exactly 160px. The plain <section> elements below matched fine either way,
+     which is what made it look like an alignment problem rather than a
+     scoping one. */
+  :global(.about__section) {
     padding: 0 40px;
     margin-top: 160px;
   }
@@ -179,13 +199,25 @@ const EMAIL = 'max.shturma@gmail.com';
        column — an even split. */
     grid-template-columns: 1fr 1fr;
     gap: 64px;
-    align-items: start;
+    /* stretch, not start: the card column is a fixed 468 + 64 + 468 = 1000px
+       while the portrait's height followed its own aspect ratio, so the two
+       only ended level when the column happened to be 791.5px wide. Measured
+       ragged both ways — portrait 722px against cards 1000px at a 1440
+       viewport, and 1025 against 1000 at 1920. Letting the row height drive
+       the image and absorbing the difference in the crop makes them level at
+       every width. */
+    align-items: stretch;
+  }
+  .about__portrait-wrap {
+    position: relative;
+    min-height: 0;
   }
   .about__portrait {
+    position: absolute;
+    inset: 0;
     display: block;
     width: 100%;
-    height: auto;
-    aspect-ratio: 791.5 / 1000;
+    height: 100%;
     object-fit: cover;
   }
 
@@ -250,8 +282,11 @@ const EMAIL = 'max.shturma@gmail.com';
 
   @media (max-width: 1023px) {
     /* Same scale-down [slug].astro and process.astro apply — 160px of empty
-       space between sections is a desktop-only luxury. */
-    .about__section,
+       space between sections is a desktop-only luxury. :global() to match the
+       base rule, or this override would miss OverviewSection too. */
+    :global(.about__section) {
+      margin-top: var(--spacing-4xl);
+    }
     .about__to-top {
       margin-top: var(--spacing-4xl);
     }
@@ -260,8 +295,12 @@ const EMAIL = 'max.shturma@gmail.com';
     .about__profile {
       grid-template-columns: 1fr;
     }
-    .about__portrait {
+    /* Stacked there is no card column to decide the row, so the wrapper carries
+       the ratio itself — an absolutely-filled image inside a box with no height
+       would collapse to nothing. */
+    .about__portrait-wrap {
       max-width: 520px;
+      aspect-ratio: 791.5 / 1000;
     }
   }
 
@@ -269,7 +308,10 @@ const EMAIL = 'max.shturma@gmail.com';
     :global(.about__header) {
       padding: 0 24px;
     }
-    .about__section,
+    /* :global() to match the base rule — see the note there. */
+    :global(.about__section) {
+      padding: 0 24px;
+    }
     .about__to-top {
       padding: 0 24px;
     }
