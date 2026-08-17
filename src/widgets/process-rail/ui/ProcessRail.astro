@@ -92,9 +92,11 @@ import { PROCESS_STEPS } from '../model/steps';
         beside is aria-hidden for the same reason. */
       }
       <span class="rail-hint" aria-hidden="true">
-        {/* Wrapped because Icon's Props are explicit with no attribute
+        {
+          /* Wrapped because Icon's Props are explicit with no attribute
         pass-through, so aria-hidden on the component itself is dropped —
-        the same reason VideoSection wraps Media (feat-041). */}
+        the same reason VideoSection wraps Media (feat-041). */
+        }
         <Icon name="arrow-right" size={16} class="rail-hint__icon" />
       </span>
     </div>
@@ -170,7 +172,7 @@ import { PROCESS_STEPS } from '../model/steps';
         // to stickOffset - scrollSpan rather than from 0.
         const p = Math.min(
           1,
-          Math.max(0, (stickOffset - section.getBoundingClientRect().top) / scrollSpan)
+          Math.max(0, (stickOffset - section.getBoundingClientRect().top) / scrollSpan),
         );
         rail.style.transform = `translate3d(${-p * travel}px, 0, 0)`;
         // Fills continuously off p rather than stepping a one-twelfth segment
@@ -331,7 +333,7 @@ import { PROCESS_STEPS } from '../model/steps';
             e.preventDefault();
             scrubTo(e.clientX);
           },
-          { signal }
+          { signal },
         );
         axisEl.addEventListener(
           'pointermove',
@@ -339,7 +341,7 @@ import { PROCESS_STEPS } from '../model/steps';
             if (!axisEl.hasPointerCapture(e.pointerId)) return;
             scrubTo(e.clientX);
           },
-          { signal }
+          { signal },
         );
         const release = (e: PointerEvent) => {
           if (axisEl.hasPointerCapture(e.pointerId)) axisEl.releasePointerCapture(e.pointerId);
@@ -564,6 +566,23 @@ import { PROCESS_STEPS } from '../model/steps';
       display: flex;
       flex-direction: column;
       padding-top: 160px;
+      /* 90vh, so the workflow uses the screen instead of floating in the middle
+         of it — the band was ~560px in a 1114px window, leaving a third of the
+         screen empty below the axis. The scroll maths is indifferent: `travel`
+         is `pitch * (total - 1)`, purely horizontal, and both `contentH` and
+         `section.style.height` read `viewport.clientHeight` live. feat-055's
+         centring also self-clamps — at 90vh the offset computes negative and
+         clamps to 0, so the band sticks to the top and the 10vh remainder sits
+         below it; the formula stays because a short window still needs it.
+
+         Capped at `100vh - 120px` as well, because the band's axis and counter
+         sit at its bottom edge and `features/scroll-to-top` is global chrome
+         fixed at `bottom: 48px` with a 60px box — so it occupies the last 108px
+         of every viewport. At a flat 90vh the counter landed *underneath* it for
+         any window shorter than ~1080 (measured overlapping at 900). 120px
+         clears the button plus a 12px gap. 90vh still wins on tall windows;
+         below that the band gives up a few vh rather than colliding. */
+      height: min(90vh, 100vh - 120px);
     }
 
     /* The clip is a separate box from the viewport so the mask only ever
@@ -572,6 +591,12 @@ import { PROCESS_STEPS } from '../model/steps';
        with the transform. */
     .rail-section.is-pinned .rail-clip {
       overflow: hidden;
+      /* Absorbs whatever the 90vh viewport has left after its padding and the
+         axis below, so the cards inherit the height rather than the band
+         growing past it. `min-height: 0` because a flex child's default
+         `min-height: auto` would refuse to shrink below its content. */
+      flex: 1;
+      min-height: 0;
       /* Both edges — the track is clipped left and right, and a hard cut
          through a title mid-stroke reads as a rendering fault rather than as
          content continuing past the frame. The 40px ramps are exactly the
@@ -590,6 +615,12 @@ import { PROCESS_STEPS } from '../model/steps';
       flex-direction: row;
       gap: 48px;
       padding: 0 40px;
+      height: 100%;
+      /* Centre the cards in the clip. `align-items` is centre rather than the
+         default stretch because the cards carry their own capped height below —
+         stretch plus a max-height would pin them to the top of the clip and put
+         all the slack underneath. */
+      align-items: center;
       /* No transition — the transform has to track the wheel exactly, or the
          rail lags behind the gesture driving it. */
       will-change: transform;
@@ -605,6 +636,13 @@ import { PROCESS_STEPS } from '../model/steps';
     .rail-section.is-pinned .step {
       flex: 0 0 392px;
       width: 392px;
+      /* Fill the 90vh band, but stop at 640px. A step carries ~250px of content
+         (rule, number, icon, title, action, pills), so on a 1080+ window an
+         uncapped card ran 764px and the surplus had nowhere good to go. 640
+         against the 392px width is a 1:1.63 column, and the cap only bites on
+         tall windows — at 900 the clip is 602 and at 800 it is 512, both under
+         it, so those fill exactly as asked. */
+      height: min(640px, 100%);
       opacity: 0.85;
       transition: opacity var(--duration-slow) var(--ease-fade);
     }
@@ -634,7 +672,16 @@ import { PROCESS_STEPS } from '../model/steps';
 
     /* Pinned to the card's bottom edge rather than flowing straight after the
        action text — the actions run one to three lines depending on the step,
-       and without this the pills sit at a different height on every card. */
+       and without this the pills sit at a different height on every card.
+       At 90vh this needed a card-height cap to stay readable, and the two
+       alternatives were both tried and rejected by looking at them: unbounded,
+       a 764px card put ~460px of surplus into ONE gap between the action and
+       the pills, which reads as a rendering fault; `justify-content:
+       space-between` split it in two but orphaned the rule ~250px above the
+       number it belongs to, which is worse — the rule is the card's top edge,
+       not a third element. Capping the card keeps the top group tight and the
+       pills anchored, and the surplus moves outside the card where it is just
+       band padding. */
     .rail-section.is-pinned .step__outputs {
       margin-top: auto;
     }

@@ -13,7 +13,7 @@
 //   * There is no Languages section. It was on the canvas during copy-019 and
 //     is gone from it now, so the page matches what the canvas actually says.
 import Layout from '@app/layouts/Layout.astro';
-import { Heading, Icon } from '@shared/ui';
+import { Heading } from '@shared/ui';
 import { PageHeader } from '@widgets/page-header';
 import { ProjectHero } from '@widgets/project-hero';
 import { OverviewSection } from '@widgets/overview-section';
@@ -153,15 +153,13 @@ const EMAIL = 'max.shturma@gmail.com';
     </section>
 
     {
-      /* Page-local rather than the shared Button: that component hardcodes an
-        arrow-right icon and a 320px min-width, so giving it an icon-only mode
-        would touch every page that uses it. */
+      /* No page-local back-to-top. The canvas shows one in this corner, but
+        `features/scroll-to-top` is already global chrome mounted once in
+        Layout.astro — a viewport-fixed button that appears after a screen of
+        scrolling — and its own comment records that exact decision for this
+        Figma node (2377:2011). feat-066 added a second one here and it was a
+        straight duplicate. */
     }
-    <div class="about__to-top">
-      <a class="about__to-top-link" href="#top" aria-label="Back to top">
-        <Icon name="arrow-up" size={28} />
-      </a>
-    </div>
   </main>
 </Layout>
 
@@ -251,31 +249,8 @@ const EMAIL = 'max.shturma@gmail.com';
     background-size: 100% 1px;
   }
 
-  .about__to-top {
-    display: flex;
-    justify-content: flex-end;
-    padding: 0 40px;
-    margin-top: 160px;
-  }
-  .about__to-top-link {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 60px;
-    height: 60px;
-    border: 1px solid var(--color-border-accent);
-    color: var(--color-icon-accent);
-    transition: background var(--duration-base) var(--ease-fade);
-  }
-  @media (hover: hover) and (pointer: fine) {
-    .about__to-top-link:hover {
-      background: var(--color-bg-muted);
-    }
-  }
-
   @media (prefers-reduced-motion: reduce) {
-    .about__email,
-    .about__to-top-link {
+    .about__email {
       transition: none;
     }
   }
@@ -285,9 +260,6 @@ const EMAIL = 'max.shturma@gmail.com';
        space between sections is a desktop-only luxury. :global() to match the
        base rule, or this override would miss OverviewSection too. */
     :global(.about__section) {
-      margin-top: var(--spacing-4xl);
-    }
-    .about__to-top {
       margin-top: var(--spacing-4xl);
     }
     /* The photo beside a 2x2 card grid needs more width than a tablet has;
@@ -310,9 +282,6 @@ const EMAIL = 'max.shturma@gmail.com';
     }
     /* :global() to match the base rule — see the note there. */
     :global(.about__section) {
-      padding: 0 24px;
-    }
-    .about__to-top {
       padding: 0 24px;
     }
     .about {
