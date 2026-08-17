@@ -239,20 +239,16 @@ import { PROCESS_STEPS } from '../model/steps';
         scrollSpan = travel * SCROLL_RATIO;
         lastWidth = vp.width;
 
-        // Centre the band in the window while it's stuck. Sized to its content
-        // it is 563px in a 900px window, so a third of the screen sat empty
-        // below it for the whole section. This offsets the STICK POINT and
-        // leaves the box's own height alone, which is what keeps it different
-        // from the centring feat-050 removed: that one made the viewport 100vh
-        // and centred inside it, inflating the lead-to-cards distance in the
-        // document by ~227px. Nothing here moves in flow — only where the band
-        // locks on screen. The padding is subtracted because it sits inside
-        // clientHeight but isn't visible content, so centring on the raw box
-        // would push the cards low.
-        const padTop = parseFloat(getComputedStyle(viewport).paddingTop) || 0;
-        const contentH = viewport.clientHeight - padTop;
-        stickOffset = Math.max(0, Math.round((window.innerHeight - contentH) / 2 - padTop));
-        viewport.style.top = `${stickOffset}px`;
+        // feat-055's centring is retired. The band is full-height by
+        // construction now (`calc(100vh - 120px)`, top-aligned to the sidebar
+        // logo's 40px), so there is nothing left to centre — and the old formula
+        // actively fought that alignment: with the height tied to the viewport it
+        // resolved to a constant 40px at every window size and pushed the cards
+        // a further 40px below the logo line. The band sticks at top 0; CSS
+        // `top: 0` does it, and the inline value is cleared so a stale offset
+        // from a previous measure can't survive a resize.
+        stickOffset = 0;
+        viewport.style.top = '';
 
         // The stuck distance is section.height - viewport.height regardless of
         // the offset, so the travel maths is indifferent to it: the band still
@@ -543,46 +539,51 @@ import { PROCESS_STEPS } from '../model/steps';
      would pin content that can never be scrolled into view. Below the floor
      the stacked list takes over, which always works. */
   @media (min-width: 1024px) and (min-height: 700px) and (prefers-reduced-motion: no-preference) {
-    /* The section carries no top margin here: the gap to the lead statement
-       is the viewport's own padding-top instead, so it stays 160px — the
-       same rhythm every case-study section uses — whether the viewport is
-       still flowing or already stuck. Centring the content in 100vh (which
-       this did until feat-050) added roughly another 227px of dead air above
-       the cards on entry, on top of the margin. */
+    /* The 160px gap to the lead statement is now SPLIT: 120px of section margin
+       plus the viewport's own 40px padding-top. It used to be all padding, with
+       the margin at 0, which worked while the padding was 160 — but the padding
+       doubles as the stuck top offset, and that has to be 40px now so the cards
+       align to the sidebar logo. Splitting it keeps the flow rhythm at exactly
+       160px (120 + 40) while letting the stuck offset be its own number. */
     .rail-section.is-pinned {
-      margin-top: 0;
+      margin-top: 120px;
     }
-    /* Height is the content's, not 100vh. At 100vh the band's own slack —
-       371px in a 900px window, 551px in a 1080px one — sat inside the section
-       below the axis, and Build's margin stacked on top of it, so the gap to
-       Build measured 467px/647px and *grew with window height*. Sized to
-       content, the only thing between the axis and Build is Build's own
-       160px margin, at any window height. The travel maths is indifferent:
-       `section.height = viewport.clientHeight + travel` means the sticky
-       release still lands at `rect.top === -travel` by construction. */
+    /* Viewport-relative height, deliberately — and this is NOT the 100vh
+       feat-051 removed. That one left the band's own slack (371px at a 900px
+       window, 551px at 1080) sitting inside the section *below the axis*, where
+       Build's margin stacked on top of it, so the gap to Build measured
+       467px/647px and grew with window height. Here the axis sits at the box's
+       bottom edge, so there is no interior slack to leak: the only thing between
+       the axis and Build is Build's own 160px margin, at any window height —
+       re-asserted after this change, not assumed. The travel maths is
+       indifferent either way, since `section.height = viewport.clientHeight +
+       scrollSpan` means the sticky release still lands at `rect.top ===
+       -scrollSpan` by construction. */
     .rail-section.is-pinned .rail-viewport {
       position: sticky;
       top: 0;
       display: flex;
       flex-direction: column;
-      padding-top: 160px;
-      /* 90vh, so the workflow uses the screen instead of floating in the middle
-         of it — the band was ~560px in a 1114px window, leaving a third of the
-         screen empty below the axis. The scroll maths is indifferent: `travel`
-         is `pitch * (total - 1)`, purely horizontal, and both `contentH` and
-         `section.style.height` read `viewport.clientHeight` live. feat-055's
-         centring also self-clamps — at 90vh the offset computes negative and
-         clamps to 0, so the band sticks to the top and the 10vh remainder sits
-         below it; the formula stays because a short window still needs it.
+      /* 40px, matching the sidebar logo's own box top — measured, not assumed:
+         the nav is a 40px-padded sidebar and its 64px logo box starts at exactly
+         y=40, which is the same padding grid the page gutters use. Because the
+         viewport is stuck at `top: 0`, this padding IS the on-screen offset, so
+         the first thing in a card (its hairline rule) now sits on the logo's top
+         edge instead of 160px below it. The flow gap to the lead is preserved by
+         the section's 120px margin above. */
+      padding-top: 40px;
+      /* Full visible height, top-aligned to the logo and stopping clear of the
+         fixed chrome. `- 120px` is not cosmetic: `features/scroll-to-top` is
+         global chrome fixed at `bottom: 48px` with a 60px box, so it owns the
+         last 108px of every viewport, and the band's axis and counter sit at its
+         bottom edge — at a flat 90vh the counter landed *underneath* the button
+         for any window below ~1080 (measured overlapping at 900). 120px clears
+         it plus a 12px gap.
 
-         Capped at `100vh - 120px` as well, because the band's axis and counter
-         sit at its bottom edge and `features/scroll-to-top` is global chrome
-         fixed at `bottom: 48px` with a 60px box — so it occupies the last 108px
-         of every viewport. At a flat 90vh the counter landed *underneath* it for
-         any window shorter than ~1080 (measured overlapping at 900). 120px
-         clears the button plus a 12px gap. 90vh still wins on tall windows;
-         below that the band gives up a few vh rather than colliding. */
-      height: min(90vh, 100vh - 120px);
+         The scroll maths is indifferent to all of this: `travel` is
+         `pitch * (total - 1)`, purely horizontal, and both `contentH` and
+         `section.style.height` read `viewport.clientHeight` live. */
+      height: calc(100vh - 120px);
     }
 
     /* The clip is a separate box from the viewport so the mask only ever
@@ -616,11 +617,10 @@ import { PROCESS_STEPS } from '../model/steps';
       gap: 48px;
       padding: 0 40px;
       height: 100%;
-      /* Centre the cards in the clip. `align-items` is centre rather than the
-         default stretch because the cards carry their own capped height below —
-         stretch plus a max-height would pin them to the top of the clip and put
-         all the slack underneath. */
-      align-items: center;
+      /* stretch, not centre: the cards must START at the clip's top edge, which
+         is the logo line. Centring them (which the 640px cap needed) pushed the
+         rule 56px below it at 1080 — the exact gap this change is closing. */
+      align-items: stretch;
       /* No transition — the transform has to track the wheel exactly, or the
          rail lags behind the gesture driving it. */
       will-change: transform;
@@ -636,13 +636,14 @@ import { PROCESS_STEPS } from '../model/steps';
     .rail-section.is-pinned .step {
       flex: 0 0 392px;
       width: 392px;
-      /* Fill the 90vh band, but stop at 640px. A step carries ~250px of content
-         (rule, number, icon, title, action, pills), so on a 1080+ window an
-         uncapped card ran 764px and the surplus had nowhere good to go. 640
-         against the 392px width is a 1:1.63 column, and the cap only bites on
-         tall windows — at 900 the clip is 602 and at 800 it is 512, both under
-         it, so those fill exactly as asked. */
-      height: min(640px, 100%);
+      /* No height cap. feat-067 capped this at 640px to keep the surplus out of
+         the card, but the cap required centring the cards in the clip, and
+         centring is what held the rule 56px below the logo line. Max asked for
+         the carousel to occupy the whole visible band and to start at the logo,
+         and those two together mean the card fills the clip: rule on the logo
+         line at the top, pills anchored at the bottom, the surplus between them.
+         Adding real per-step visuals is what would fill that middle properly. */
+      height: 100%;
       opacity: 0.85;
       transition: opacity var(--duration-slow) var(--ease-fade);
     }
