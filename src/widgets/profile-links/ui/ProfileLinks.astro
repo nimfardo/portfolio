@@ -1,0 +1,164 @@
+---
+// /about's link cards: an 80px icon centred over a token background, a hairline
+// divider, then a label + trailing icon footer. Node 2702:11276 / 2702:11254.
+//
+// Deliberately NOT an extension of entities/project's LinkCards, which looks
+// similar and is not. That widget paints a logo image onto each card's own
+// *baked brand* background, and bug-040 pinned its divider/label/arrow to the
+// cream primitive precisely so they would NOT flip with the theme. These cards
+// sit on the page surface and must flip. Same shape, opposite colour contract —
+// one component serving both would fight itself.
+//
+// Two colour facts read off the canvas rather than guessed: the amber face is
+// `bg/accent` (dark: obsidian-amber-300, exactly the canvas's #E0964D) and the
+// muted face is `bg/muted` (dark: obsidian-amber-800 = #2F1C08). The canvas
+// *alternates* label ink between amber-200 and cream-50 across the four cards;
+// that is drift, not a pattern, so ink here is per-variant and consistent.
+import { Icon } from '@shared/ui';
+import type { ProfileLink } from '../model/types';
+
+interface Props {
+  cards: ProfileLink[];
+  class?: string;
+}
+
+const { cards, class: className } = Astro.props;
+---
+
+<ul class:list={['profile-links', className]}>
+  {
+    cards.map((card) => {
+      const variant = card.variant ?? 'muted';
+      const isExternal = card.href.startsWith('http');
+      return (
+        <li class="profile-links__item">
+          <a
+            class:list={['profile-links__card', `profile-links__card--${variant}`]}
+            href={card.href}
+            download={card.download ? '' : undefined}
+            target={isExternal ? '_blank' : undefined}
+            rel={isExternal ? 'noopener noreferrer' : undefined}
+          >
+            <span class="profile-links__media">
+              <Icon name={card.icon} size={80} class="profile-links__icon" />
+            </span>
+            <span class="profile-links__footer">
+              <span class="profile-links__label">{card.label}</span>
+              <Icon
+                name={card.download ? 'download' : 'arrow-right'}
+                size={32}
+                class="profile-links__arrow"
+              />
+            </span>
+          </a>
+        </li>
+      );
+    })
+  }
+</ul>
+
+<style>
+  /* Two columns takes 4 cards to a 2x2 and 2 cards to a single row with no
+     second rule — the page uses both arrangements (top grid, contact close). */
+  .profile-links {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 64px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .profile-links__card {
+    display: flex;
+    flex-direction: column;
+    /* Canvas card is 468px tall; two of them plus the 64px gap is the 1000px
+       portrait beside them, which is what makes the top row line up. */
+    height: 468px;
+    text-decoration: none;
+    transition: filter var(--duration-base) var(--ease-fade);
+  }
+  /* No border. The canvas draws one, bound to obsidian-amber-950 — the same
+     value as the page ground behind it — so it is invisible by construction in
+     dark mode, and a rule that renders nothing is worse than no rule. Both
+     faces are defined by their fill against the ground in both themes. */
+  .profile-links__card--accent {
+    background: var(--color-bg-accent);
+  }
+  .profile-links__card--muted {
+    background: var(--color-bg-muted);
+  }
+  .profile-links__media {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+    padding: 22px 0;
+  }
+  .profile-links__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 40px;
+    margin: 0 40px 40px;
+    padding-top: 40px;
+    border-top: 1px solid currentColor;
+  }
+  .profile-links__label {
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-xl);
+    line-height: var(--font-line-height-xl);
+    font-weight: var(--font-weight-bold);
+  }
+
+  /* Ink is set on the card so the divider (`currentColor`), the label and both
+     icons all resolve from one declaration per variant — the amber face needs
+     on-accent ink, the muted face needs emphasis ink, and in light mode both
+     invert together because the tokens do. */
+  .profile-links__card--accent {
+    color: var(--color-text-on-accent);
+  }
+  .profile-links__card--muted {
+    color: var(--color-text-emphasis);
+  }
+
+  /* Same restrained hover as LinkCards (feat-034), gated to real pointers so a
+     touch device never gets a stuck state. The trailing icon nudges along its
+     own glyph direction: up-right for the arrow, down for the download. */
+  @media (hover: hover) and (pointer: fine) {
+    .profile-links__card:hover {
+      filter: brightness(1.08);
+    }
+    .profile-links__card:hover :global(.profile-links__arrow) {
+      transform: translate(3px, -3px);
+    }
+    .profile-links__card--accent:hover :global(.profile-links__arrow) {
+      transform: translate(0, 3px);
+    }
+  }
+  :global(.profile-links__arrow) {
+    transition: transform var(--duration-base) var(--ease-fade);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .profile-links__card,
+    :global(.profile-links__arrow) {
+      transition: none;
+    }
+  }
+
+  @media (max-width: 767px) {
+    /* Two cards side by side on a phone leaves each ~150px wide with an 80px
+       icon in it — stack instead, and drop the height since a 468px card is
+       most of a phone screen. Same judgment call LinkCards made. */
+    .profile-links {
+      grid-template-columns: 1fr;
+      gap: var(--spacing-xl);
+    }
+    .profile-links__card {
+      height: 320px;
+    }
+    .profile-links__footer {
+      margin: 0 24px 24px;
+      padding-top: 24px;
+    }
+  }
+</style>
