@@ -644,14 +644,50 @@ import { PROCESS_STEPS } from '../model/steps';
          line at the top, pills anchored at the bottom, the surplus between them.
          Adding real per-step visuals is what would fill that middle properly. */
       height: 100%;
+      /* 40px of inset on every side, but NOT as `padding: 40px` — that would put
+         the hairline rule 40px below the card's top edge, and the rule is the
+         only visible top edge on an inactive card, so it would undo feat-068's
+         logo alignment (rule would land at 80px, not 40px). Instead the top
+         padding is 0 and the rule is full-bleed (see .step__rule below), which
+         keeps the rule ON the card's top edge — its documented role as the
+         card's frame — while the flex `gap: 40px` supplies the same 40px between
+         it and the content. Net effect: 40px consistent inset on all four sides,
+         and the panel's top edge still sits on the logo line.
+         `box-sizing: border-box` is global, so this costs no width: the card
+         stays 392px, the content column becomes 312px, and the card PITCH is
+         unchanged — which is what keeps `travel` and everything derived from it
+         identical. Applied to every card, not just the active one, so nothing
+         shifts when the fill appears. */
+      padding: 0 40px 40px;
       opacity: 0.85;
-      transition: opacity var(--duration-slow) var(--ease-fade);
+      transition:
+        opacity var(--duration-slow) var(--ease-fade),
+        background-color var(--duration-slow) var(--ease-fade);
     }
     .rail-section.is-pinned .step.is-past {
       opacity: 0.65;
     }
     .rail-section.is-pinned .step.is-active {
       opacity: 1;
+      /* The active card carries a fill as well as full opacity and the 2px rule.
+         MEASURED: in dark mode `bg/subtle` (#1a0f05) against the page ground
+         (#110a03) is a 1.04:1 luminance ratio — far below any text-contrast
+         threshold. It reads here only because it is a large filled panel, where
+         luminance differences are detectable well below the thresholds that
+         apply to type. `bg/muted` (#2f1c08) would measure 1.21:1 if this ever
+         needs to be more assertive. Light mode is 1.11:1 (#e2e2e2 on #ededed). */
+      background: var(--color-bg-subtle);
+    }
+
+    /* Full-bleed across the card, cancelling the horizontal padding, so the rule
+       spans the whole 392px and sits flush on the card's top edge. That is what
+       keeps it aligned to the sidebar logo (feat-068) once the card has a 40px
+       inset, and it keeps the rule reading as the card's frame rather than as an
+       internal divider. Only the horizontal margins are negative — the top
+       spacing is the card's own flex gap, so there is no negative margin
+       interacting with `gap`. */
+    .rail-section.is-pinned .step__rule {
+      margin: 0 -40px;
     }
 
     /* Thickness as well as colour, so the active step still reads at a glance
