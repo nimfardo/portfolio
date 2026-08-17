@@ -29,6 +29,9 @@ import iconSystem from './svg/system.svg?raw';
 import iconResponsive from './svg/responsive.svg?raw';
 import iconMotion from './svg/motion.svg?raw';
 import iconHandoff from './svg/handoff.svg?raw';
+import iconGithub from './svg/github.svg?raw';
+import iconCv from './svg/cv.svg?raw';
+import iconDownload from './svg/download.svg?raw';
 
 const icons = {
   'arrow-right': iconArrowRight,
@@ -63,6 +66,13 @@ const icons = {
   responsive: iconResponsive,
   motion: iconMotion,
   handoff: iconHandoff,
+  // /about's link cards (feat-063). `cv` and `download` are 28x28 like most of
+  // the set; `github` is a 32x32 frame (comp-014) and so joins FRAME_32_ICONS
+  // below — its export carries the frame's own padding, so scale must divide
+  // by 32 or the glyph renders ~14% small.
+  github: iconGithub,
+  cv: iconCv,
+  download: iconDownload,
 } as const;
 
 export type IconName = keyof typeof icons;
@@ -75,7 +85,7 @@ export type IconName = keyof typeof icons;
 // how this was diagnosed. So: render each glyph at its own intrinsic size,
 // then scale it by size/nativeFrame to match how Figma scales an icon
 // instance up or down, instead of stretching it to fill an arbitrary box.
-const FRAME_32_ICONS = new Set<IconName>(['linkedin', 'behance', 'smile']);
+const FRAME_32_ICONS = new Set<IconName>(['linkedin', 'behance', 'smile', 'github']);
 
 interface Props {
   name: IconName;
