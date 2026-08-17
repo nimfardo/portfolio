@@ -35,10 +35,12 @@ export const artAnnanolli = {
     text: 'Tero Annanolli paints, teaches, and runs an academy. One site now carries all three.',
     // Slot 1 is the domain, matching CONNECTIS ('Logistics'), medicalSoftware
     // ('Medical') and Arvus ('Security') — not the product category. Slot 2
-    // names the build because Max owned it here: unlike Arvus (design only) and
-    // unlike the code pages ('Solo design engineer'), this one shipped on
-    // Webflow by his own hand, so 'Webflow developer' is the accurate claim and
-    // identity.md forbids falling back to plain 'UI/UX designer'.
+    // names the build because Max owned it here: unlike Arvus ('Solo UX/UI
+    // designer', design only) and unlike the code pages ('Solo design
+    // engineer'), this one shipped on Webflow by his own hand, so 'Webflow
+    // developer' is the accurate claim — it is chosen for accuracy, not to dodge
+    // 'UI/UX designer', which identity.md now permits as depth (never a
+    // headline) rather than banning outright.
     tags: [
       'Art',
       'Solo designer and Webflow developer',
