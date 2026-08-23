@@ -130,6 +130,20 @@ const scale = size / nativeFrame;
   }
   .icon__glyph {
     display: inline-flex;
+    /* Load-bearing (bug-055). This span is a flex item inside the `size`-px
+       `.icon` box, so with the default `flex-shrink: 1` the browser shrinks an
+       oversized SVG to fit BEFORE the transform below scales it — the glyph
+       then lands at `size² / frame` instead of `size`. Asked for 16px, a
+       natural-28 export rendered 9.1px (16 × 16/28).
+       It only bites when `size < natural`, which is why the default 28 and
+       every 32/40/64/80 call site were always right and this sat unnoticed:
+       the two victims were the 16px CV nav glyph and Home's 16px NDA locker
+       badge. And because flex shrinks along the main axis only, `locker`
+       (22×24) came out 9.1×13.7 — horizontally compressed, not merely small.
+       Nothing overflows with the shrink off: rendered size is
+       natural × (size/frame), which can only exceed `size` if natural > frame,
+       and the sole 32-natural export is `github`, whose frame is 32. */
+    flex-shrink: 0;
   }
   .icon__glyph :global(svg) {
     display: block;
