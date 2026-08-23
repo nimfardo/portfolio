@@ -22,7 +22,14 @@ const { title, hideNav = false } = Astro.props;
 <html lang="en">
   <head>
     <meta charset="utf-8" />
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    {/* Static, not a prefers-color-scheme pair: the light theme is a
+     * localStorage preference (see the inline script below), not an OS
+     * one, so a media-query pair would disagree with the rendered page
+     * whenever the two differ. Dark is the default theme. */}
+    <meta name="theme-color" content="#110a03" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
