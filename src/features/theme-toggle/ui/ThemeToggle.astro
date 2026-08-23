@@ -21,7 +21,7 @@ const { class: className } = Astro.props;
 </button>
 
 <script>
-  import { bindOncePersisted } from '@shared/lib';
+  import { bindOncePersisted, prefersReducedMotion } from '@shared/lib';
 
   // The desktop toggle (PageHeader) is fresh, unpersisted markup on every
   // page — needs (re)binding after each `astro:page-load`. The mobile
@@ -41,19 +41,52 @@ const { class: className } = Astro.props;
     document.querySelectorAll<HTMLButtonElement>('[data-theme-toggle]').forEach(syncLabel);
   }
 
+  function switchTheme() {
+    const isLight = document.documentElement.dataset.theme === 'light';
+    if (isLight) {
+      delete document.documentElement.dataset.theme;
+      localStorage.setItem(STORAGE_KEY, 'dark');
+    } else {
+      document.documentElement.dataset.theme = 'light';
+      localStorage.setItem(STORAGE_KEY, 'light');
+    }
+    syncAllLabels();
+  }
+
+  /**
+   * Circular wipe out of the clicked toggle (awwwards idea 2, feat-084).
+   * The `::view-transition-*` keyframes live in global.css behind
+   * `html[data-theme-switching]` — that flag is the whole reason page
+   * navigations (also view transitions, via ClientRouter) don't inherit the
+   * circle. Set it before starting, clear it when the transition settles.
+   */
+  function wipeTheme(button: HTMLElement) {
+    const root = document.documentElement;
+    const box = button.getBoundingClientRect();
+    const x = box.left + box.width / 2;
+    const y = box.top + box.height / 2;
+    // Farthest viewport corner from the origin — the radius at which the
+    // circle has covered every pixel, so the wipe never stops short.
+    const r = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
+    root.style.setProperty('--tt-x', `${x}px`);
+    root.style.setProperty('--tt-y', `${y}px`);
+    root.style.setProperty('--tt-r', `${r}px`);
+    root.dataset.themeSwitching = '';
+    const transition = document.startViewTransition(switchTheme);
+    transition.finished.finally(() => {
+      delete root.dataset.themeSwitching;
+    });
+  }
+
   function initThemeToggle() {
     syncAllLabels();
     bindOncePersisted<HTMLButtonElement>('[data-theme-toggle]', (button) => {
       button.addEventListener('click', () => {
-        const isLight = document.documentElement.dataset.theme === 'light';
-        if (isLight) {
-          delete document.documentElement.dataset.theme;
-          localStorage.setItem(STORAGE_KEY, 'dark');
-        } else {
-          document.documentElement.dataset.theme = 'light';
-          localStorage.setItem(STORAGE_KEY, 'light');
+        if (!document.startViewTransition || prefersReducedMotion()) {
+          switchTheme();
+          return;
         }
-        syncAllLabels();
+        wipeTheme(button);
       });
     });
   }

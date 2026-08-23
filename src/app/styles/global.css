@@ -170,3 +170,39 @@ svg {
     transition: none;
   }
 }
+
+/* Theme-toggle circular wipe (feat-084, awwwards idea 2). The new theme's
+   snapshot is revealed by a circle growing out of the toggle that was
+   clicked; the old snapshot just sits still underneath until it is done.
+
+   SCOPING IS LOAD-BEARING: ClientRouter drives page navigations through the
+   same View Transitions API, so an unscoped `::view-transition-new(root)`
+   rule would put this circle on every route change too. The
+   `[data-theme-switching]` flag is set by ThemeToggle immediately before
+   `startViewTransition` and cleared when it settles, so these keyframes can
+   only ever fire for a theme swap. --tt-x/--tt-y/--tt-r come from the same
+   place (the clicked button's centre, and the distance to the farthest
+   viewport corner). Reduced motion never reaches here — the toggle skips
+   the transition entirely and swaps instantly. */
+html[data-theme-switching]::view-transition-old(root),
+html[data-theme-switching]::view-transition-new(root) {
+  /* Both snapshots opt out of the default cross-fade and its blending; the
+     clip-path below is the only thing that should be moving. */
+  animation: none;
+  mix-blend-mode: normal;
+}
+html[data-theme-switching]::view-transition-old(root) {
+  z-index: 0;
+}
+html[data-theme-switching]::view-transition-new(root) {
+  z-index: 1;
+  animation: theme-wipe var(--duration-slow) var(--ease-reveal) both;
+}
+@keyframes theme-wipe {
+  from {
+    clip-path: circle(0 at var(--tt-x) var(--tt-y));
+  }
+  to {
+    clip-path: circle(var(--tt-r) at var(--tt-x) var(--tt-y));
+  }
+}
