@@ -32,7 +32,15 @@ const { href, active = false, large = false, external = false, icon } = Astro.pr
      `transform-origin` between rest and hover/active so the same scaleX
      transition reads as "wipes in from the left, retreats to the right"
      instead of a plain fade. Replaces the old active-only indicator span —
-     hover and the active-page state now share one mechanism. */
+     hover and the active-page state now share one mechanism.
+
+     ⚠ The underline lives on the LABEL, not the anchor, and that distinction
+     is load-bearing (bug-052). It sat on the anchor for as long as the label
+     was the anchor's only child, so the two boxes were the same width and
+     nothing gave the shortcut away. `CV` then gained a trailing 16px glyph and
+     the underline stretched 24px past the word, running under the gap and the
+     icon while the other three items still ended at their last letter. The
+     underline is a *label* affordance; the anchor stays the hover target. */
   .nav-item {
     display: inline-flex;
     /* Row, not column: the label used to be the only child so the axis did not
@@ -42,7 +50,6 @@ const { href, active = false, large = false, external = false, icon } = Astro.pr
     flex-direction: row;
     align-items: center;
     gap: var(--spacing-sm);
-    position: relative;
     padding-bottom: 6px;
     text-decoration: none;
     font-family: var(--font-family-body);
@@ -53,20 +60,28 @@ const { href, active = false, large = false, external = false, icon } = Astro.pr
     text-transform: uppercase;
     color: var(--color-text-primary);
   }
-  .nav-item::after {
+  .nav-item__label {
+    position: relative;
+  }
+  .nav-item__label::after {
     content: '';
     position: absolute;
     left: 0;
     right: 0;
-    bottom: 0;
+    /* -6px, not 0: the anchor's own `padding-bottom: 6px` still reserves the
+       gap, so the rule hangs that far below the label rather than sitting on
+       its baseline box. Same rendered position as before the move. */
+    bottom: -6px;
     height: 1.5px;
     background: var(--color-icon-default);
     transform: scaleX(0);
     transform-origin: right center;
     transition: transform var(--duration-slow) var(--ease-reveal);
   }
-  .nav-item:hover::after,
-  .nav-item[aria-current='page']::after {
+  /* Trigger is still the whole anchor — hovering the CV glyph underlines the
+     word, which is what a single link should do. */
+  .nav-item:hover .nav-item__label::after,
+  .nav-item[aria-current='page'] .nav-item__label::after {
     transform-origin: left center;
     transform: scaleX(1);
   }

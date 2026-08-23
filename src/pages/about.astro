@@ -138,27 +138,35 @@ const mediaRows = [{ tallFirst: true }, { tallFirst: false }];
     <section class="about__section section-grid">
       <Heading class="section-grid__aside">Availability</Heading>
       <div class="section-grid__body about__availability" data-reveal>
-        <div class="about__place">
-          <BudapestCrest />
-          <p class="about__place-name">Budapest</p>
-        </div>
+        {
+          /* The row is a child so the body above it can be the query
+            container — an element cannot container-query itself, and
+            `flex-direction` has to change on the row. Same root-plus-inner-row
+            shape industries-bar uses, for the same reason. */
+        }
+        <div class="about__availability-row">
+          <div class="about__place">
+            <BudapestCrest />
+            <p class="about__place-name">Budapest</p>
+          </div>
 
-        <div class="about__arrow" aria-hidden="true">
-          <span class="about__arrow-shaft"></span>
-          <svg
-            class="about__arrow-head"
-            viewBox={ARROW_VIEWBOX}
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            focusable="false"
-          >
-            <path d={ARROW_PATH} fill="currentColor"></path>
-          </svg>
-        </div>
+          <div class="about__arrow" aria-hidden="true">
+            <span class="about__arrow-shaft"></span>
+            <svg
+              class="about__arrow-head"
+              viewBox={ARROW_VIEWBOX}
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              focusable="false"
+            >
+              <path d={ARROW_PATH} fill="currentColor"></path>
+            </svg>
+          </div>
 
-        <div class="about__destination">
-          <p class="about__from">From January 2027</p>
-          <p class="about__place-name">Open to relocate</p>
+          <div class="about__destination">
+            <p class="about__from">From January 2027</p>
+            <p class="about__place-name">Open to relocate</p>
+          </div>
         </div>
       </div>
     </section>
@@ -246,6 +254,9 @@ const mediaRows = [{ tallFirst: true }, { tallFirst: false }];
   /* --- Availability (canvas 2793:3213) --- */
 
   .about__availability {
+    container: availability / inline-size;
+  }
+  .about__availability-row {
     display: flex;
     /* Canvas gap between the three parts. */
     gap: 40px;
@@ -254,6 +265,7 @@ const mediaRows = [{ tallFirst: true }, { tallFirst: false }];
        bottom one, which is where the arrow belongs. */
     align-items: flex-end;
   }
+
   .about__place,
   .about__destination {
     display: flex;
@@ -318,6 +330,43 @@ const mediaRows = [{ tallFirst: true }, { tallFirst: false }];
        shaft stub lines up with the CSS shaft to the pixel. */
     width: 28.195px;
     height: 29.8464px;
+  }
+
+  /* ⚠ This block must stay BELOW the base .about__arrow / .about__destination
+     rules. A container query adds no specificity, so `display: none` here and
+     `display: flex` there are a straight source-order contest — with this
+     block written above them the arrow kept rendering while stacked, which is
+     how it shipped for one build of this fix.
+
+     Stacks on its own width, not the viewport's (bug-053).
+     The two text blocks are `flex: none` with nowrap labels, so the row has a
+     hard floor: 177.6 (place) + 40 + 28.2 (arrowhead) + 40 + 305.7
+     (destination) = 591.5px of content that cannot shrink, plus a shaft short
+     enough to still read as an arrow — 80px — is 672px, rounded to 680.
+     A viewport media query could not see this. At 1024px the sidebar still
+     takes 153px and the 3-column grid leaves the body 500.7px, so `≤1023px`
+     never fired and the row pushed 22px past the page edge; every width from
+     1024 to about 1230 overflowed. Querying the container catches it wherever
+     it happens.
+     It also *improves* the wide-but-not-desktop case: at a 1023px viewport the
+     grid has collapsed to one column and the body is ~943px, which has ample
+     room, so the row now keeps its arrow there instead of stacking because a
+     breakpoint said so. */
+  @container availability (max-width: 680px) {
+    .about__availability-row {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--spacing-lg);
+    }
+    /* A 506px arrow between two 40px labels needs horizontal room. Rotating it
+       to point down would be a different statement, so it goes. */
+    .about__arrow {
+      display: none;
+    }
+    .about__destination {
+      align-items: flex-start;
+      text-align: left;
+    }
   }
 
   /* --- Media placeholders (canvas 2799:3373) --- */
@@ -392,22 +441,6 @@ const mediaRows = [{ tallFirst: true }, { tallFirst: false }];
     :global(.about__section) {
       margin-top: var(--spacing-4xl);
     }
-    /* A 506px arrow between two 40px labels needs horizontal room a tablet
-       does not have. Stack the three parts, drop the arrow entirely — an
-       arrow rotated to point down would be a different statement — and let
-       the date/status block align left with everything else. */
-    .about__availability {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: var(--spacing-lg);
-    }
-    .about__arrow {
-      display: none;
-    }
-    .about__destination {
-      align-items: flex-start;
-      text-align: left;
-    }
     /* Stacked, no card column is left to decide the row, so every slot has to
        carry its own ratio — an unsized box in a 1fr row would collapse. */
     .about__media-row {
@@ -442,11 +475,15 @@ const mediaRows = [{ tallFirst: true }, { tallFirst: false }];
     .about__media-row {
       gap: var(--spacing-xl);
     }
-    /* 40px city names wrap on a phone; nowrap would overflow the page instead,
-       which is the failure feat-033's tags already caught once. */
+    /* Only `white-space`. The font-size/line-height step that used to sit here
+       was dead (bug-054): global.css carries a responsive type scale that
+       already takes 4xl to 28px at this width — the same value 3xl resolves to
+       — so the override moved nothing but 2px of line-height while reading as
+       though it set the mobile size. `normal` is kept deliberately: 375px does
+       not need it (the longest name is ~215px in a 327px column), but a nowrap
+       40px string is a latent page-overflow on anything narrower, which is the
+       failure feat-033's tags already caught once. */
     .about__place-name {
-      font-size: var(--font-size-3xl);
-      line-height: var(--font-line-height-4xl);
       white-space: normal;
     }
   }
