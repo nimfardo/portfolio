@@ -26,6 +26,8 @@ import iconPalette from './svg/palette.svg?raw';
 import iconLayers from './svg/layers.svg?raw';
 import iconTokens from './svg/tokens.svg?raw';
 import iconSystem from './svg/system.svg?raw';
+import iconFrame from './svg/frame.svg?raw';
+import iconTerminal from './svg/terminal.svg?raw';
 import iconResponsive from './svg/responsive.svg?raw';
 import iconMotion from './svg/motion.svg?raw';
 import iconHandoff from './svg/handoff.svg?raw';
@@ -53,8 +55,21 @@ const icons = {
   smile: iconSmile,
   tree: iconTree,
   waves: iconWaves,
-  // The 12-step process icons (comp-011) — all built on the same 28x28
-  // frame as the rest of the set, so none belong in FRAME_32_ICONS.
+  // The process-rail icons (comp-011) — all built on the same 28x28 frame as
+  // the rest of the set, so none belong in FRAME_32_ICONS.
+  //
+  // `frame` and `terminal` joined the set with the 16-step sync (feat-091):
+  // steps 10 and 11 ("Screens in Figma", "Figma to Code") are new, and their
+  // glyphs already existed in the Figma library. Both were read off their
+  // masters (2849:15 is 24x24 in a 28 frame, 2643:12 is 26x22) rather than
+  // scaled down from the rail's 32px instances, which is what the instance
+  // renders would have given. `terminal` was drawn for the old step 00
+  // (`Claude Code Setup`) and left unused when that step was dropped; it is
+  // in the code set for the first time here.
+  //
+  // Steps 15 and 16 reuse `arrow-up` and `eye`, already in the set for other
+  // callers. Not a name-match assumption — both were diffed against their
+  // Figma masters (2377:1996, 2048:456) and the path data is identical.
   search: iconSearch,
   personas: iconPersonas,
   sitemap: iconSitemap,
@@ -64,6 +79,8 @@ const icons = {
   layers: iconLayers,
   tokens: iconTokens,
   system: iconSystem,
+  frame: iconFrame,
+  terminal: iconTerminal,
   responsive: iconResponsive,
   motion: iconMotion,
   handoff: iconHandoff,
