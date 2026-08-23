@@ -184,6 +184,27 @@ svg {
    place (the clicked button's centre, and the distance to the farthest
    viewport corner). Reduced motion never reaches here — the toggle skips
    the transition entirely and swaps instantly. */
+/* Nothing may still be moving when the pseudo tree is torn down (feat-090).
+   The new snapshot is captured the instant the theme flips, so anything with
+   a CSS transition is frozen at its OLD value in that image while the live
+   DOM underneath carries on to its new one — and 0.55s later, when the
+   snapshot is removed, the live DOM pops into view already finished. The
+   toggle's own knob was the visible case: `left: 2px` → `22px` on a 0.2s
+   ease, so it teleported 20px at the end of every wipe, right under the
+   cursor that started it.
+
+   Suppressing transitions while the flag is up makes the flip instant, which
+   means the snapshot captures the final state and there is nothing left to
+   move. Global rather than scoped to the two toggle rules on purpose: any
+   property that ever transitions on a theme change would bring the same pop
+   back silently. It costs nothing visible — for the duration of the wipe the
+   live DOM is behind a full-screen snapshot anyway. */
+html[data-theme-switching] *,
+html[data-theme-switching] *::before,
+html[data-theme-switching] *::after {
+  transition: none !important;
+}
+
 html[data-theme-switching]::view-transition-old(root),
 html[data-theme-switching]::view-transition-new(root) {
   /* Both snapshots opt out of the default cross-fade and its blending; the

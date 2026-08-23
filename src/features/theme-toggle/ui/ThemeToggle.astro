@@ -54,42 +54,36 @@ const { class: className } = Astro.props;
   }
 
   /**
-   * Where the wipe starts: the pointer itself, not the button's centre
-   * (feat-089, after Max read the original as mis-positioned). The toggle is
-   * ~102px wide — the word plus the track — so clicking the label put the
-   * origin up to half that away from the cursor, and a circle that grows
-   * from somewhere you didn't click is exactly what reads as wrong.
-   *
-   * A keyboard activation (Enter/Space) reports clientX/clientY as 0, which
-   * is also a legitimate coordinate, so `detail` is what distinguishes them:
-   * it counts clicks and is 0 for a synthesised one. Keyboard falls back to
-   * the button's centre, which is the right answer when there is no cursor.
+   * Where the wipe starts: the centre of the switch itself — the 44px track,
+   * not the button box. The button is ~98px wide because it carries the word
+   * "DARK" as well, so its centre sits ~27px to the left of the thing that
+   * visually reads as the toggle. Max's call after seeing it; feat-089 had
+   * briefly used the pointer instead, which was the wrong reading of a note
+   * about position.
    */
-  function wipeOrigin(event: MouseEvent, button: HTMLElement) {
-    if (event.detail > 0) {
-      return {
-        x: Math.min(Math.max(event.clientX, 0), innerWidth),
-        y: Math.min(Math.max(event.clientY, 0), innerHeight),
-      };
-    }
-    const box = button.getBoundingClientRect();
+  function wipeOrigin(button: HTMLElement) {
+    const anchor = button.querySelector('.theme-toggle__track') ?? button;
+    const box = anchor.getBoundingClientRect();
     return { x: box.left + box.width / 2, y: box.top + box.height / 2 };
   }
 
   /**
-   * Circular wipe out of the click (awwwards idea 2, feat-087).
+   * Circular wipe out of the toggle (awwwards idea 2, feat-087).
    * The `::view-transition-*` keyframes live in global.css behind
    * `html[data-theme-switching]` — that flag is the whole reason page
    * navigations (also view transitions, via ClientRouter) don't inherit the
-   * circle. Set it before starting, clear it when the transition settles.
+   * circle, and it is also what suppresses every CSS transition for the
+   * duration so the wipe ends without a pop. Set it before starting, clear
+   * it when the transition settles.
    */
-  function wipeTheme(event: MouseEvent, button: HTMLElement) {
+  function wipeTheme(button: HTMLElement) {
     const root = document.documentElement;
-    const { x, y } = wipeOrigin(event, button);
+    const { x, y } = wipeOrigin(button);
     // Farthest viewport corner from the origin — the radius at which the
     // circle has covered every pixel, so the wipe never stops short no
-    // matter which corner it started nearest.
-    const r = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
+    // matter which corner it started nearest. Rounded up: a fractional
+    // shortfall would leave one pixel of the old theme to snap away.
+    const r = Math.ceil(Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y)));
     root.style.setProperty('--tt-x', `${x}px`);
     root.style.setProperty('--tt-y', `${y}px`);
     root.style.setProperty('--tt-r', `${r}px`);
@@ -103,12 +97,12 @@ const { class: className } = Astro.props;
   function initThemeToggle() {
     syncAllLabels();
     bindOncePersisted<HTMLButtonElement>('[data-theme-toggle]', (button) => {
-      button.addEventListener('click', (event) => {
+      button.addEventListener('click', () => {
         if (!document.startViewTransition || prefersReducedMotion()) {
           switchTheme();
           return;
         }
-        wipeTheme(event, button);
+        wipeTheme(button);
       });
     });
   }
