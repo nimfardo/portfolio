@@ -80,10 +80,7 @@ const ARROW_PATH =
 // 64px gutter; the big slot swaps sides between rows. Slot heights are 468 +
 // 64 + 468 = 1000, which is why the stacked pair ends level with the tall one.
 // `tallFirst` is which side the full-height slot takes in that row.
-const mediaRows = [
-  { tallFirst: true },
-  { tallFirst: false },
-];
+const mediaRows = [{ tallFirst: true }, { tallFirst: false }];
 ---
 
 <Layout title="About — Max Shturma">
@@ -155,7 +152,7 @@ const mediaRows = [
             xmlns="http://www.w3.org/2000/svg"
             focusable="false"
           >
-            <path d={ARROW_PATH} fill="currentColor" />
+            <path d={ARROW_PATH} fill="currentColor"></path>
           </svg>
         </div>
 
@@ -186,10 +183,10 @@ const mediaRows = [
             class:list={['about__media-row', { 'about__media-row--reversed': !row.tallFirst }]}
             data-reveal
           >
-            <div class="about__media-tall"></div>
+            <div class="about__media-tall" />
             <div class="about__media-stack">
-              <div class="about__media-slot"></div>
-              <div class="about__media-slot"></div>
+              <div class="about__media-slot" />
+              <div class="about__media-slot" />
             </div>
           </div>
         ))

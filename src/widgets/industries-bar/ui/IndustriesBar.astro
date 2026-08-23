@@ -227,27 +227,13 @@ const columns = INDUSTRIES.map((d, i) => ({
          wraps. Reserving the second line means it fills space already there
          rather than pushing its own column deeper than its neighbours, so all
          four narrow columns stay level at every width. Nothing follows this
-         section, so an unused reserved line costs nothing. */
+         section, so an unused reserved line costs nothing.
+         Rejected: a third step down to 12px. It buys that one label its single
+         line and costs a visible 18-vs-12 jump between two adjacent columns.
+         `2lh` resolves against whichever step this query landed on. */
       min-height: 2lh;
     }
   }
-  /* Two lines reserved for every label, always.
-     The bar is fluid but the type is not, so the canvas's one-line labels do
-     not survive every width: the body column is 65% of the content column, so
-     at a 1440-1456 viewport the bar is ~778px against the canvas's 1071 —
-     73% of canvas scale — while the text stays 18/14px. Measured in-browser,
-     CONSUMER & BRAND needs 147.4px at 14px and its column there is 138.6px,
-     so it wraps. That is the one label that does; every other fits at every
-     width the horizontal bar renders at.
-     Stepping down a third time to 12px would buy that one label one line and
-     cost a visible 18-vs-12 jump between two adjacent columns, so instead the
-     wrap is allowed and made even: reserving the second line everywhere means
-     a wrapped label fills space that was already there rather than pushing its
-     own column deeper than its neighbours. Nothing follows this section, so
-     the reserved line is free when it goes unused. `2lh` resolves against
-     whichever step the container query above landed on. */
-
-
   .industries-bar__industry--1 .industries-bar__seg {
     background: var(--seg-1);
   }
