@@ -19,7 +19,7 @@ import { ProjectHero } from '@widgets/project-hero';
 import { OverviewSection } from '@widgets/overview-section';
 import { ProfileLinks } from '@widgets/profile-links';
 import type { ProfileLink } from '@widgets/profile-links';
-import { IndustryDonut } from '@widgets/industry-donut';
+import { IndustriesBar } from '@widgets/industries-bar';
 
 // Four cards, 2x2, matching canvas nodes 2702:11276 / 2702:11254. GitHub points
 // at glacier-flow because the portfolio's own repo stays private (Max's call,
@@ -125,7 +125,7 @@ const EMAIL = 'max.shturma@gmail.com';
     <section class="about__section section-grid">
       <Heading class="section-grid__aside">Industries</Heading>
       <div class="section-grid__body" data-reveal>
-        <IndustryDonut />
+        <IndustriesBar />
       </div>
     </section>
 

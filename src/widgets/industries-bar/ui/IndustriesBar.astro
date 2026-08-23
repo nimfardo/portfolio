@@ -1,0 +1,335 @@
+---
+// /about's Industries bar (canvas node 2793:3188; hover spec 2812:1872).
+// Five columns, each a segment with its count inside it and its name directly
+// beneath — replacing the donut this widget used to be.
+//
+// ── Why a bar, and why the labels sit under their own segments ─────────────
+// The donut's legend keyed by colour at fixed gaps (0/240/455/606/737) against
+// arcs starting at 0/356/712/832/952 — nothing lined up, so hue was the only
+// cue, and the last three steps are adjacent shades of ONE amber ramp. A
+// single-hue palette cannot do a categorical job. Putting each name directly
+// under its own segment makes position the cue and retires the problem: colour
+// now carries order only, which a sequential ramp is allowed to do.
+//
+// ⚠ The same warning the donut carried still applies: if this is ever changed
+// back to a legend/swatch treatment, colour carries identity again and the
+// palette must be re-derived from scratch.
+//
+// ── Why no width is hardcoded ─────────────────────────────────────────────
+// Canvas widths are 472.444 / 236.222 / 118.111 / 118.111 / 118.111 at a
+// 1071px container. Those are NOT a straight proportion — a straight split puts
+// the 1-project column at 53.15px behind an 86px label, so the three tail
+// columns are floored at a minimum-readable 118.111px and only the two wide
+// ones divide what is left, 10:5 (feat-078).
+//
+// That is exactly what the flex algorithm does on its own given
+// `flex: <count> 1 0` plus `min-width: 118.111px`. At a 1071px container with
+// 4x2px gaps: 1063 to share, unconstrained shares are 531.5 / 265.75 / 106.3 /
+// 106.3 / 53.15, the three tails violate the floor and freeze at 118.111
+// (354.333 total), and the remaining 708.667 divides 10:5 into 472.444 /
+// 236.222 — the canvas numbers, to the third decimal, derived rather than
+// pasted. So the widths self-correct if the counts change, and there is no
+// second copy of the ramp-and-width arithmetic to drift.
+//
+// ── Why the ramp is selected per theme, never flipped ─────────────────────
+// The canvas only specs dark. Its ramp is invisible in light: amber-50 measures
+// 1.02:1 on #ededed. So light gets its own steps, largest-is-darkest, which is
+// the standard direction on a light ground and the inverse of dark's
+// largest-is-lightest. Carried forward from the donut, where it was derived.
+//
+// The count-ink flip point therefore differs BETWEEN THEMES, which is the
+// non-obvious part: dark flips after step 3 (dark ink on the three light
+// steps, light ink on the two dark ones), light flips after step 4. Measured,
+// not estimated — every pair below clears the 3:1 large-text floor that 32px
+// bold sits above:
+//   dark  seg-vs-ground 17.20 / 12.88 / 8.08 / 4.10 / 3.00
+//         count ink     17.20 / 12.88 / 8.08 / 3.14 / 4.29
+//   light seg-vs-ground 13.90 / 10.57 / 5.59 / 4.09 / 2.43
+//         count ink     14.24 / 10.83 / 5.73 / 4.19 / 5.72
+// Light step 5 at 2.43:1 against the ground is the one value under 3:1 — the
+// same trade-off the donut recorded and accepted, relieved by the direct label.
+import { INDUSTRIES } from '../model/industries';
+
+interface Props {
+  class?: string;
+}
+const { class: className } = Astro.props;
+
+const total = INDUSTRIES.reduce((sum, d) => sum + d.count, 0);
+
+const columns = INDUSTRIES.map((d, i) => ({
+  ...d,
+  // Position, 1-based. Indexes the ramp and the ink — never read off the
+  // record, so a reorder cannot carry a colour with it.
+  step: i + 1,
+  figure: d.display ?? String(d.count),
+  // Share of the whole, for the stacked layout only. Computed here rather than
+  // in calc() so the percentage and the flex ratio come from one source.
+  pct: `${((d.count / total) * 100).toFixed(2)}%`,
+}));
+---
+
+<div class:list={['industries-bar', className]}>
+  {
+    /* Decorative. Every value is in the list below, which is the accessible
+      equivalent the dataviz method requires — same one-node-two-presentations
+      arrangement the donut used. No tabindex is added: these columns lead
+      nowhere, and giving decorative shapes tab stops to satisfy the hover
+      spec's keyboard mirror would cost keyboard users more than it returns.
+      The :focus-within rule is still written, so the highlight works for free
+      if a column ever gains a real focusable child. */
+  }
+  <div class="industries-bar__bar" role="presentation" aria-hidden="true">
+    {
+      columns.map((c) => (
+        <div
+          class={`industries-bar__industry industries-bar__industry--${c.step}`}
+          style={`flex: ${c.count} 1 0; --pct: ${c.pct};`}
+        >
+          <div class="industries-bar__seg">
+            <span class="industries-bar__count">{c.figure}</span>
+          </div>
+          <span class="industries-bar__rule" />
+          <span class="industries-bar__label">{c.label}</span>
+        </div>
+      ))
+    }
+  </div>
+
+  <ul class="industries-bar__list">
+    {
+      INDUSTRIES.map((d) => (
+        <li>
+          {d.label}: {d.display ?? d.count} {d.count === 1 ? 'project' : 'projects'}
+        </li>
+      ))
+    }
+  </ul>
+</div>
+
+<style>
+  /* Dark (default): largest segment is LIGHTEST, because luminance against the
+     near-black ground is what makes a block read. 400 is skipped — it is
+     perceptually identical to 300 (ΔE 4.4) — and 700 is excluded at 1.59:1. */
+  .industries-bar {
+    --seg-1: var(--color-obsidian-amber-50);
+    --seg-2: var(--color-obsidian-amber-200);
+    --seg-3: var(--color-obsidian-amber-300);
+    --seg-4: var(--color-obsidian-amber-500);
+    --seg-5: var(--color-obsidian-amber-600);
+    /* Ink flips after step 3 here. */
+    --ink-1: var(--color-obsidian-amber-950);
+    --ink-2: var(--color-obsidian-amber-950);
+    --ink-3: var(--color-obsidian-amber-950);
+    --ink-4: var(--color-obsidian-amber-200);
+    --ink-5: var(--color-obsidian-amber-200);
+  }
+  /* Light: a SELECTED ramp, not a flip, and the ink flips one step later. */
+  :global([data-theme='light']) .industries-bar {
+    --seg-1: var(--color-obsidian-amber-800);
+    --seg-2: var(--color-obsidian-amber-700);
+    --seg-3: var(--color-obsidian-amber-600);
+    --seg-4: var(--color-obsidian-amber-500);
+    --seg-5: var(--color-obsidian-amber-400);
+    --ink-1: var(--color-obsidian-amber-50);
+    --ink-2: var(--color-obsidian-amber-50);
+    --ink-3: var(--color-obsidian-amber-50);
+    --ink-4: var(--color-obsidian-amber-50);
+    --ink-5: var(--color-obsidian-amber-800);
+  }
+
+  /* Two NAMED containers. Both the bar and each column need a container query
+     — the bar to decide horizontal-vs-stacked, the column to size its own
+     label — and an unnamed `@container` resolves against the NEAREST ancestor
+     container, which for a label is the column. Naming them is what keeps the
+     720px rule from being evaluated against a 118px column. */
+  .industries-bar {
+    container: industries-bar / inline-size;
+  }
+
+  .industries-bar__bar {
+    display: flex;
+    align-items: flex-start;
+    /* Canvas: 2px of ground between segments, not a radius or a stroke. */
+    gap: 2px;
+  }
+
+  .industries-bar__industry {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    /* Canvas gap between the segment's bottom (80) and the label's top (104). */
+    gap: 24px;
+    /* The minimum-readable band from feat-078. A `min-width`, deliberately not
+       a flex ratio: the floor has to win over the proportion, which is the
+       whole point of it. */
+    min-width: 118.111px;
+    overflow: hidden;
+    container: industry-col / inline-size;
+    /* `flex: <count> 1 0` arrives inline — it is data, not style. */
+  }
+
+  .industries-bar__seg {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* Fixed on canvas and fixed here: the bar encodes value in WIDTH only, so
+       a height that moved with anything would add a second, false dimension. */
+    height: 80px;
+  }
+  .industries-bar__count {
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-3xl);
+    line-height: var(--font-line-height-3xl);
+    font-weight: var(--font-weight-bold);
+    /* -1%, the tracking this scale carries from 3xl up. */
+    letter-spacing: -0.32px;
+    white-space: nowrap;
+  }
+
+  /* Absolute, at the canvas's own y=92 — dead centre of the 24px gap between
+     segment and label (80 + 12). In flow it would have to fight the gap. */
+  .industries-bar__rule {
+    position: absolute;
+    top: 92px;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background: var(--color-border-strong);
+  }
+
+  .industries-bar__label {
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-lg);
+    line-height: var(--font-line-height-lg);
+    font-weight: var(--font-weight-medium);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--color-text-primary);
+  }
+  /* Labels size to their column's room, not to the viewport — the same
+     width-stepping rule bug-051 ships for .profile-links__item, and the reason
+     is the same: one widget renders at five different widths on one row.
+     E-LEARNING's glyph run is 86px, which leaves 32px of clear space in a
+     118px column at 14px and about 7px at 18px. 200px cleanly separates the
+     two wide columns (354px+) from the three floored ones (118px). */
+  @container industry-col (max-width: 200px) {
+    .industries-bar__label {
+      font-size: var(--font-size-sm);
+      line-height: var(--font-line-height-sm);
+    }
+  }
+
+  .industries-bar__industry--1 .industries-bar__seg {
+    background: var(--seg-1);
+  }
+  .industries-bar__industry--2 .industries-bar__seg {
+    background: var(--seg-2);
+  }
+  .industries-bar__industry--3 .industries-bar__seg {
+    background: var(--seg-3);
+  }
+  .industries-bar__industry--4 .industries-bar__seg {
+    background: var(--seg-4);
+  }
+  .industries-bar__industry--5 .industries-bar__seg {
+    background: var(--seg-5);
+  }
+  .industries-bar__industry--1 .industries-bar__count {
+    color: var(--ink-1);
+  }
+  .industries-bar__industry--2 .industries-bar__count {
+    color: var(--ink-2);
+  }
+  .industries-bar__industry--3 .industries-bar__count {
+    color: var(--ink-3);
+  }
+  .industries-bar__industry--4 .industries-bar__count {
+    color: var(--ink-4);
+  }
+  .industries-bar__industry--5 .industries-bar__count {
+    color: var(--ink-5);
+  }
+
+  /* Hover, verbatim from the canvas spec at 2812:1872: the hit area is the
+     whole COLUMN, not the segment, so hovering a label highlights its own
+     segment. Hovered column stays at full strength and its siblings drop to
+     30%. Pure CSS — the donut shipped zero client JS and that property has to
+     survive the port. Gated to real pointers so a touch device never gets a
+     stuck state, the same gate LinkCards and ProfileLinks use. */
+  @media (hover: hover) and (pointer: fine) {
+    .industries-bar__bar:hover .industries-bar__industry:not(:hover) {
+      opacity: 0.3;
+    }
+  }
+  .industries-bar__bar:focus-within .industries-bar__industry:not(:focus-within) {
+    opacity: 0.3;
+  }
+  .industries-bar__industry {
+    transition: opacity var(--duration-base) var(--ease-fade);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .industries-bar__industry {
+      transition: none;
+    }
+  }
+
+  .industries-bar__list {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+    list-style: none;
+  }
+
+  /* The squeeze band. Between roughly 1024 and 1350px viewport the sidebar and
+     the 3-column section grid crush the body column to 500-717px, where even
+     the two wide columns fall under the 118px floor and the bar stops encoding
+     anything. Below 1024 the grid collapses to one column and the body is wide
+     again, so this is a genuine middle-band problem, not a mobile one — which
+     is exactly why it is a container query and not a media query.
+     Stacked, each row is its own bar: name above, segment sized to its share.
+     The three tails all floor at 72px and render identical — the same accepted
+     trade-off the horizontal bar makes, where the printed number carries the
+     value. 72px is what a 32px bold "10+" needs. */
+  @container industries-bar (max-width: 720px) {
+    .industries-bar__bar {
+      flex-direction: column;
+      align-items: stretch;
+      gap: var(--spacing-lg);
+    }
+    .industries-bar__industry {
+      /* The row is now full width; the SEGMENT carries the proportion. */
+      flex: none;
+      min-width: 0;
+      gap: var(--spacing-sm);
+    }
+    .industries-bar__seg {
+      width: var(--pct);
+      min-width: 72px;
+      height: 56px;
+      /* Left-aligned bars share a baseline to compare against; centred ones
+         would not. */
+      justify-content: flex-start;
+      padding-left: var(--spacing-md);
+    }
+    /* A divider drawn between a segment and the label above it has nothing
+       left to divide once the order flips. */
+    .industries-bar__rule {
+      display: none;
+    }
+    /* Name first, then its bar — reading order for a stacked list. */
+    .industries-bar__label {
+      order: -1;
+      /* Every row is full width here, so no column is narrow enough to trip
+         the 200px step; state the size rather than inheriting it by luck. */
+      font-size: var(--font-size-sm);
+      line-height: var(--font-line-height-sm);
+    }
+  }
+</style>
