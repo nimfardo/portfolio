@@ -1,18 +1,20 @@
 ---
-// The 12-step workflow as a rail of cards.
+// The 16-step workflow as a rail of cards.
 //
 // Two layouts, one markup. At >=1024px with motion allowed the section is
 // pinned: it stands as tall as the track is wide, the viewport sticks for
 // that distance, and the track slides sideways 1:1 with the reader's vertical
 // scroll (feat-048). Everywhere else — narrow viewports, reduced motion, or
-// no JS at all — it is a plain vertical stack of 12 entries. The stack is the
+// no JS at all — it is a plain vertical stack of 16 entries. The stack is the
 // base stylesheet and pinning is a script-added class on top of it, so the
 // fallback is what you get by default rather than what you get after a
 // failure.
 //
 // Synced to Max's Figma restyle (node 2124:1834): a hairline rule per step
 // that thickens to 2px when active, a 32px icon above the title, and the
-// step's outputs as pill tags.
+// step's outputs as pill tags. Re-synced to 16 steps at node 2839:4618
+// (feat-092) — a content change only; nothing here counts steps by hand, so
+// the geometry all followed from PROCESS_STEPS.length.
 //
 // The step number and the step's one-line action are back on the card
 // (feat-047). feat-046 had removed both to match canvas, which left every
@@ -39,8 +41,12 @@ import { PROCESS_STEPS } from '../model/steps';
   explicit role needed. It is also the *only* thing naming this group now that
   Max has taken the visible "The 12-Step Workflow" heading off the page
   (feat-050) — which is why the step titles are h2 rather than h3: with no
-  parent heading left, h3 would skip a level under the page's h1. -->
-<section class="rail-section" aria-label="The 12-step AI-design workflow" data-rail-section>
+  parent heading left, h3 would skip a level under the page's h1.
+
+  "design workflow", not "AI-design workflow": the canvas labels this section
+  "Workflow" and the lead beside it no longer mentions the tooling, so the
+  accessible name now matches what a sighted reader is told. -->
+<section class="rail-section" aria-label="The 16-step design workflow" data-rail-section>
   <div class="rail-viewport" data-rail-viewport>
     <div class="rail-clip">
       <ol class="rail" data-process-rail>
@@ -76,7 +82,7 @@ import { PROCESS_STEPS } from '../model/steps';
         <span class="rail-axis__progress" data-process-progress></span>
       </div>
       {
-        /* Duplicates what a screen reader already gets from 12 numbered list
+        /* Duplicates what a screen reader already gets from 16 numbered list
         items, and a live region here would interrupt on every step change
         during a continuous scroll. Sighted-reader affordance only. */
       }
@@ -136,6 +142,12 @@ import { PROCESS_STEPS } from '../model/steps';
       // 4588px — 67% of the whole document — to deliver twelve short cards,
       // ~368px of scrolling each. The track still crosses its full width and
       // still tracks progress exactly; only the price in wheel-turns changes.
+      //
+      // Deliberately unchanged at 16 steps (feat-092). This ratio fixes the
+      // cost *per card* at 264px (a 440px pitch at 0.6), so four more cards
+      // buy four more cards' worth of scroll — 3960px of span where twelve
+      // bought 2904 — rather than compressing sixteen steps into the old
+      // budget and halving what each one gets.
       const SCROLL_RATIO = 0.6;
       // How late the highlight hands over, in card-widths. See update().
       const ACTIVE_BIAS = 0.25;
@@ -297,7 +309,7 @@ import { PROCESS_STEPS } from '../model/steps';
 
       // The axis looks exactly like a progress bar, and progress bars get
       // clicked. Without this the only way past the rail is to keep scrolling
-      // through all twelve steps. Same trick as the wheel handler: it moves
+      // through all sixteen steps. Same trick as the wheel handler: it moves
       // the PAGE, so scroll position stays the single source of truth and the
       // existing rAF update() does the rendering.
       //
@@ -441,9 +453,9 @@ import { PROCESS_STEPS } from '../model/steps';
   }
 
   /* The axis and counter only exist in pinned mode, so a stacked reader had
-     nothing at all telling them how far through twelve steps they were —
+     nothing at all telling them how far through the steps they were —
      4520px of list at 375px wide, no position anywhere. Each entry carries
-     its own instead, in the counter's own `01 / 12` format.
+     its own instead, in the counter's own `01 / 16` format.
 
      Keyed to :not(.is-pinned) rather than to a width, because stacked is also
      what a reduced-motion reader and a short window get at desktop widths —
@@ -697,12 +709,18 @@ import { PROCESS_STEPS } from '../model/steps';
       background: var(--color-border-emphasis);
     }
 
-    /* Two lines reserved, so every action starts on the same baseline. Eleven
-       titles wrap to one line and "Motion & Micro-interactions" wraps to two,
-       which pushed that card's action and pills 48px below its neighbours' —
-       invisible in a stacked list, obvious when cards stand side by side.
-       Pinned mode only: stacked, there is nothing to align against and this
-       would just be dead space. */
+    /* Two lines reserved, so every action starts on the same baseline. Most
+       titles wrap to one line and a few — "Research & Benchmarking",
+       "Information Architecture", "Motion & Micro-interactions" — wrap to
+       two, which pushed those cards' actions and pills 48px below their
+       neighbours': invisible in a stacked list, obvious when cards stand side
+       by side. Pinned mode only: stacked, there is nothing to align against
+       and this would just be dead space.
+
+       Two lines is still enough at 16 steps. Measured, not assumed: with the
+       card's 40px inset the title column is 312px, and all sixteen rendered
+       at exactly 96px — none reached a third line. The tightest is
+       "Micro-interactions", which breaks at its own hyphen. */
     .rail-section.is-pinned .step__title {
       min-height: calc(var(--font-line-height-4xl) * 2);
     }

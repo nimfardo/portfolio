@@ -3,7 +3,7 @@
 // this page closes that 404. (/about is still outstanding.)
 //
 // Structure follows Max's Figma frame (node 2124:1834): a lead statement in
-// the 66% column, the 12-step rail, then the Build section. BuildSection is
+// the 66% column, the 16-step rail, then the Build section. BuildSection is
 // reused verbatim from the case-study pages — it already renders a hardcoded
 // "Build" heading, one media+text block and an optional GitHub button, which
 // is exactly what the canvas has.
@@ -58,13 +58,26 @@ const buildBlocks: ContentBlock[] = [
       {
         /* Labels the lead + rail as one section, the way "Build" labels the
           block below it. "Workflow" rather than "Process" — the page title
-          is already "Design Process", and this names what the 12 steps
+          is already "Design Process", and this names what the 16 steps
           actually are. */
       }
       <Heading class="section-grid__aside">Workflow</Heading>
+      {
+        /* Verbatim from canvas node 2669:10778. copy-016 had cut the old lead
+          to 103 characters on Max's instruction; this one is 218 and he wrote
+          it himself, so the trim is not re-applied — canvas is the source of
+          truth for this page's copy. It renders 4 lines at 40/56 in the 66%
+          column, which is what the canvas box measures too.
+
+          It also drops the old "nothing is ever exported" claim, and that is
+          the point rather than an omission: the workflow now runs through
+          Figma screens, code, deploy and testing (steps 10-16), so the claim
+          had stopped being true. */
+      }
       <p class="process__lead-text section-grid__body">
-        Twelve steps from a blank repo to a living design system, run in Claude Code. Nothing is
-        ever exported.
+        I take every new project from scratch through the same 16 steps. Context is stored locally
+        and updated after every decision. That keeps client expectations aligned with user needs,
+        and leaves a full history of changes.
       </p>
     </div>
 
