@@ -16,17 +16,17 @@
 // 2778:1840 and 2690:10957 are both gone or parked; the node ids in the old
 // comments here pointed at frames that no longer exist.
 //
-// Assets still owed, all Max's, all rendering the placeholder fill in the
-// meantime: the hero video, and the six media slots below Hobbies. He asked
-// for placeholders deliberately (2026-08-23) so the slots are ready to fill.
+// The hero and all six slots below Hobbies now carry real assets (feat-095).
+// They were placeholders because Max hadn't supplied files yet, not because
+// the design was unsettled — see the slot table above mediaRows for which
+// Figma node each file came from.
 //
-// `public/media/about/portrait.jpg` is deliberately left on disk and
-// unreferenced. The canvas has no portrait any more; the file is kept because
-// the first media slot below Hobbies is 791.5x1000, the portrait's exact box,
-// so it is the obvious candidate when Max fills those in. Not wired up here:
-// choosing what goes in a media slot is his call, not an inference.
+// `public/media/about/portrait.jpg` is STILL deliberately unreferenced, and no
+// longer a candidate for anything: it's the cat photo, and the canvas has no
+// slot holding it. Kept on disk under Max's "don't remove images" rule.
 import Layout from '@app/layouts/Layout.astro';
 import { Heading, HungaryFlag } from '@shared/ui';
+import { Media } from '@entities/media';
 import { PageHeader } from '@widgets/page-header';
 import { ProjectHero } from '@widgets/project-hero';
 import { OverviewSection } from '@widgets/overview-section';
@@ -80,7 +80,83 @@ const ARROW_PATH =
 // 64px gutter; the big slot swaps sides between rows. Slot heights are 468 +
 // 64 + 468 = 1000, which is why the stacked pair ends level with the tall one.
 // `tallFirst` is which side the full-height slot takes in that row.
-const mediaRows = [{ tallFirst: true }, { tallFirst: false }];
+//
+// Which file goes where is NOT a guess. Max named two of the slot frames after
+// the files themselves, and the videos' pixel dimensions match those exact
+// slots, so the two constraints agree:
+//
+//   row  slot            Figma node    box         file
+//   1    tall (left)     2793:3220     791.5x1000  dt-lecture.webm   (792x1000)
+//   1    stack top       2793:3222     791.5x468   photography.jpg
+//   1    stack bottom    2793:3223     791.5x468   workshop.jpg
+//   2    stack top       2799:3370     791.5x468   wireframing.webm  (792x468)
+//   2    stack bottom    2799:3371     791.5x468   desk.jpg
+//   2    tall (right)    2799:3368     791.5x1000  team.jpg
+//
+// Frames 2793:3220 and 2799:3370 are literally named `about-dt-lecture.webm`
+// and `about-wireframing.webm` on canvas. The four stills are 2x renders of
+// their slot FRAME rather than the raw fill, which is what preserves Figma's
+// own crop — 2793:3222 is a STRETCH fill with a crop transform, and 2793:3223
+// is a background fill with a 791x519 photo layered over it at y-25. Pulling
+// raw fills would have lost both.
+//
+// Chase 2793:3161 for all of these. The loose `About` frame 2851:5316 is a
+// stale duplicate: same 1920x5767 box, but its slots are all still named
+// `image` and it carries the retired Budapest crest.
+type AboutMedia =
+  | { kind: 'image'; src: string; alt: string }
+  | { kind: 'video'; src: string; poster: string; alt: string };
+
+interface AboutMediaRow {
+  tallFirst: boolean;
+  tall: AboutMedia;
+  stack: [AboutMedia, AboutMedia];
+}
+
+const mediaRows: AboutMediaRow[] = [
+  {
+    tallFirst: true,
+    tall: {
+      kind: 'video',
+      src: '/media/about/dt-lecture.webm',
+      poster: '/media/about/dt-lecture-poster.jpg',
+      alt: 'Max presenting a Design Thinking session to a workshop group',
+    },
+    stack: [
+      {
+        kind: 'image',
+        src: '/media/about/photography.jpg',
+        alt: 'Max checking a shot on his camera on a forest trail',
+      },
+      {
+        kind: 'image',
+        src: '/media/about/workshop.jpg',
+        alt: 'A workshop group posing in front of the session screen',
+      },
+    ],
+  },
+  {
+    tallFirst: false,
+    tall: {
+      kind: 'image',
+      src: '/media/about/team.jpg',
+      alt: 'Max with his team at a karting track',
+    },
+    stack: [
+      {
+        kind: 'video',
+        src: '/media/about/wireframing.webm',
+        poster: '/media/about/wireframing-poster.jpg',
+        alt: 'Sketching paper wireframes and drawing gothic lettering by hand',
+      },
+      {
+        kind: 'image',
+        src: '/media/about/desk.jpg',
+        alt: 'A desk with paper wireframes, notes, and a competitor-analysis board on screen',
+      },
+    ],
+  },
+];
 ---
 
 <Layout title="About — Max Shturma">
@@ -93,7 +169,19 @@ const mediaRows = [{ tallFirst: true }, { tallFirst: false }];
 
     <PageHeader title="About" class="about__header" />
 
-    <ProjectHero scrollCue />
+    {
+      /* Canvas 2793:3169 — a 1647x800 crop of Max's portrait. Passing `media`
+        retires ProjectHero's --placeholder branch with no other change, which
+        is exactly what that component's own comment says it's there for. */
+    }
+    <ProjectHero
+      media={{
+        type: 'image',
+        image: '/media/about/hero.jpg',
+        imageAlt: 'Max Shturma in a green beanie against a rust-coloured backdrop',
+      }}
+      scrollCue
+    />
 
     {
       /* Lead copy is copy-024 verbatim — Max rewrote it, then it went through a
@@ -182,22 +270,61 @@ const mediaRows = [{ tallFirst: true }, { tallFirst: false }];
     </section>
 
     {
-      /* Six empty slots on the --color-bg-muted placeholder fill, the same
-        treatment ProjectHero gives its own unset media (feat-053). Max asked
-        for placeholders rather than an omitted section so the boxes are ready
-        for files; nothing is invented to fill them. */
+      /* No `aria-hidden` any more. These six are a real photo/video set about
+        Max, not decoration standing in for absent art, so every slot carries
+        alt text instead of being hidden from assistive tech wholesale.
+
+        Videos go through <Media> rather than a bare <video> so they inherit
+        its IntersectionObserver autoplay (paused off-screen, and off entirely
+        under prefers-reduced-motion or below tablet), its .mp4 fallback
+        derived from the .webm basename, and its poster. */
     }
-    <section class="about__section about__media" aria-hidden="true">
+    <section class="about__section about__media">
       {
         mediaRows.map((row) => (
           <div
             class:list={['about__media-row', { 'about__media-row--reversed': !row.tallFirst }]}
             data-reveal
           >
-            <div class="about__media-tall" />
+            <div class="about__media-tall">
+              {row.tall.kind === 'video' ? (
+                <Media
+                  type="video"
+                  src={row.tall.src}
+                  poster={row.tall.poster}
+                  alt={row.tall.alt}
+                  class="about__media-asset"
+                />
+              ) : (
+                <img
+                  class="about__media-asset"
+                  src={row.tall.src}
+                  alt={row.tall.alt}
+                  loading="lazy"
+                />
+              )}
+            </div>
             <div class="about__media-stack">
-              <div class="about__media-slot" />
-              <div class="about__media-slot" />
+              {row.stack.map((slot) => (
+                <div class="about__media-slot">
+                  {slot.kind === 'video' ? (
+                    <Media
+                      type="video"
+                      src={slot.src}
+                      poster={slot.poster}
+                      alt={slot.alt}
+                      class="about__media-asset"
+                    />
+                  ) : (
+                    <img
+                      class="about__media-asset"
+                      src={slot.src}
+                      alt={slot.alt}
+                      loading="lazy"
+                    />
+                  )}
+                </div>
+              ))}
             </div>
           </div>
         ))
@@ -423,6 +550,23 @@ const mediaRows = [{ tallFirst: true }, { tallFirst: false }];
   }
   .about__media-slot {
     background: var(--color-bg-muted);
+  }
+  /* The --color-bg-muted fills above are kept deliberately now that the slots
+     are filled: they're what shows in the box while a lazy image decodes, so
+     the reveal lands on the same grey the placeholders used rather than on the
+     page background.
+
+     :global() because this class lands on a plain <img> in the image branch but
+     on Media's own root <div> in the video branch — a classlist merge, not a
+     descendant, so a scoped selector would miss it. object-fit is inert on
+     Media's wrapper div itself, but Media's internal CSS already applies
+     object-fit: cover to its <video>, so both branches crop identically. Same
+     arrangement, and the same reason, as ProjectHero's .project-hero__image. */
+  :global(.about__media-asset) {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
 
   /* --- Contact (canvas 2793:3226) --- */

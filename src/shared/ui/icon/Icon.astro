@@ -55,21 +55,6 @@ const icons = {
   smile: iconSmile,
   tree: iconTree,
   waves: iconWaves,
-  // The process-rail icons (comp-011) — all built on the same 28x28 frame as
-  // the rest of the set, so none belong in FRAME_32_ICONS.
-  //
-  // `frame` and `terminal` joined the set with the 16-step sync (feat-091):
-  // steps 10 and 11 ("Screens in Figma", "Figma to Code") are new, and their
-  // glyphs already existed in the Figma library. Both were read off their
-  // masters (2849:15 is 24x24 in a 28 frame, 2643:12 is 26x22) rather than
-  // scaled down from the rail's 32px instances, which is what the instance
-  // renders would have given. `terminal` was drawn for the old step 00
-  // (`Claude Code Setup`) and left unused when that step was dropped; it is
-  // in the code set for the first time here.
-  //
-  // Steps 15 and 16 reuse `arrow-up` and `eye`, already in the set for other
-  // callers. Not a name-match assumption — both were diffed against their
-  // Figma masters (2377:1996, 2048:456) and the path data is identical.
   search: iconSearch,
   personas: iconPersonas,
   sitemap: iconSitemap,
@@ -84,32 +69,50 @@ const icons = {
   responsive: iconResponsive,
   motion: iconMotion,
   handoff: iconHandoff,
-  // /about's link cards (feat-063). `cv` and `download` are 28x28 like most of
-  // the set; `github` is a 32x32 frame (comp-014) and so joins FRAME_32_ICONS
-  // below — its export carries the frame's own padding, so scale must divide
-  // by 32 or the glyph renders ~14% small.
   github: iconGithub,
   cv: iconCv,
   download: iconDownload,
-  // /about's Contact mail card (feat-074, canvas 2793:3231). A 28-frame icon,
-  // not a 32: its 80px instance insets the glyph 14.29% each side, and 14.29%
-  // of 28 is exactly the 4px padding the rest of the 28-frame set carries
-  // (on a 32 frame it would be 4.57px, which no icon in the set uses). So it
-  // stays out of FRAME_32_ICONS and scales by /28 like the majority.
   mail: iconMail,
 } as const;
 
 export type IconName = keyof typeof icons;
 
-// Figma's icon components live in a 28x28 frame with the glyph inset at its
-// own natural size (not stretched to fill it) — e.g. arrow-right's glyph is
-// 14x14 within that 28x28 frame. linkedin/behance/smile are the exception,
-// framed at 32x32. Every exported SVG's width/height already IS that natural
-// glyph size (tight viewBox, not padded to the frame) — see wiki/log.md for
-// how this was diagnosed. So: render each glyph at its own intrinsic size,
-// then scale it by size/nativeFrame to match how Figma scales an icon
-// instance up or down, instead of stretching it to fill an arbitrary box.
-const FRAME_32_ICONS = new Set<IconName>(['linkedin', 'behance', 'smile', 'github']);
+// Every file in ./svg is a full-frame `viewBox="0 0 28 28"` export of its Figma
+// master, so rendering is one rule: fill the `size` box. There is no per-icon
+// arithmetic here and there must not be again.
+//
+// What that replaced (comp-016, 2026-08-23): the set used to be a MIX of tight
+// glyph-box exports (arrow-right was 14x14) and full-frame ones (menu was
+// 28x28), on masters framed at either 28 or 32. So the old component rendered
+// each file at its own intrinsic size and then CSS-scaled it by
+// `size / nativeFrame`, with a FRAME_32_ICONS set naming the four exceptions.
+// Both halves of that are gone because the Figma library was normalised first:
+// all 45 `icon/*` masters are now 28x28 with SCALE/SCALE constraints, so a
+// component export is uniform and an instance actually resizes.
+//
+// The normalisation deliberately did NOT rescale any glyph artwork — Max's
+// constraint was a consistent library with no visual change to the site, and
+// those two pull against each other (arrow-right's glyph is 14px inside its
+// 28 frame, tokens' is 26px; equalising them IS the visual change). So optical
+// size is still as-drawn, and the four masters that moved 32 -> 28 had their
+// glyphs scaled by 28/32 in the same edit, which cancels exactly against this
+// file no longer dividing by 32. github's glyph went 20 -> 17.5 and still
+// renders 20px at size={32}.
+//
+// Verified rather than assumed: all 36 exports were measured against the files
+// they replaced — identical path structure, identical ink size, and identical
+// ink position to within 0.01px at size=28. Fourteen carry a sub-pixel
+// `translate(...)` for that last part, because the old component CENTRED a
+// tight export in its box while a full-frame export honours the glyph's own
+// placement in the frame; arrow-left was the widest gap at 0.947px.
+//
+// Four files are NOT the current Figma export — close, menu, handoff and
+// github. Their masters had already drifted from what shipped (menu's bars are
+// 8px apart in Figma and 6px here; handoff has a page-corner fold in code that
+// the master lacks; github is the 23px drawing comp-014 logged while the master
+// measures 20px). Taking Figma would have changed the site, so these keep the
+// shipped artwork, re-framed onto the 28 viewBox. That drift is pre-existing
+// and still unreconciled — see wiki/log.md.
 
 interface Props {
   name: IconName;
@@ -118,16 +121,20 @@ interface Props {
 }
 
 const { name, size = 28, class: className } = Astro.props;
-const nativeFrame = FRAME_32_ICONS.has(name) ? 32 : 28;
-const scale = size / nativeFrame;
 ---
 
-<span class:list={['icon', className]} style={{ width: `${size}px`, height: `${size}px` }}>
-  <span class="icon__glyph" style={{ transform: `scale(${scale})` }} set:html={icons[name]} />
-</span>
+<span
+  class:list={['icon', className]}
+  style={{ width: `${size}px`, height: `${size}px` }}
+  set:html={icons[name]}
+/>
 
 <style>
   .icon {
+    /* Kept as inline-flex, not switched to inline-block, even though the SVG
+       now fills the box on its own: both are inline-level, but they derive
+       their baseline differently, and this element sits inline next to text at
+       several call sites. Same outer box as before = no baseline shift. */
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -145,24 +152,17 @@ const scale = size / nativeFrame;
        only ever one real `color` declaration on the element: the
        consumer's, when it sets one. */
   }
-  .icon__glyph {
-    display: inline-flex;
-    /* Load-bearing (bug-055). This span is a flex item inside the `size`-px
-       `.icon` box, so with the default `flex-shrink: 1` the browser shrinks an
-       oversized SVG to fit BEFORE the transform below scales it — the glyph
-       then lands at `size² / frame` instead of `size`. Asked for 16px, a
-       natural-28 export rendered 9.1px (16 × 16/28).
-       It only bites when `size < natural`, which is why the default 28 and
-       every 32/40/64/80 call site were always right and this sat unnoticed:
-       the two victims were the 16px CV nav glyph and Home's 16px NDA locker
-       badge. And because flex shrinks along the main axis only, `locker`
-       (22×24) came out 9.1×13.7 — horizontally compressed, not merely small.
-       Nothing overflows with the shrink off: rendered size is
-       natural × (size/frame), which can only exceed `size` if natural > frame,
-       and the sole 32-natural export is `github`, whose frame is 32. */
-    flex-shrink: 0;
-  }
-  .icon__glyph :global(svg) {
+  /* :global() — the SVG comes from set:html, so it carries no astro-cid and a
+     scoped selector would never match it.
+     `flex: none` is the descendant of bug-055: width/height 100% resolve to
+     exactly the container's content box, so there is no free space to shrink
+     and the default flex-shrink cannot actually bite here — but that fix was
+     originally lost precisely because the shrink was implicit, so it stays
+     explicit. */
+  .icon :global(svg) {
     display: block;
+    flex: none;
+    width: 100%;
+    height: 100%;
   }
 </style>
