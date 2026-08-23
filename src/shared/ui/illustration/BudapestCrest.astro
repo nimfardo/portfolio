@@ -1,0 +1,56 @@
+---
+// The traced Budapest coat of arms from /about's Availability block (feat-074,
+// canvas node 2794:3334). Sits above "Budapest" in the Budapest -> open-to-
+// relocate arrow row.
+//
+// Imported as raw text and inlined via set:html — same pattern as
+// PageNotFoundCat, Logo and Icon — because an <img src="*.svg"> renders the
+// file in an isolated context that can't inherit `color`, so the SVG's
+// `fill="currentColor"` would never resolve and the crest would render black.
+//
+// ⚠ This is a traced third-party municipal mark, not original artwork. Max
+// approved shipping it on 2026-08-23 with the licence question open and
+// accepted as his call — Hungarian municipal coats of arms are regulated and
+// a portfolio is a public, self-promotional use. If that answer ever comes
+// back the wrong way, this component and its one consumer in about.astro are
+// the whole blast radius: delete both and the Availability row still reads
+// (Budapest -> arrow -> Open to relocate), one element short.
+import crestSvg from './budapest-crest.svg?raw';
+
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+---
+
+<span class:list={['budapest-crest', className]} aria-hidden="true" set:html={crestSvg} />
+
+<style>
+  .budapest-crest {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    /* Canvas binds the crest to obsidian-amber-300, which is `icon/accent` —
+       the one token carrying that exact value in dark (#e0964d) while still
+       stepping to #885018 in light, where amber-300 would be 2.4:1 on the
+       grey ground. A primitive here would not theme. */
+    color: var(--color-icon-accent);
+  }
+  /* Native 86x56 from the export. Fixed rather than fluid: it sits above a
+     40px "Budapest" line whose own size is fixed, so scaling the crest with
+     the viewport would break the pair's proportion for no gain. */
+  .budapest-crest :global(svg) {
+    display: block;
+    width: 86px;
+    height: auto;
+  }
+
+  @media (max-width: 767px) {
+    /* The whole Availability row stacks on a phone and the type steps down
+       with it; 86px of crest over a smaller city name reads top-heavy. */
+    .budapest-crest :global(svg) {
+      width: 64px;
+    }
+  }
+</style>

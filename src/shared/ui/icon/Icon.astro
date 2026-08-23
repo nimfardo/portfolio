@@ -32,6 +32,7 @@ import iconHandoff from './svg/handoff.svg?raw';
 import iconGithub from './svg/github.svg?raw';
 import iconCv from './svg/cv.svg?raw';
 import iconDownload from './svg/download.svg?raw';
+import iconMail from './svg/mail.svg?raw';
 
 const icons = {
   'arrow-right': iconArrowRight,
@@ -73,6 +74,12 @@ const icons = {
   github: iconGithub,
   cv: iconCv,
   download: iconDownload,
+  // /about's Contact mail card (feat-074, canvas 2793:3231). A 28-frame icon,
+  // not a 32: its 80px instance insets the glyph 14.29% each side, and 14.29%
+  // of 28 is exactly the 4px padding the rest of the 28-frame set carries
+  // (on a 32 frame it would be 4.57px, which no icon in the set uses). So it
+  // stays out of FRAME_32_ICONS and scales by /28 like the majority.
+  mail: iconMail,
 } as const;
 
 export type IconName = keyof typeof icons;
