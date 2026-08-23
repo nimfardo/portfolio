@@ -1,19 +1,32 @@
 ---
-// The nav has linked to /about since copy-003 and the route never existed —
-// this closes the last 404 on the site (feat-044 closed /process's).
+// Built from Max's canvas frame 2793:3161, which he approved on 2026-08-23.
+// Sections in canvas order, on the site's 160px rhythm — verified against the
+// canvas rather than assumed: every gap between sections there is exactly 160
+// (Hero ends 900 / Lead 1060, Lead ends 1483 / Industries 1643, and so on).
 //
-// Built 1:1 from Max's canvas frame 2690:10957, after the copy-019/feat-061
-// pass rebuilt it for recruiters and design leads. Sections in canvas order.
+// This is the feat-074 port, and it is a rebuild rather than a patch. What
+// changed against the version built from 2690:10957:
+//   * Industries is a five-column segmented bar, not a donut.
+//   * Availability is a Budapest -> open-to-relocate arrow block.
+//   * The portrait + 4-card link row is GONE — the canvas dropped it.
+//   * Two 1000px media rows arrived below Hobbies.
+//   * Contact leads with mail, and the email lives inside that card.
 //
-// Three deliberate omissions, all for want of assets rather than intent:
-//   * The hero ships media-less and renders the placeholder box, exactly as
-//     /process does (feat-053) — the video isn't shot yet.
-//   * The two empty `image` frames below Hobbies (2712:2262/2264/2265) are
-//     Max's placeholders with no content; nothing is invented to fill them.
-//   * There is no Languages section. It was on the canvas during copy-019 and
-//     is gone from it now, so the page matches what the canvas actually says.
+// Chase 2793:3161 and nothing older. Max works by duplicating the page, so
+// 2778:1840 and 2690:10957 are both gone or parked; the node ids in the old
+// comments here pointed at frames that no longer exist.
+//
+// Assets still owed, all Max's, all rendering the placeholder fill in the
+// meantime: the hero video, and the six media slots below Hobbies. He asked
+// for placeholders deliberately (2026-08-23) so the slots are ready to fill.
+//
+// `public/media/about/portrait.jpg` is deliberately left on disk and
+// unreferenced. The canvas has no portrait any more; the file is kept because
+// the first media slot below Hobbies is 791.5x1000, the portrait's exact box,
+// so it is the obvious candidate when Max fills those in. Not wired up here:
+// choosing what goes in a media slot is his call, not an inference.
 import Layout from '@app/layouts/Layout.astro';
-import { Heading } from '@shared/ui';
+import { Heading, BudapestCrest } from '@shared/ui';
 import { PageHeader } from '@widgets/page-header';
 import { ProjectHero } from '@widgets/project-hero';
 import { OverviewSection } from '@widgets/overview-section';
@@ -21,47 +34,56 @@ import { ProfileLinks } from '@widgets/profile-links';
 import type { ProfileLink } from '@widgets/profile-links';
 import { IndustriesBar } from '@widgets/industries-bar';
 
-// Four cards, 2x2, matching canvas nodes 2702:11276 / 2702:11254. GitHub points
-// at glacier-flow because the portfolio's own repo stays private (Max's call,
-// 2026-08-17) — glacier-flow is public and already linked from three case
-// studies, so it is the one real code artifact a reader can open.
-// LINKEDIN_URL / BEHANCE_URL are copied from widgets/navigation, which is where
-// the site's real profile URLs live. Deliberately duplicated rather than
-// extracted: hoisting them into shared/config would mean editing Navigation,
-// which renders on every page, and this change set is meant to be additive.
-// They are a One-Place-Rule violation and owe an extraction — the copy deck
-// already drifted from these once.
-const LINKEDIN_URL = 'https://www.linkedin.com/in/maksym-shturma-680292149/';
-const BEHANCE_URL = 'https://www.behance.net/shturma';
-
-const links: ProfileLink[] = [
-  {
-    label: 'Download CV',
-    icon: 'cv',
-    href: '/max-shturma-cv.pdf',
-    variant: 'accent',
-    download: true,
-  },
-  { label: 'LinkedIn', icon: 'linkedin', href: LINKEDIN_URL },
-  { label: 'Behance', icon: 'behance', href: BEHANCE_URL },
-  { label: 'GitHub', icon: 'github', href: 'https://github.com/nimfardo/glacier-flow' },
-];
-
-// The close repeats the primary action beside the fastest way to reach him.
-// CV first — canvas 2729:1908 leads with the accent card (Max reordered it
-// from LinkedIn-first himself; see STATE.md's copy-019 notes).
-const contactLinks: ProfileLink[] = [
-  {
-    label: 'Download CV',
-    icon: 'cv',
-    href: '/max-shturma-cv.pdf',
-    variant: 'accent',
-    download: true,
-  },
-  { label: 'LinkedIn', icon: 'linkedin', href: LINKEDIN_URL },
-];
-
 const EMAIL = 'max.shturma@gmail.com';
+
+// Canvas 2793:3228: mail card first, CV second, 24px apart.
+//
+// Mail leading REVERSES bug-051, which put CV first on canvas authority at the
+// time. The canvas changed, so this follows it — and the reasoning changed with
+// it: the CV is no longer the page's only route to itself, because the sidebar
+// now carries CV on every route (feat-082). That frees Contact to lead with the
+// thing a reader does when the page has convinced them, which is write.
+//
+// The email address is no longer a standalone link. It is the mail card's own
+// label, which is why the `.about__email` block that used to sit above these
+// cards is gone rather than merely restyled.
+const contactCards: ProfileLink[] = [
+  { label: EMAIL, icon: 'mail', href: `mailto:${EMAIL}`, variant: 'muted' },
+  {
+    label: 'Download CV',
+    icon: 'cv',
+    href: '/max-shturma-cv.pdf',
+    variant: 'accent',
+    download: true,
+  },
+];
+
+// The arrowhead from canvas 2794:3323, exported bytes verbatim.
+//
+// The canvas arrow is one 506x0 stroked vector with an arrow end-cap, which
+// exports as a single filled path: a 4px shaft (the rect at y 26-30) plus the
+// chevron. It cannot ship as one stretched SVG — the export carries
+// preserveAspectRatio="none", so widening it to fill a fluid column would
+// smear the head horizontally.
+//
+// So the shaft is CSS (a plain 4px block; there is no shape in a straight line
+// to get wrong) and this SVG carries the head. Its viewBox starts at x=480
+// rather than at the head's own left edge, which keeps 26px of the exported
+// shaft attached as a stub — that is what makes the join to the CSS shaft
+// seamless instead of a butt-joint with a visible notch, since both are the
+// same 4px band centred on y=28.
+const ARROW_VIEWBOX = '480 13.0768 28.195 29.8464';
+const ARROW_PATH =
+  'M507.414 29.4142C508.195 28.6332 508.195 27.3668 507.414 26.5858L494.686 13.8579C493.905 13.0768 492.639 13.0768 491.858 13.8579C491.077 14.6389 491.077 15.9052 491.858 16.6863L503.172 28L491.858 39.3137C491.077 40.0948 491.077 41.3611 491.858 42.1421C492.639 42.9232 493.905 42.9232 494.686 42.1421L507.414 29.4142ZM0 28V30H506V28V26H0V28Z';
+
+// Canvas 2799:3373. Two 1000px rows, 64px apart, each a 2-column split with a
+// 64px gutter; the big slot swaps sides between rows. Slot heights are 468 +
+// 64 + 468 = 1000, which is why the stacked pair ends level with the tall one.
+// `tallFirst` is which side the full-height slot takes in that row.
+const mediaRows = [
+  { tallFirst: true },
+  { tallFirst: false },
+];
 ---
 
 <Layout title="About — Max Shturma">
@@ -76,6 +98,13 @@ const EMAIL = 'max.shturma@gmail.com';
 
     <ProjectHero scrollCue />
 
+    {
+      /* Lead copy is copy-024 verbatim — Max rewrote it, then it went through a
+        grammar pass. The tag list is unchanged from what shipped: the canvas
+        still carries all eight pills including "Git & deploy". The note about
+        VS Code and Git being cut was about the *paragraph's* tool list, which
+        is why the paragraph now names Claude Code and Supabase and stops. */
+    }
     <OverviewSection
       heading="Since 2017"
       class="about__section"
@@ -90,37 +119,10 @@ const EMAIL = 'max.shturma@gmail.com';
         'Mentoring',
       ]}
     >
-      I'm Max Shturma, a design engineer. Nine years of UX/UI and design systems behind that —
-      3-tier tokens, component architecture. The last year I've been building what I design, in
-      code.
+      I'm Max Shturma, a design engineer. Nine years of generalist UX/UI and product design — sole
+      designer on some products, part of an existing team on others. The last year I've been
+      building what I design, in code: Claude Code, Supabase, and I deploy it myself.
     </OverviewSection>
-
-    {
-      /* Portrait beside the 2x2 card grid. The canvas pairs a 791.5x1000 photo
-        with two 468px card rows and a 64px gap — which is exactly 1000px, and
-        that is what makes the two columns end level. */
-    }
-    <section class="about__section about__profile">
-      {
-        /* The wrapper is what suppresses the raggedness: as a bare grid item the
-          <img>'s own intrinsic height drove the row (1025px at a 1920 column
-          against the cards' 1000px), so stretching alone left 25px of slack
-          inside the card column. An empty positioned box has no intrinsic
-          height, so the card column decides the row at every width and the
-          image fills it. */
-      }
-      <div class="about__portrait-wrap" data-reveal>
-        <img
-          class="about__portrait"
-          src="/media/about/portrait.jpg"
-          alt="Max Shturma outdoors in a green beanie, holding a tabby cat that is nuzzling his beard"
-          width="1583"
-          height="2000"
-          loading="lazy"
-        />
-      </div>
-      <ProfileLinks cards={links} class="about__links" />
-    </section>
 
     <section class="about__section section-grid">
       <Heading class="section-grid__aside">Industries</Heading>
@@ -129,28 +131,76 @@ const EMAIL = 'max.shturma@gmail.com';
       </div>
     </section>
 
+    {
+      /* Canvas 2793:3213: crest over "Budapest", a long arrow, then the date
+        over "Open to relocate" — right-aligned, so the two city/status lines
+        bracket the arrow and the date hangs above the second one. The row is
+        align-items: end because the arrow has to meet the two 40px baselines,
+        not the top of the crest. */
+    }
     <section class="about__section section-grid">
       <Heading class="section-grid__aside">Availability</Heading>
-      <p class="section-grid__body section-prose" data-reveal>
-        Based in Budapest. Open to Design Engineer and design systems roles in Zurich, Amsterdam,
-        London, and Dublin. I need visa sponsorship or an EOR arrangement, and I'm ready to
-        relocate.
-      </p>
+      <div class="section-grid__body about__availability" data-reveal>
+        <div class="about__place">
+          <BudapestCrest />
+          <p class="about__place-name">Budapest</p>
+        </div>
+
+        <div class="about__arrow" aria-hidden="true">
+          <span class="about__arrow-shaft"></span>
+          <svg
+            class="about__arrow-head"
+            viewBox={ARROW_VIEWBOX}
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            focusable="false"
+          >
+            <path d={ARROW_PATH} fill="currentColor" />
+          </svg>
+        </div>
+
+        <div class="about__destination">
+          <p class="about__from">From January 2027</p>
+          <p class="about__place-name">Open to relocate</p>
+        </div>
+      </div>
     </section>
 
     <section class="about__section section-grid">
       <Heading class="section-grid__aside">Hobbies</Heading>
       <p class="section-grid__body section-prose" data-reveal>
-        Photography, gothic typography, gaming, travel.
+        Photography, gothic typography, motion design, acoustic guitar.
       </p>
+    </section>
+
+    {
+      /* Six empty slots on the --color-bg-muted placeholder fill, the same
+        treatment ProjectHero gives its own unset media (feat-053). Max asked
+        for placeholders rather than an omitted section so the boxes are ready
+        for files; nothing is invented to fill them. */
+    }
+    <section class="about__section about__media" aria-hidden="true">
+      {
+        mediaRows.map((row) => (
+          <div
+            class:list={['about__media-row', { 'about__media-row--reversed': !row.tallFirst }]}
+            data-reveal
+          >
+            <div class="about__media-tall"></div>
+            <div class="about__media-stack">
+              <div class="about__media-slot"></div>
+              <div class="about__media-slot"></div>
+            </div>
+          </div>
+        ))
+      }
     </section>
 
     <section class="about__section section-grid">
       <Heading class="section-grid__aside">Contact</Heading>
       <div class="section-grid__body about__contact" data-reveal>
         <p class="section-prose">If any of this fits what you're hiring for, get in touch.</p>
-        <a class="about__email" href={`mailto:${EMAIL}`}>{EMAIL}</a>
-        <ProfileLinks cards={contactLinks} />
+        <ProfileLinks cards={contactCards} class="about__contact-cards" />
       </div>
     </section>
 
@@ -187,78 +237,155 @@ const EMAIL = 'max.shturma@gmail.com';
      wider, and the hero-to-overview gap was 0px where every other gap was
      exactly 160px. The plain <section> elements below matched fine either way,
      which is what made it look like an alignment problem rather than a
-     scoping one. */
+     scoping one.
+
+     ⚠ The generalisable rule, and the reason this comment is this long: any
+     class handed to a child component as a prop must be :global(). */
   :global(.about__section) {
     padding: 0 40px;
     margin-top: 160px;
   }
 
-  .about__profile {
-    display: grid;
-    /* Canvas: 791.5 photo + 64 gap + 791.5 cards inside the 1647 content
-       column — an even split. */
-    grid-template-columns: 1fr 1fr;
-    gap: 64px;
-    /* stretch, not start: the card column is a fixed 468 + 64 + 468 = 1000px
-       while the portrait's height followed its own aspect ratio, so the two
-       only ended level when the column happened to be 791.5px wide. Measured
-       ragged both ways — portrait 722px against cards 1000px at a 1440
-       viewport, and 1025 against 1000 at 1920. Letting the row height drive
-       the image and absorbing the difference in the crop makes them level at
-       every width. */
-    align-items: stretch;
-  }
-  .about__portrait-wrap {
-    position: relative;
-    min-height: 0;
-  }
-  .about__portrait {
-    position: absolute;
-    inset: 0;
-    display: block;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
+  /* --- Availability (canvas 2793:3213) --- */
 
-  .about__contact {
-    /* Canvas 2729:1908: statement -> email and email -> cards are both 64px. */
+  .about__availability {
+    display: flex;
+    /* Canvas gap between the three parts. */
+    gap: 40px;
+    /* end, not center: the crest sits ABOVE "Budapest" and the date ABOVE
+       "Open to relocate", so the only line the three parts share is the
+       bottom one, which is where the arrow belongs. */
+    align-items: flex-end;
+  }
+  .about__place,
+  .about__destination {
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-3xl);
+    flex: none;
   }
-  .about__email {
+  .about__destination {
+    /* Canvas right-aligns this block, so the date sits over the end of
+       "Open to relocate" rather than its start. */
+    align-items: flex-end;
+    text-align: right;
+  }
+  .about__place-name {
+    margin: 0;
     font-family: var(--font-family-body);
-    font-size: var(--font-size-3xl);
-    /* Cross-paired on purpose: the canvas text is Manrope/3xl/medium (32/48),
-       and this scale carries one line-height per size step (3xl = 40) — the
-       same 3xl-size/4xl-line-height pairing the process card title uses. */
-    line-height: var(--font-line-height-4xl);
+    font-size: var(--font-size-4xl);
+    line-height: var(--font-line-height-5xl);
+    letter-spacing: -0.4px;
     font-weight: var(--font-weight-medium);
-    color: var(--color-text-primary);
-    text-decoration: none;
-    /* Same animated underline vocabulary as the nav (feat-015): a wipe rather
-       than a static rule, so it reads as part of the system. */
-    background-image: linear-gradient(currentColor, currentColor);
-    background-position: 0 100%;
-    background-repeat: no-repeat;
-    background-size: 0 1px;
-    transition: background-size var(--duration-base) var(--ease-fade);
-    align-self: flex-start;
+    color: var(--color-text-emphasis);
+    white-space: nowrap;
   }
-  @media (hover: hover) and (pointer: fine) {
-    .about__email:hover {
-      background-size: 100% 1px;
-    }
-  }
-  .about__email:focus-visible {
-    background-size: 100% 1px;
+  /* Figma text style Manrope/xl/regular-loose — 20px on a 40px line, the same
+     pairing overview-section__description uses. */
+  .about__from {
+    margin: 0;
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-xl);
+    line-height: var(--font-line-height-3xl);
+    font-weight: var(--font-weight-regular);
+    color: var(--color-text-emphasis);
+    white-space: nowrap;
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    .about__email {
-      transition: none;
-    }
+  .about__arrow {
+    display: flex;
+    align-items: center;
+    /* Takes whatever the two fixed blocks leave — the canvas's 506px is one
+       width, not the width. min-width: 0 so a flex item with content can
+       actually shrink below its content size. */
+    flex: 1;
+    min-width: 0;
+    /* One declaration for both halves: the shaft reads it via currentColor and
+       the head's path is fill="currentColor". */
+    color: var(--color-icon-default);
+    /* Matches the canvas frame's own height, so the row's baseline maths is
+       the canvas's. */
+    height: 56px;
+  }
+  .about__arrow-shaft {
+    flex: 1;
+    min-width: 0;
+    /* 4px is the export's own shaft: its outlined rect spans y 26-30 around
+       the line's y=28 centre. Not a guess — measured off the path data. */
+    height: 4px;
+    background: currentColor;
+  }
+  .about__arrow-head {
+    display: block;
+    flex: none;
+    /* The viewBox's own dimensions, so the head renders at 1:1 and the 26px
+       shaft stub lines up with the CSS shaft to the pixel. */
+    width: 28.195px;
+    height: 29.8464px;
+  }
+
+  /* --- Media placeholders (canvas 2799:3373) --- */
+
+  .about__media {
+    display: flex;
+    flex-direction: column;
+    /* Canvas: row 2 starts at 1064 against row 1's 1000. */
+    gap: 64px;
+  }
+  .about__media-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 64px;
+    /* The tall slot's aspect-ratio sets the row height and the stack fills it
+       — the same arrangement the retired portrait row used, and for the same
+       reason: something has to decide the row, and a box with no intrinsic
+       height cannot. */
+    align-items: stretch;
+  }
+  /* Row 2 mirrors row 1. Reversing the visual order rather than swapping the
+     markup keeps both rows identical in the DOM, so the reading order stays
+     tall-then-stack and only the paint order flips. */
+  .about__media-row--reversed .about__media-tall {
+    order: 2;
+  }
+  .about__media-tall {
+    /* Canvas slot is 791.5x1000. */
+    aspect-ratio: 791.5 / 1000;
+    background: var(--color-bg-muted);
+  }
+  .about__media-stack {
+    display: grid;
+    grid-template-rows: 1fr 1fr;
+    /* 468 + 64 + 468 = 1000, which is the tall slot exactly. */
+    gap: 64px;
+  }
+  .about__media-slot {
+    background: var(--color-bg-muted);
+  }
+
+  /* --- Contact (canvas 2793:3226) --- */
+
+  .about__contact {
+    display: flex;
+    flex-direction: column;
+    /* Canvas: statement -> cards is 64px. */
+    gap: var(--spacing-3xl);
+  }
+  /* ProfileLinks ships a 64px grid gap, which is right for the 2x2 arrangement
+     it was built for. This row is two cards at 24px on canvas, so the gap is
+     overridden here rather than in the widget — the widget still serves its
+     other arrangement, and there is only one consumer of this one.
+     :global() because the class merges onto ProfileLinks' own <ul>.
+
+     The selector is `ul.profile-links.about__contact-cards`, not the bare
+     class, and the extra weight is load-bearing: Astro compiles the widget's
+     own rule to `.profile-links[data-astro-cid-…]`, which is (0,2,0), so a
+     bare `:global(.about__contact-cards)` at (0,1,0) loses and the gap stays
+     64px — measured, not theorised. Matching at (0,2,0) would only TIE, and a
+     tie resolves on stylesheet bundling order, which is the exact
+     non-determinism Icon.astro's comment records from bug-002. One element
+     selector puts this at (0,2,1) and settles it. */
+  :global(ul.profile-links.about__contact-cards) {
+    gap: 24px;
   }
 
   @media (max-width: 1023px) {
@@ -268,17 +395,35 @@ const EMAIL = 'max.shturma@gmail.com';
     :global(.about__section) {
       margin-top: var(--spacing-4xl);
     }
-    /* The photo beside a 2x2 card grid needs more width than a tablet has;
-       stack them, photo first, as the canvas orders them. */
-    .about__profile {
+    /* A 506px arrow between two 40px labels needs horizontal room a tablet
+       does not have. Stack the three parts, drop the arrow entirely — an
+       arrow rotated to point down would be a different statement — and let
+       the date/status block align left with everything else. */
+    .about__availability {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--spacing-lg);
+    }
+    .about__arrow {
+      display: none;
+    }
+    .about__destination {
+      align-items: flex-start;
+      text-align: left;
+    }
+    /* Stacked, no card column is left to decide the row, so every slot has to
+       carry its own ratio — an unsized box in a 1fr row would collapse. */
+    .about__media-row {
       grid-template-columns: 1fr;
     }
-    /* Stacked there is no card column to decide the row, so the wrapper carries
-       the ratio itself — an absolutely-filled image inside a box with no height
-       would collapse to nothing. */
-    .about__portrait-wrap {
-      max-width: 520px;
-      aspect-ratio: 791.5 / 1000;
+    .about__media-row--reversed .about__media-tall {
+      order: 0;
+    }
+    .about__media-stack {
+      grid-template-rows: none;
+    }
+    .about__media-slot {
+      aspect-ratio: 791.5 / 468;
     }
   }
 
@@ -295,6 +440,17 @@ const EMAIL = 'max.shturma@gmail.com';
     }
     .about__contact {
       gap: var(--spacing-xl);
+    }
+    .about__media,
+    .about__media-row {
+      gap: var(--spacing-xl);
+    }
+    /* 40px city names wrap on a phone; nowrap would overflow the page instead,
+       which is the failure feat-033's tags already caught once. */
+    .about__place-name {
+      font-size: var(--font-size-3xl);
+      line-height: var(--font-line-height-4xl);
+      white-space: normal;
     }
   }
 </style>
