@@ -1,19 +1,29 @@
 ---
+import { Icon } from '@shared/ui';
+import type { IconName } from '@shared/ui';
+
 interface Props {
   href: string;
   active?: boolean;
   large?: boolean;
+  /** Opens in a new tab. The CV is the only nav entry that leaves the site. */
+  external?: boolean;
+  /** Trailing 16px glyph, beside the label. Optional — most items have none. */
+  icon?: IconName;
 }
 
-const { href, active = false, large = false } = Astro.props;
+const { href, active = false, large = false, external = false, icon } = Astro.props;
 ---
 
 <a
   href={href}
   class:list={['nav-item', { 'nav-item--large': large }]}
   aria-current={active ? 'page' : undefined}
+  target={external ? '_blank' : undefined}
+  rel={external ? 'noopener noreferrer' : undefined}
 >
   <span class="nav-item__label"><slot /></span>
+  {icon && <Icon name={icon} size={16} class="nav-item__icon" />}
 </a>
 
 <style>
@@ -25,8 +35,13 @@ const { href, active = false, large = false } = Astro.props;
      hover and the active-page state now share one mechanism. */
   .nav-item {
     display: inline-flex;
-    flex-direction: column;
+    /* Row, not column: the label used to be the only child so the axis did not
+       matter, and a trailing glyph in a column would stack under the text.
+       Canvas puts the download icon beside "CV" (label at x=0 w=19, icon at
+       x=27), which is an 8px gap. */
+    flex-direction: row;
     align-items: center;
+    gap: var(--spacing-sm);
     position: relative;
     padding-bottom: 6px;
     text-decoration: none;
@@ -59,5 +74,11 @@ const { href, active = false, large = false } = Astro.props;
     font-size: var(--font-size-lg);
     line-height: var(--font-line-height-lg);
     font-weight: var(--font-weight-bold);
+  }
+  /* :global() — the class merges onto Icon's own rendered <span>, which is a
+     classlist merge rather than a descendant, so a scoped selector never
+     matches it. Same gotcha every other Icon consumer documents. */
+  :global(.nav-item__icon) {
+    color: var(--color-icon-default);
   }
 </style>

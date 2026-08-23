@@ -13,6 +13,12 @@ import { MobileNavToggle } from '@features/mobile-nav-toggle';
 import NavItem from './NavItem.astro';
 import { NAV_ITEMS } from '../model/nav-items';
 
+// GitHub joined in feat-082 (canvas node I2793:3257;2778:2970), which also
+// makes it site-wide rather than an /about card — the rebuilt page has no link
+// grid to hold one any more. It points at glacier-flow because the portfolio's
+// own repo stays private (Max's call, 2026-08-17): glacier-flow is public and
+// already linked from three case studies, so it is the one real code artifact a
+// reader can open.
 const SOCIAL_LINKS = [
   {
     name: 'linkedin' as const,
@@ -20,6 +26,7 @@ const SOCIAL_LINKS = [
     label: 'LinkedIn',
   },
   { name: 'behance' as const, href: 'https://www.behance.net/shturma', label: 'Behance' },
+  { name: 'github' as const, href: 'https://github.com/nimfardo/glacier-flow', label: 'GitHub' },
 ];
 
 const currentPath = Astro.url.pathname;
@@ -34,7 +41,12 @@ const currentPath = Astro.url.pathname;
       {
         NAV_ITEMS.map((item) => (
           <li>
-            <NavItem href={item.href} active={currentPath === item.href}>
+            <NavItem
+              href={item.href}
+              active={currentPath === item.href}
+              external={item.external}
+              icon={item.icon}
+            >
               {item.label}
             </NavItem>
           </li>
@@ -94,7 +106,13 @@ const currentPath = Astro.url.pathname;
       {
         NAV_ITEMS.map((item) => (
           <li>
-            <NavItem href={item.href} active={currentPath === item.href} large>
+            <NavItem
+              href={item.href}
+              active={currentPath === item.href}
+              external={item.external}
+              icon={item.icon}
+              large
+            >
               {item.label}
             </NavItem>
           </li>
@@ -173,11 +191,25 @@ const currentPath = Astro.url.pathname;
       margin: 0;
       padding: 0;
     }
+    /* Wraps, left-aligned. The sidebar is 153px with 40px padding, so the
+       content column is 73px — and three 32px icons at an 8px gap need 112px,
+       which does not fit. Two per row is 32+8+32 = 72px and fits with 1px to
+       spare, so the set becomes 2 + 1 rather than one overflowing row.
+
+       The canvas (node I2793:3257;2778:2586) instead centres a 112px row in
+       the full 153px sidebar, breaking the 40px padding by 19.5px each side.
+       That is a deliberate divergence, not a miss: the 40px grid is what the
+       logo, the nav items and every page gutter align to, and feat-068 pinned
+       the process rail to it. Losing it for one row of icons costs more than
+       the extra 32px of height. If Max wants the canvas version, this rule is
+       the only thing to change. */
     .nav-desktop__links {
       display: flex;
+      flex-wrap: wrap;
       gap: var(--spacing-sm);
     }
     .nav-desktop__links a {
+      display: flex;
       color: var(--color-icon-default);
     }
   }
