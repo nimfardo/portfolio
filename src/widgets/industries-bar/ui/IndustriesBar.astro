@@ -138,11 +138,12 @@ const columns = INDUSTRIES.map((d, i) => ({
     --ink-5: var(--color-obsidian-amber-800);
   }
 
-  /* Two NAMED containers. Both the bar and each column need a container query
-     — the bar to decide horizontal-vs-stacked, the column to size its own
-     label — and an unnamed `@container` resolves against the NEAREST ancestor
-     container, which for a label is the column. Naming them is what keeps the
-     720px rule from being evaluated against a 118px column. */
+  /* A NAMED container, and the name still earns its keep even now that the
+     per-column container is gone (it sized each label to its own width until
+     the uniform-size decision retired it). An unnamed `@container` resolves
+     against the nearest ancestor container, so naming this one keeps the 720px
+     stacking rule pinned to the bar even if a descendant becomes a container
+     again later. */
   .industries-bar {
     container: industries-bar / inline-size;
   }
@@ -165,7 +166,6 @@ const columns = INDUSTRIES.map((d, i) => ({
        whole point of it. */
     min-width: 118.111px;
     overflow: hidden;
-    container: industry-col / inline-size;
     /* `flex: <count> 1 0` arrives inline — it is data, not style. */
   }
 
@@ -198,41 +198,33 @@ const columns = INDUSTRIES.map((d, i) => ({
     background: var(--color-border-strong);
   }
 
+  /* ONE size for all five columns.
+     The canvas sizes each label to its column's room — 18px for the two wide
+     columns, 14px for the three floored ones — and that rule was ported
+     faithfully and then rejected on review (2026-08-23). The reason it fails
+     in code: the bar is 65% of the content column, so it only reaches the
+     canvas's 1071px near a 1900px viewport. At 1440 the bar is 778px and the
+     SECOND wide column is already down to 138.6px, which takes the small step
+     — leaving one large label among four small ones. That reads as a mistake
+     rather than as a system, which is exactly how Max read it.
+     14px, not 18 or 12: at 18px two labels wrap (CONSUMER & BRAND needs
+     189.5px against 138.6, E-LEARNING 141.8 against 118), and 12px avoids
+     every wrap but is small for a chart label. 14px leaves exactly one wrap. */
   .industries-bar__label {
     font-family: var(--font-family-body);
-    font-size: var(--font-size-lg);
-    line-height: var(--font-line-height-lg);
+    font-size: var(--font-size-sm);
+    line-height: var(--font-line-height-sm);
     font-weight: var(--font-weight-medium);
     letter-spacing: 0.04em;
     text-transform: uppercase;
     color: var(--color-text-primary);
-  }
-  /* Labels size to their column's room, not to the viewport — the same
-     width-stepping rule bug-051 ships for .profile-links__item, and the reason
-     is the same: one widget renders at five different widths on one row.
-     E-LEARNING's glyph run is 86px, which leaves 32px of clear space in a
-     118px column at 14px and about 7px at 18px. 200px cleanly separates the
-     two wide columns (354px+) from the three floored ones (118px). */
-  @container industry-col (max-width: 200px) {
-    .industries-bar__label {
-      font-size: var(--font-size-sm);
-      line-height: var(--font-line-height-sm);
-      /* Two lines reserved, but only on this step — this is the only band
-         where a label can wrap, and reserving on the 18px step instead would
-         hang the widest column 16px below every other one for nothing.
-         CONSUMER & BRAND needs 147.4px at 14px (measured in-browser) and its
-         column is 138.6px at a 1440-1456 viewport, so it wraps there: the bar
-         is fluid at 65% of the content column (~778px against the canvas's
-         1071) while the type stays fixed. It is the only label that ever
-         wraps. Reserving the second line means it fills space already there
-         rather than pushing its own column deeper than its neighbours, so all
-         four narrow columns stay level at every width. Nothing follows this
-         section, so an unused reserved line costs nothing.
-         Rejected: a third step down to 12px. It buys that one label its single
-         line and costs a visible 18-vs-12 jump between two adjacent columns.
-         `2lh` resolves against whichever step this query landed on. */
-      min-height: 2lh;
-    }
+    /* The one wrap, reserved. CONSUMER & BRAND needs 147.4px at 14px (measured
+       in-browser) against a 138.6px column at 1440, so it takes two lines
+       there. Reserving the second line everywhere means it fills space that was
+       already allocated rather than pushing its own column deeper than its
+       neighbours, so all five stay level at every width. Nothing follows this
+       section, so an unused reserved line costs nothing. */
+    min-height: 2lh;
   }
   .industries-bar__industry--1 .industries-bar__seg {
     background: var(--seg-1);
