@@ -170,6 +170,14 @@ const currentPath = Astro.url.pathname;
      a new permanent divider on a sidebar the canvas draws without one, so at
      scroll-top the chrome is pixel-identical to before this landed.
 
+     ⚠ LONGHANDS, NOT `animation:`. Writing `animation: nav-progress-y linear
+     both` next to `animation-timeline` builds fine and works in dev, then
+     ships dead: Lightning CSS folds the pair into
+     `animation: linear both nav-progress-y scroll(root)`, and Chrome rejects
+     that whole declaration — measured, `animation-name` computes to `none`.
+     Only the minified output is broken, so `astro dev` will tell you it
+     works. Longhands are not foldable and survive the minifier intact.
+
      Everything lives inside `@supports`, so browsers without scroll-driven
      animations get no element at all rather than a line frozen at 0% — as of
      mid-2026 that is mainly Firefox, where the feature ships behind a flag.
@@ -205,7 +213,10 @@ const currentPath = Astro.url.pathname;
         background: var(--color-border-accent);
         transform-origin: top center;
         transform: scaleY(0);
-        animation: nav-progress-y linear both;
+        animation-name: nav-progress-y;
+        animation-duration: auto;
+        animation-timing-function: linear;
+        animation-fill-mode: both;
         animation-timeline: scroll(root block);
       }
     }
@@ -219,7 +230,10 @@ const currentPath = Astro.url.pathname;
         background: var(--color-border-accent);
         transform-origin: left center;
         transform: scaleX(0);
-        animation: nav-progress-x linear both;
+        animation-name: nav-progress-x;
+        animation-duration: auto;
+        animation-timing-function: linear;
+        animation-fill-mode: both;
         animation-timeline: scroll(root block);
       }
     }
