@@ -21,7 +21,7 @@ const { class: className } = Astro.props;
 </button>
 
 <script>
-  import { bindOncePersisted, prefersReducedMotion } from '@shared/lib';
+  import { bindOncePersisted } from '@shared/lib';
 
   // The desktop toggle (PageHeader) is fresh, unpersisted markup on every
   // page — needs (re)binding after each `astro:page-load`. The mobile
@@ -41,68 +41,19 @@ const { class: className } = Astro.props;
     document.querySelectorAll<HTMLButtonElement>('[data-theme-toggle]').forEach(syncLabel);
   }
 
-  function switchTheme() {
-    const isLight = document.documentElement.dataset.theme === 'light';
-    if (isLight) {
-      delete document.documentElement.dataset.theme;
-      localStorage.setItem(STORAGE_KEY, 'dark');
-    } else {
-      document.documentElement.dataset.theme = 'light';
-      localStorage.setItem(STORAGE_KEY, 'light');
-    }
-    syncAllLabels();
-  }
-
-  /**
-   * Where the wipe starts: the centre of the switch itself — the 44px track,
-   * not the button box. The button is ~98px wide because it carries the word
-   * "DARK" as well, so its centre sits ~27px to the left of the thing that
-   * visually reads as the toggle. Max's call after seeing it; feat-089 had
-   * briefly used the pointer instead, which was the wrong reading of a note
-   * about position.
-   */
-  function wipeOrigin(button: HTMLElement) {
-    const anchor = button.querySelector('.theme-toggle__track') ?? button;
-    const box = anchor.getBoundingClientRect();
-    return { x: box.left + box.width / 2, y: box.top + box.height / 2 };
-  }
-
-  /**
-   * Circular wipe out of the toggle (awwwards idea 2, feat-087).
-   * The `::view-transition-*` keyframes live in global.css behind
-   * `html[data-theme-switching]` — that flag is the whole reason page
-   * navigations (also view transitions, via ClientRouter) don't inherit the
-   * circle, and it is also what suppresses every CSS transition for the
-   * duration so the wipe ends without a pop. Set it before starting, clear
-   * it when the transition settles.
-   */
-  function wipeTheme(button: HTMLElement) {
-    const root = document.documentElement;
-    const { x, y } = wipeOrigin(button);
-    // Farthest viewport corner from the origin — the radius at which the
-    // circle has covered every pixel, so the wipe never stops short no
-    // matter which corner it started nearest. Rounded up: a fractional
-    // shortfall would leave one pixel of the old theme to snap away.
-    const r = Math.ceil(Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y)));
-    root.style.setProperty('--tt-x', `${x}px`);
-    root.style.setProperty('--tt-y', `${y}px`);
-    root.style.setProperty('--tt-r', `${r}px`);
-    root.dataset.themeSwitching = '';
-    const transition = document.startViewTransition(switchTheme);
-    transition.finished.finally(() => {
-      delete root.dataset.themeSwitching;
-    });
-  }
-
   function initThemeToggle() {
     syncAllLabels();
     bindOncePersisted<HTMLButtonElement>('[data-theme-toggle]', (button) => {
       button.addEventListener('click', () => {
-        if (!document.startViewTransition || prefersReducedMotion()) {
-          switchTheme();
-          return;
+        const isLight = document.documentElement.dataset.theme === 'light';
+        if (isLight) {
+          delete document.documentElement.dataset.theme;
+          localStorage.setItem(STORAGE_KEY, 'dark');
+        } else {
+          document.documentElement.dataset.theme = 'light';
+          localStorage.setItem(STORAGE_KEY, 'light');
         }
-        wipeTheme(button);
+        syncAllLabels();
       });
     });
   }
