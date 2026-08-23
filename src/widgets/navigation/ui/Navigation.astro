@@ -189,21 +189,36 @@ const currentPath = Astro.url.pathname;
     /* One row, centred in the full sidebar — canvas node
        I2793:3257;2778:2586, which sits at x=20.5 and is 112px wide.
 
-       This deliberately breaks out of the 40px padding grid, and the
-       arithmetic is exact: the content column is 73px, -19.5px each side makes
-       it 112px, and 3x32 + 2x8 = 112 — a perfect fit with nothing to spare.
-       feat-082 originally wrapped the set 2+1 to stay inside the gutter the
-       logo, the nav items and every page margin align to; Max reviewed it
-       against the canvas on 2026-08-23 and chose canvas fidelity, so the icons
-       now sit 19.5px outside that gutter on both sides. His call — recorded
-       here because the misalignment is intentional and will look like a bug to
-       anyone measuring against the logo above it. */
+       GRID with `grid-auto-flow: column`, not a flex row. Column flow has no
+       wrap concept, so a single line is guaranteed by CONSTRUCTION rather than
+       by policy: there is no `flex-wrap` here for a later edit to flip back to
+       `wrap`, which is exactly how the second line got in (feat-082 wrapped the
+       set 2+1 deliberately, and bug-056 turned that off with `nowrap`). Max
+       reported the two-line state twice, so this removes the property that can
+       cause it instead of setting it correctly.
+
+       Arithmetic, and it now carries slack. The content column is 73px;
+       -24px each side makes the row 121px, against 3x32 + 2x8 = 112px of
+       icons — 9px spare. Centring keeps the group canvas-exact regardless:
+       40 - 24 + (121 - 112) / 2 = 20.5px for the first icon, so 20.5 / 60.5 /
+       100.5 as on canvas. The earlier -19.5px gave a 112px row for 112px of
+       content, i.e. ZERO slack — correct, but flush against its own contents
+       and the kind of exact fit that breaks on the next change.
+
+       ⚠ CEILING: three 32px icons at an 8px gap is 112px, and that is what
+       fits. A fourth needs 152px against the 121px available, which no amount
+       of slack absorbs — it would overflow the sidebar. Adding a social link is
+       a design decision (smaller icons, tighter gap, or two rows on purpose),
+       not a CSS tweak. This row also sits 19.5px outside the 40px padding grid
+       the logo, nav items and page gutters align to; that misalignment is
+       intentional canvas fidelity, chosen by Max on 2026-08-23. */
     .nav-desktop__links {
-      display: flex;
-      flex-wrap: nowrap;
+      display: grid;
+      grid-auto-flow: column;
+      grid-auto-columns: max-content;
       justify-content: center;
       gap: var(--spacing-sm);
-      margin-inline: -19.5px;
+      margin-inline: -24px;
     }
     .nav-desktop__links a {
       display: flex;
