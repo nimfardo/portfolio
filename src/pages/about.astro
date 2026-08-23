@@ -272,6 +272,18 @@ const mediaRows = [{ tallFirst: true }, { tallFirst: false }];
     flex-direction: column;
     flex: none;
   }
+  /* flex-start, not the default stretch (bug-058). The crest sat 45.8px right
+     of the word: as a stretched column item, BudapestCrest's inline-flex span
+     filled the column's full 177.6px and its own `justify-content: center`
+     centred the 86px artwork inside it. Canvas puts crest and word both at
+     x=0. Shrink-wrapping the span makes its internal centring a no-op, which
+     is why the component itself is left alone — that centring is the right
+     default for any consumer that does give it a wider box.
+     Scoped to .about__place on purpose: .about__destination right-aligns and
+     sets its own `align-items: flex-end` below. */
+  .about__place {
+    align-items: flex-start;
+  }
   .about__destination {
     /* Canvas right-aligns this block, so the date sits over the end of
        "Open to relocate" rather than its start. */
