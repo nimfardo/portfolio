@@ -10,7 +10,14 @@ const { value, unit, label, class: className } = Astro.props;
 
 <div class:list={['stat', className]}>
   <p class="stat__value">
-    {value}{unit && <>{' '}<span class="stat__unit">{unit}</span></>}
+    <span class="stat__number" data-count-up style={`min-width: ${value.length}ch`}>{value}</span>{
+      unit && (
+        <>
+          {' '}
+          <span class="stat__unit">{unit}</span>
+        </>
+      )
+    }
   </p>
   <p class="stat__label">{label}</p>
 </div>
@@ -33,6 +40,15 @@ const { value, unit, label, class: className } = Astro.props;
     line-height: var(--font-line-height-8xl);
     font-weight: var(--font-weight-medium);
     letter-spacing: -1.92px;
+  }
+  /* The number rolls 0 -> value on first view (feat-086), so its box has to
+     be final-size from frame one or the unit beside it would shuffle right
+     for 900ms. `tabular-nums` makes every digit exactly 1ch wide, which is
+     what lets the `min-width` above be exact rather than approximate.
+     inline-block is only there so min-width applies at all. */
+  .stat__number {
+    display: inline-block;
+    font-variant-numeric: tabular-nums;
   }
   .stat__unit {
     font-size: 32px;

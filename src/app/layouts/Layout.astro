@@ -51,10 +51,12 @@ const { title, hideNav = false } = Astro.props;
         document.addEventListener('astro:after-swap', apply);
       })();
     </script>
-    {/* Static, not a prefers-color-scheme pair: the light theme is a
-     * localStorage preference (see the inline script below), not an OS
-     * one, so a media-query pair would disagree with the rendered page
-     * whenever the two differ. Dark is the default theme. */}
+    {
+      /* Static, not a prefers-color-scheme pair: the light theme is a
+       * localStorage preference (see the inline script below), not an OS
+       * one, so a media-query pair would disagree with the rendered page
+       * whenever the two differ. Dark is the default theme. */
+    }
     <meta name="theme-color" content="#110a03" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generator" content={Astro.generator} />
@@ -87,12 +89,13 @@ const { title, hideNav = false } = Astro.props;
       <slot />
     </div>
     <script>
-      import { initScrollReveal } from '@shared/lib';
+      import { initScrollReveal, initCountUp } from '@shared/lib';
       // `astro:page-load` fires once for the real initial load and again
       // after every ClientRouter swap — top-level module scripts only ever
       // run once, so anything that needs to see the *new* page's content
       // (new [data-reveal] elements) has to hang off this event instead.
       document.addEventListener('astro:page-load', initScrollReveal);
+      document.addEventListener('astro:page-load', initCountUp);
     </script>
   </body>
 </html>

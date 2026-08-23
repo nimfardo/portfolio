@@ -87,7 +87,13 @@ const columns = INDUSTRIES.map((d, i) => ({
           style={`flex: ${c.count} 1 0; --pct: ${c.pct};`}
         >
           <div class="industries-bar__seg">
-            <span class="industries-bar__count">{c.figure}</span>
+            <span
+              class="industries-bar__count"
+              data-count-up
+              style={`min-width: ${c.figure.length}ch`}
+            >
+              {c.figure}
+            </span>
           </div>
           <span class="industries-bar__label">{c.label}</span>
         </div>
@@ -183,6 +189,14 @@ const columns = INDUSTRIES.map((d, i) => ({
     /* -1%, the tracking this scale carries from 3xl up. */
     letter-spacing: -0.32px;
     white-space: nowrap;
+    /* The figure rolls 0 -> count on first view (feat-086). The seg centres
+       its child, so without a reserved box the number would drift left as it
+       gained a digit; `min-width` (set inline from the figure's own length)
+       plus tabular digits fixes the box at its final size, and text-align
+       keeps the glyphs centred inside it. Nothing moves at rest — today's
+       box is already the final box. */
+    text-align: center;
+    font-variant-numeric: tabular-nums;
   }
 
   /* ONE size for all five columns.
