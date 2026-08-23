@@ -23,8 +23,34 @@ const { title, hideNav = false } = Astro.props;
   <head>
     <meta charset="utf-8" />
     <link rel="icon" href="/favicon.ico" sizes="32x32" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" id="favicon" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <script is:inline>
+      // The favicon is a bare mark with no tile, so it has to invert against
+      // the browser's tab strip: amber (#efcba6) on a dark strip, obsidian
+      // (#110a03) on a light one — matching the Figma tab spec at 2826:11.
+      //
+      // This is driven from here rather than by a `prefers-color-scheme`
+      // media query inside the SVG, because Chrome resolves that query to
+      // `light` when it renders an SVG through the image path regardless of
+      // the actual browser theme (measured, not assumed), which would put the
+      // obsidian mark on a dark strip. `matchMedia` in page context does
+      // report the real scheme, so the page picks the file instead.
+      //
+      // NOTE: this tracks the BROWSER/OS theme, which is what colours the tab
+      // strip — deliberately not the site's own `theme` localStorage toggle.
+      (function () {
+        var q = matchMedia('(prefers-color-scheme: light)');
+        function apply() {
+          var el = document.getElementById('favicon');
+          if (el) el.href = q.matches ? '/favicon-light.svg' : '/favicon.svg';
+        }
+        apply();
+        q.addEventListener('change', apply);
+        // ClientRouter swaps the head; re-apply against the new <link>.
+        document.addEventListener('astro:after-swap', apply);
+      })();
+    </script>
     {/* Static, not a prefers-color-scheme pair: the light theme is a
      * localStorage preference (see the inline script below), not an OS
      * one, so a media-query pair would disagree with the rendered page
