@@ -541,6 +541,11 @@ const mediaRows: AboutMediaRow[] = [
     /* Canvas slot is 791.5x1000. */
     aspect-ratio: 791.5 / 1000;
     background: var(--color-bg-muted);
+    /* Containing block for the absolutely-positioned media, and `overflow`
+       is load-bearing rather than tidiness — see the .about__media-asset
+       rule below for why both of these exist. */
+    position: relative;
+    overflow: hidden;
   }
   .about__media-stack {
     display: grid;
@@ -550,20 +555,51 @@ const mediaRows: AboutMediaRow[] = [
   }
   .about__media-slot {
     background: var(--color-bg-muted);
+    /* Same pair as .about__media-tall, same reason — see below. */
+    position: relative;
+    overflow: hidden;
   }
   /* The --color-bg-muted fills above are kept deliberately now that the slots
      are filled: they're what shows in the box while a lazy image decodes, so
      the reveal lands on the same grey the placeholders used rather than on the
      page background.
 
-     :global() because this class lands on a plain <img> in the image branch but
-     on Media's own root <div> in the video branch — a classlist merge, not a
-     descendant, so a scoped selector would miss it. object-fit is inert on
-     Media's wrapper div itself, but Media's internal CSS already applies
-     object-fit: cover to its <video>, so both branches crop identically. Same
-     arrangement, and the same reason, as ProjectHero's .project-hero__image. */
-  :global(.about__media-asset) {
-    display: block;
+     ⚠ The media is absolutely positioned, and that is what keeps the two
+     columns equal. It looks like over-engineering for "fill the box" and it
+     is not.
+
+     The row is `1fr 1fr`, and `.about__media-tall`'s aspect-ratio is what
+     decides the row height (nothing else in the row has an intrinsic height).
+     In flow, each slot's content contributes an intrinsic height, which pushed
+     the row TALLER than the tall slot's ratio wanted — and because that item
+     has an aspect-ratio, the extra height came straight back as extra WIDTH,
+     so the tall slot overflowed its own 1fr track. The tracks stayed equal;
+     the item did not fit in one. Measured at 1024px: tracks 363.5/363.5 with
+     the tall item rendering 390.66 wide, i.e. row 2's two columns visually
+     54px apart. It scaled with viewport — ~54px at 1024, ~9px at 1728, gone by
+     2560 — which is why it read as "weird alignment" rather than as a bug with
+     a shape. The empty placeholders never showed it because they had no
+     content to contribute.
+
+     Out of flow, the slots contribute nothing, the row height is the tall
+     slot's ratio height again, and every column is 1fr exactly. `overflow:
+     hidden` above is part of the same fix, not decoration: a grid item's
+     automatic minimum size is zero for a scroll container, so it stops the
+     item's own contents forcing a floor.
+
+     ⚠ Specificity, and this one bit once already. The class lands on a plain
+     <img> in the image branch but on Media's own root <div> in the video
+     branch, and Media ships `.media { position: relative }`, which Astro
+     compiles to (0,2,0). A bare `:global(.about__media-asset)` is (0,1,0) and
+     LOSES, so the video wrapper stayed in flow and the bug only half went
+     away — the fix worked for the four stills and not for the two videos.
+     Scoping the ancestor puts this at (0,3,0), which wins outright rather than
+     tying: a tie would resolve on stylesheet bundling order, the exact
+     non-determinism Icon.astro's comment records from bug-002. */
+  .about__media-tall :global(.about__media-asset),
+  .about__media-slot :global(.about__media-asset) {
+    position: absolute;
+    inset: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
