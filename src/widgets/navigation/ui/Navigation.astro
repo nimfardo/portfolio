@@ -32,6 +32,17 @@ const SOCIAL_LINKS = [
 const currentPath = Astro.url.pathname;
 ---
 
+{
+  /* Scroll progress. Its own element rather than a pseudo on the nav chrome,
+   * because the bar has to exist at every width and the two nav roots each
+   * only exist at one — see the style block. Unlike the three roots below it
+   * is NOT `transition:persist`: there is no state to carry across a swap
+   * (the scroll timeline re-resolves against the new document by itself), and
+   * an unnamed persist key is positional, so persisting it would tie this
+   * element's identity to its position among its siblings for nothing. */
+}
+<div class="nav-progress" aria-hidden="true"></div>
+
 <nav id="nav-desktop" class="nav-desktop" aria-label="Primary" transition:persist>
   <div class="nav-desktop__top">
     <a href="/" aria-label="Home">
@@ -159,42 +170,51 @@ const currentPath = Astro.url.pathname;
     display: none;
   }
 
-  /* Scroll-progress hairline (feat-085, awwwards idea 6). One pseudo-element
-     per breakpoint — down the sidebar's right edge on desktop, along the
-     mobile header's bottom edge — scaled by the document's own scroll
-     position. No JS: `scroll(root block)` hands the compositor the timeline
-     directly, which also means the nav's `transition:persist` costs nothing
-     here (there is nothing to re-bind after a ClientRouter swap).
+  /* Scroll-progress hairline (feat-085, reoriented in feat-088 on Max's
+     review): one horizontal bar across the top of the viewport, filling
+     left-to-right with the document's own scroll. It was a vertical line
+     down the sidebar's right edge, which only reads as progress if you
+     already know to look there; across the top it is the shape readers
+     recognise.
 
-     Deliberately no track behind the fill. A full-length faint line would be
-     a new permanent divider on a sidebar the canvas draws without one, so at
-     scroll-top the chrome is pixel-identical to before this landed.
+     It is its own element rather than a pseudo on the nav chrome because it
+     has to exist at every width, and the two nav roots each only exist at
+     one — `.nav-desktop` is `display: none` below 1024 and
+     `.nav-mobile-header` above it, and a pseudo on a `display: none` parent
+     renders nothing. One element, one rule, no breakpoint split.
 
-     ⚠ LONGHANDS, NOT `animation:`. Writing `animation: nav-progress-y linear
+     No JS: `scroll(root block)` hands the compositor the timeline directly,
+     so `transition:persist` costs nothing here — there is nothing to re-bind
+     after a ClientRouter swap, the timeline just re-resolves against the new
+     document.
+
+     Deliberately no track behind the fill, so at scroll-top the page is
+     pixel-identical to before this landed.
+
+     z-index sits above the mobile header (900) and below the mobile overlay
+     (950) on purpose: an open menu should cover it, and the body is
+     scroll-locked then anyway, so a bar would be frozen mid-fill.
+
+     ⚠ LONGHANDS, NOT `animation:`. Writing `animation: nav-progress linear
      both` next to `animation-timeline` builds fine and works in dev, then
      ships dead: Lightning CSS folds the pair into
-     `animation: linear both nav-progress-y scroll(root)`, and Chrome rejects
+     `animation: linear both nav-progress scroll(root)`, and Chrome rejects
      that whole declaration — measured, `animation-name` computes to `none`.
      Only the minified output is broken, so `astro dev` will tell you it
-     works. Longhands are not foldable and survive the minifier intact.
+     works (bug-060). Longhands are not foldable and survive the minifier.
 
      Everything lives inside `@supports`, so browsers without scroll-driven
-     animations get no element at all rather than a line frozen at 0% — as of
+     animations get no element at all rather than a bar frozen at 0% — as of
      mid-2026 that is mainly Firefox, where the feature ships behind a flag.
      Kept visible under reduced motion on purpose: this tracks the reader's
      own scrolling rather than moving on its own, so there is no vestibular
      cost to it, and it is the one motion on the page that carries
      information. /process keeps advancing through the rail's pinned band —
      document scroll is still document scroll, which is the honest reading. */
-  @keyframes nav-progress-y {
-    from {
-      transform: scaleY(0);
-    }
-    to {
-      transform: scaleY(1);
-    }
+  .nav-progress {
+    display: none;
   }
-  @keyframes nav-progress-x {
+  @keyframes nav-progress {
     from {
       transform: scaleX(0);
     }
@@ -203,39 +223,20 @@ const currentPath = Astro.url.pathname;
     }
   }
   @supports (animation-timeline: scroll()) {
-    @media (min-width: 1024px) {
-      .nav-desktop::after {
-        content: '';
-        position: absolute;
-        inset: 0 0 auto auto;
-        width: 2px;
-        height: 100%;
-        background: var(--color-border-accent);
-        transform-origin: top center;
-        transform: scaleY(0);
-        animation-name: nav-progress-y;
-        animation-duration: auto;
-        animation-timing-function: linear;
-        animation-fill-mode: both;
-        animation-timeline: scroll(root block);
-      }
-    }
-    @media (max-width: 1023px) {
-      .nav-mobile-header::after {
-        content: '';
-        position: absolute;
-        inset: auto auto 0 0;
-        width: 100%;
-        height: 2px;
-        background: var(--color-border-accent);
-        transform-origin: left center;
-        transform: scaleX(0);
-        animation-name: nav-progress-x;
-        animation-duration: auto;
-        animation-timing-function: linear;
-        animation-fill-mode: both;
-        animation-timeline: scroll(root block);
-      }
+    .nav-progress {
+      display: block;
+      position: fixed;
+      inset: 0 0 auto 0;
+      height: 2px;
+      z-index: 901;
+      background: var(--color-border-accent);
+      transform-origin: left center;
+      transform: scaleX(0);
+      animation-name: nav-progress;
+      animation-duration: auto;
+      animation-timing-function: linear;
+      animation-fill-mode: both;
+      animation-timeline: scroll(root block);
     }
   }
 
