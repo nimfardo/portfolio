@@ -196,7 +196,18 @@ html[data-theme-switching]::view-transition-old(root) {
 }
 html[data-theme-switching]::view-transition-new(root) {
   z-index: 1;
-  animation: theme-wipe var(--duration-slow) var(--ease-reveal) both;
+  /* 0.55s, and NOT the reveal curve (feat-089, after Max read the original
+     0.75s expo-out as unsmooth). `--ease-reveal` is cubic-bezier(0.19, 1,
+     0.22, 1) — right for an underline, wrong here: it is so front-loaded
+     that the circle is nearly done in the first fifth of its duration and
+     then crawls. A radial reveal is already accelerating on its own, since
+     the area it covers grows as the square of the radius, so it wants the
+     gentler curve underneath it, not a second one stacked on top.
+
+     The duration is written out rather than tokenised because it has one
+     consumer; `--duration-slow` (0.75s) is the reveal duration and belongs
+     to a different gesture. */
+  animation: theme-wipe 0.55s var(--ease-fade) both;
 }
 @keyframes theme-wipe {
   from {
