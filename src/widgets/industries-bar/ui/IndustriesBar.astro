@@ -40,8 +40,15 @@
 // The count-ink flip point therefore differs BETWEEN THEMES, which is the
 // non-obvious part: dark flips after step 3 (dark ink on the three light
 // steps, light ink on the two dark ones), light flips after step 4. Measured,
-// not estimated — every pair below clears the 3:1 large-text floor that 32px
-// bold sits above:
+// not estimated — every pair below clears the 3:1 large-text floor.
+//
+// That floor still applies now the count is 24px Medium rather than 32px bold
+// (it was rebound to the canvas style — see .industries-bar__count). Worth
+// stating why, because dropping bold looks like it should cost the exemption:
+// WCAG's large-scale threshold is 18pt OR 14pt bold, and 24px is exactly
+// 18pt, so size alone qualifies and the weight was never carrying it. The
+// ratios are unchanged either way — they are properties of the two colours,
+// not of the type:
 //   dark  seg-vs-ground 17.20 / 12.88 / 8.08 / 4.10 / 3.00
 //         count ink     17.20 / 12.88 / 8.08 / 3.14 / 4.29
 //   light seg-vs-ground 13.90 / 10.57 / 5.59 / 4.09 / 2.43
@@ -181,13 +188,25 @@ const columns = INDUSTRIES.map((d, i) => ({
        a height that moved with anything would add a second, false dimension. */
     height: 80px;
   }
+  /* Bound to the Figma text style `Manrope/2xl/medium-loose` (canvas node
+     2851:5521) — 24px, Medium, 200% line-height, no tracking. It had been
+     32px bold with -0.32px, a size and weight off this style entirely: the
+     figure was shouting a whole step louder than the design asks for.
+
+     The line-height is cross-paired from 4xl on purpose, the same way
+     ProcessRail's title pairs 3xl with 4xl (comp-013): this scale carries one
+     line-height per size step (`--font-line-height-2xl` is 32px) while
+     Figma's `-loose` variants differ by leading, and 4xl's 48px IS the 200%
+     the style specifies. Nothing renders differently either way — the count
+     is a single line centred in a fixed 80px segment — so this is bound for
+     parity with the style, not for layout. Below 1024 the 4xl token steps
+     with the display scale (44px, then 38px) while `--font-size-2xl` holds at
+     24; invisible here for the same reason. */
   .industries-bar__count {
     font-family: var(--font-family-body);
-    font-size: var(--font-size-3xl);
-    line-height: var(--font-line-height-3xl);
-    font-weight: var(--font-weight-bold);
-    /* -1%, the tracking this scale carries from 3xl up. */
-    letter-spacing: -0.32px;
+    font-size: var(--font-size-2xl);
+    line-height: var(--font-line-height-4xl);
+    font-weight: var(--font-weight-medium);
     white-space: nowrap;
     /* The figure rolls 0 -> count on first view (feat-086). The seg centres
        its child, so without a reserved box the number would drift left as it
@@ -303,7 +322,12 @@ const columns = INDUSTRIES.map((d, i) => ({
      Stacked, each row is its own bar: name above, segment sized to its share.
      The three tails all floor at 72px and render identical — the same accepted
      trade-off the horizontal bar makes, where the printed number carries the
-     value. 72px is what a 32px bold "10+" needs. */
+     value. 72px was sized for a 32px bold "10+"; at the canvas's 24px Medium
+     that figure measures 45.1px in-browser and needs 61.1px with the 16px
+     inset, so the floor is now generous rather than exact. Left as it is: it
+     is a minimum-readable band for a bar, not a text box, and shrinking it
+     would make the three tails smaller without making them any more
+     distinguishable from each other. */
   @container industries-bar (max-width: 720px) {
     .industries-bar__bar {
       flex-direction: column;
