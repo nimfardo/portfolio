@@ -1,0 +1,71 @@
+---
+// The flag of Hungary, sitting above "Budapest" in /about's Availability row
+// (feat-094). Replaces the traced Budapest coat of arms that shipped in
+// feat-074 — that was a regulated municipal symbol needing a permit from the
+// Fővárosi Közgyűlés under 58/1994 §4(1) which we never held, and it was a
+// trace of a raster whose licence nobody could name. Neither is true here:
+// Act CCII of 2011 §5(1) locks down the *coat of arms*, not the flag, and
+// §11(1) lets a private person use the flag with no permit at all. An equal
+// horizontal tricolour has no author, so there is no copyright to inherit.
+//
+// The SVG is written inline rather than imported with `?raw` and set:html the
+// way PageNotFoundCat, Logo and Icon are. That pattern exists solely so an
+// illustration can inherit `color` and resolve `fill="currentColor"`; a flag
+// has fixed colours and nothing to inherit, so a separate .svg file would buy
+// an extra file for no gain. Same call the arrow in about.astro makes.
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+---
+
+{
+  /* 1:2, the official proportion from the 2000 government decree, expressed as
+    a 2x1 viewBox so the three stripes are exact thirds rather than rounded
+    pixels. Red on top. */
+}
+<svg
+  class:list={['hungary-flag', className]}
+  viewBox="0 0 2 1"
+  xmlns="http://www.w3.org/2000/svg"
+  aria-hidden="true"
+  focusable="false"
+  preserveAspectRatio="none"
+>
+  <rect x="0" y="0" width="2" height="0.333333" fill="#CE2939"></rect>
+  <rect x="0" y="0.333333" width="2" height="0.333334" fill="#FFFFFF"></rect>
+  <rect x="0" y="0.666667" width="2" height="0.333333" fill="#477050"></rect>
+</svg>
+
+<style>
+  /* The one deliberate token exception on /about. Every other mark on the page
+     is bound to a semantic colour and themes with it; this cannot be. MSZ
+     1361:2009 fixes the flag at #CE2939 / #FFFFFF / #477050, and Act CCII of
+     2011 §12 requires anyone using the flag to preserve its dignity — a
+     national flag repainted in obsidian-amber is not the flag, it is three
+     amber stripes. So the hexes are hardcoded on purpose. Do not "fix" them
+     into var(--color-*). */
+  .hungary-flag {
+    display: block;
+    /* Native 48x24 at 1:2. Small by intent: it sits above a 40px "Budapest"
+       line, and the crest it replaces was 86x56 — a full-colour block at that
+       size would out-shout the type it is labelling. */
+    width: 48px;
+    height: auto;
+    /* The white stripe has no edge of its own. On the dark ground it is the
+       brightest thing on the page and reads fine, but in light theme it sits
+       on a pale grey and the flag loses its top-to-bottom shape. A hairline
+       gives it one in both themes. */
+    border: 1px solid var(--color-border-default);
+  }
+
+  @media (max-width: 767px) {
+    /* The Availability row stacks on a phone and the type steps down with it
+       (global.css collapses 4xl to 28px at this width), so the flag steps
+       too — same reasoning the crest used, one size down. */
+    .hungary-flag {
+      width: 36px;
+    }
+  }
+</style>

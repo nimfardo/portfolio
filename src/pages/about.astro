@@ -26,7 +26,7 @@
 // so it is the obvious candidate when Max fills those in. Not wired up here:
 // choosing what goes in a media slot is his call, not an inference.
 import Layout from '@app/layouts/Layout.astro';
-import { Heading, BudapestCrest } from '@shared/ui';
+import { Heading, HungaryFlag } from '@shared/ui';
 import { PageHeader } from '@widgets/page-header';
 import { ProjectHero } from '@widgets/project-hero';
 import { OverviewSection } from '@widgets/overview-section';
@@ -129,11 +129,14 @@ const mediaRows = [{ tallFirst: true }, { tallFirst: false }];
     </section>
 
     {
-      /* Canvas 2793:3213: crest over "Budapest", a long arrow, then the date
+      /* Canvas 2793:3213: a mark over "Budapest", a long arrow, then the date
         over "Open to relocate" — right-aligned, so the two city/status lines
         bracket the arrow and the date hangs above the second one. The row is
         align-items: end because the arrow has to meet the two 40px baselines,
-        not the top of the crest. */
+        not the top of the mark. Canvas draws that mark as the Budapest coat of
+        arms; code ships the flag of Hungary instead (feat-094) because the
+        municipal arms is a permit-gated symbol and the flag is not. A known,
+        deliberate divergence from the canvas — see HungaryFlag.astro. */
     }
     <section class="about__section section-grid">
       <Heading class="section-grid__aside">Availability</Heading>
@@ -146,7 +149,7 @@ const mediaRows = [{ tallFirst: true }, { tallFirst: false }];
         }
         <div class="about__availability-row">
           <div class="about__place">
-            <BudapestCrest />
+            <HungaryFlag />
             <p class="about__place-name">Budapest</p>
           </div>
 
@@ -260,7 +263,7 @@ const mediaRows = [{ tallFirst: true }, { tallFirst: false }];
     display: flex;
     /* Canvas gap between the three parts. */
     gap: 40px;
-    /* end, not center: the crest sits ABOVE "Budapest" and the date ABOVE
+    /* end, not center: the flag sits ABOVE "Budapest" and the date ABOVE
        "Open to relocate", so the only line the three parts share is the
        bottom one, which is where the arrow belongs. */
     align-items: flex-end;
@@ -272,13 +275,15 @@ const mediaRows = [{ tallFirst: true }, { tallFirst: false }];
     flex-direction: column;
     flex: none;
   }
-  /* flex-start, not the default stretch (bug-058). The crest sat 45.8px right
-     of the word: as a stretched column item, BudapestCrest's inline-flex span
-     filled the column's full 177.6px and its own `justify-content: center`
-     centred the 86px artwork inside it. Canvas puts crest and word both at
-     x=0. Shrink-wrapping the span makes its internal centring a no-op, which
-     is why the component itself is left alone — that centring is the right
-     default for any consumer that does give it a wider box.
+  /* flex-start, not the default stretch (bug-058, kept through feat-094). The
+     original defect was the traced crest sitting 45.8px right of the word: as
+     a stretched column item its inline-flex span filled the column's full
+     177.6px and centred the artwork inside itself. That component is gone and
+     HungaryFlag has no internal centring to defeat, so the rule no longer
+     fixes a bug — but it is still what pins the flag's left edge to the word's
+     at x=0, which is where canvas puts them. Stretch on a column container
+     stretches the cross axis, so dropping this would leave the flag's box
+     free to grow with the column again.
      Scoped to .about__place on purpose: .about__destination right-aligns and
      sets its own `align-items: flex-end` below. */
   .about__place {

@@ -10,4 +10,4 @@ export { default as IconBadge } from './icon-badge/IconBadge.astro';
 export { default as Heading } from './heading/Heading.astro';
 export { default as InputField } from './input-field/InputField.astro';
 export { default as PageNotFoundCat } from './illustration/PageNotFoundCat.astro';
-export { default as BudapestCrest } from './illustration/BudapestCrest.astro';
+export { default as HungaryFlag } from './illustration/HungaryFlag.astro';
