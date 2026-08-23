@@ -89,7 +89,6 @@ const columns = INDUSTRIES.map((d, i) => ({
           <div class="industries-bar__seg">
             <span class="industries-bar__count">{c.figure}</span>
           </div>
-          <span class="industries-bar__rule" />
           <span class="industries-bar__label">{c.label}</span>
         </div>
       ))
@@ -156,7 +155,6 @@ const columns = INDUSTRIES.map((d, i) => ({
   }
 
   .industries-bar__industry {
-    position: relative;
     display: flex;
     flex-direction: column;
     /* Canvas gap between the segment's bottom (80) and the label's top (104). */
@@ -185,17 +183,6 @@ const columns = INDUSTRIES.map((d, i) => ({
     /* -1%, the tracking this scale carries from 3xl up. */
     letter-spacing: -0.32px;
     white-space: nowrap;
-  }
-
-  /* Absolute, at the canvas's own y=92 — dead centre of the 24px gap between
-     segment and label (80 + 12). In flow it would have to fight the gap. */
-  .industries-bar__rule {
-    position: absolute;
-    top: 92px;
-    left: 0;
-    width: 100%;
-    height: 1px;
-    background: var(--color-border-strong);
   }
 
   /* ONE size for all five columns.
@@ -323,11 +310,6 @@ const columns = INDUSTRIES.map((d, i) => ({
          would not. */
       justify-content: flex-start;
       padding-left: var(--spacing-md);
-    }
-    /* A divider drawn between a segment and the label above it has nothing
-       left to divide once the order flips. */
-    .industries-bar__rule {
-      display: none;
     }
     /* Name first, then its bar — reading order for a stacked list. */
     .industries-bar__label {
