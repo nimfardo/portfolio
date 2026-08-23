@@ -186,22 +186,24 @@ const currentPath = Astro.url.pathname;
       margin: 0;
       padding: 0;
     }
-    /* Wraps, left-aligned. The sidebar is 153px with 40px padding, so the
-       content column is 73px — and three 32px icons at an 8px gap need 112px,
-       which does not fit. Two per row is 32+8+32 = 72px and fits with 1px to
-       spare, so the set becomes 2 + 1 rather than one overflowing row.
+    /* One row, centred in the full sidebar — canvas node
+       I2793:3257;2778:2586, which sits at x=20.5 and is 112px wide.
 
-       The canvas (node I2793:3257;2778:2586) instead centres a 112px row in
-       the full 153px sidebar, breaking the 40px padding by 19.5px each side.
-       That is a deliberate divergence, not a miss: the 40px grid is what the
-       logo, the nav items and every page gutter align to, and feat-068 pinned
-       the process rail to it. Losing it for one row of icons costs more than
-       the extra 32px of height. If Max wants the canvas version, this rule is
-       the only thing to change. */
+       This deliberately breaks out of the 40px padding grid, and the
+       arithmetic is exact: the content column is 73px, -19.5px each side makes
+       it 112px, and 3x32 + 2x8 = 112 — a perfect fit with nothing to spare.
+       feat-082 originally wrapped the set 2+1 to stay inside the gutter the
+       logo, the nav items and every page margin align to; Max reviewed it
+       against the canvas on 2026-08-23 and chose canvas fidelity, so the icons
+       now sit 19.5px outside that gutter on both sides. His call — recorded
+       here because the misalignment is intentional and will look like a bug to
+       anyone measuring against the logo above it. */
     .nav-desktop__links {
       display: flex;
-      flex-wrap: wrap;
+      flex-wrap: nowrap;
+      justify-content: center;
       gap: var(--spacing-sm);
+      margin-inline: -19.5px;
     }
     .nav-desktop__links a {
       display: flex;
