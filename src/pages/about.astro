@@ -11,6 +11,7 @@
 //   * The portrait + 4-card link row is GONE — the canvas dropped it.
 //   * Two 1000px media rows arrived below Hobbies.
 //   * Contact leads with mail, and the email lives inside that card.
+//     (Superseded by feat-099 — the cards are gone; Contact is one button.)
 //
 // Chase 2793:3161 and nothing older. Max works by duplicating the page, so
 // 2778:1840 and 2690:10957 are both gone or parked; the node ids in the old
@@ -34,38 +35,28 @@
 // from a different node (`2712:2273`). That is a separate export, not this
 // file reused, and it does not live in this folder.
 import Layout from '@app/layouts/Layout.astro';
-import { Heading, HungaryFlag } from '@shared/ui';
+import { Button, Heading, HungaryFlag } from '@shared/ui';
 import { Media } from '@entities/media';
 import { PageHeader } from '@widgets/page-header';
 import { ProjectHero } from '@widgets/project-hero';
 import { OverviewSection } from '@widgets/overview-section';
-import { ProfileLinks } from '@widgets/profile-links';
-import type { ProfileLink } from '@widgets/profile-links';
 import { IndustriesBar } from '@widgets/industries-bar';
 
 const EMAIL = 'max.shturma@gmail.com';
 
-// Canvas 2793:3228: mail card first, CV second, 24px apart.
+// Canvas 2793:3224 (feat-099): Contact is now ONE accent button carrying the
+// email address, not the two stat-cards it shipped with. The section went
+// 588px -> 180px on canvas: 56 statement + 64 gap + 60 button.
 //
-// Mail leading REVERSES bug-051, which put CV first on canvas authority at the
-// time. The canvas changed, so this follows it — and the reasoning changed with
-// it: the CV is no longer the page's only route to itself, because the sidebar
-// now carries CV on every route (feat-082). That frees Contact to lead with the
-// thing a reader does when the page has convinced them, which is write.
+// The Download CV card is GONE, and that is not a lost route — feat-082 put CV
+// in the sidebar on every page, which is what freed Contact to do one thing.
+// The mail-first ordering this replaces (which itself reversed bug-051) is now
+// moot: there is nothing left to order.
 //
-// The email address is no longer a standalone link. It is the mail card's own
-// label, which is why the `.about__email` block that used to sit above these
-// cards is gone rather than merely restyled.
-const contactCards: ProfileLink[] = [
-  { label: EMAIL, icon: 'mail', href: `mailto:${EMAIL}`, variant: 'muted' },
-  {
-    label: 'Download CV',
-    icon: 'cv',
-    href: '/max-shturma-cv.pdf',
-    variant: 'accent',
-    download: true,
-  },
-];
+// The button's glyph is `mail`, and the canvas will not tell you that by name.
+// Its icon layer is called `right-arrow` because that is the Button master's
+// slot name; the exported path is an envelope, byte-identical to this
+// project's `mail.svg`. Read the geometry, not the layer name.
 
 // The arrowhead from canvas 2794:3323, exported bytes verbatim.
 //
@@ -352,7 +343,9 @@ const mediaRows: AboutMediaRow[] = [
       <Heading class="section-grid__aside">Contact</Heading>
       <div class="section-grid__body about__contact" data-reveal>
         <p class="section-prose">If any of this fits what you're hiring for, get in touch.</p>
-        <ProfileLinks cards={contactCards} class="about__contact-cards" />
+        <Button type="solid" href={`mailto:${EMAIL}`} icon="mail" class="about__contact-button">
+          {EMAIL}
+        </Button>
       </div>
     </section>
 
@@ -630,22 +623,16 @@ const mediaRows: AboutMediaRow[] = [
     /* Canvas: statement -> cards is 64px. */
     gap: var(--spacing-3xl);
   }
-  /* ProfileLinks ships a 64px grid gap, which is right for the 2x2 arrangement
-     it was built for. This row is two cards at 24px on canvas, so the gap is
-     overridden here rather than in the widget — the widget still serves its
-     other arrangement, and there is only one consumer of this one.
-     :global() because the class merges onto ProfileLinks' own <ul>.
+  /* :global() — the class merges onto Button's own rendered <a>, which carries
+     Button.astro's astro-cid rather than this page's, so a scoped selector
+     would never match it. Same reason and same rule as
+     `.retrospective__button`.
 
-     The selector is `ul.profile-links.about__contact-cards`, not the bare
-     class, and the extra weight is load-bearing: Astro compiles the widget's
-     own rule to `.profile-links[data-astro-cid-…]`, which is (0,2,0), so a
-     bare `:global(.about__contact-cards)` at (0,1,0) loses and the gap stays
-     64px — measured, not theorised. Matching at (0,2,0) would only TIE, and a
-     tie resolves on stylesheet bundling order, which is the exact
-     non-determinism Icon.astro's comment records from bug-002. One element
-     selector puts this at (0,2,1) and settles it. */
-  :global(ul.profile-links.about__contact-cards) {
-    gap: 24px;
+     `align-self` is load-bearing, not tidiness: `.about__contact` is a flex
+     column, so the default `align-items: stretch` would blow the button to the
+     full 1071px column. Canvas has it at its content width, left-aligned. */
+  :global(.about__contact-button) {
+    align-self: flex-start;
   }
 
   @media (max-width: 1023px) {
@@ -699,6 +686,37 @@ const mediaRows: AboutMediaRow[] = [
        failure feat-033's tags already caught once. */
     .about__place-name {
       white-space: normal;
+    }
+  }
+
+  /* 400px, not one of the page's usual 1023/767 stops, because the number is
+     measured rather than chosen: Button is `white-space: nowrap` with 84px of
+     chrome (48 padding + 28 icon + 8 gap) around a 21-character email that
+     will not break, so it sits at a fixed 344px at every width. Add the page's
+     two 24px gutters and it stops fitting below ~392px.
+
+     This is the same latent-overflow class the `.about__place-name` note above
+     records from feat-033, except this one is not latent — measured via
+     same-origin iframes: the DOCUMENT scrolls 8px at 360 and 48px at 320, and
+     even 375 (which fits) has its right gutter squeezed to 7px.
+
+     Three declarations need `a.button.…` at (0,2,1) to land. Button.astro's
+     own `.button` compiles to `.button[data-astro-cid-…]` = (0,2,0), so the
+     bare class at (0,1,0) loses outright and matching at (0,2,0) would only
+     TIE — and a tie resolves on bundling order, the bug-002 non-determinism.
+     `align-self` is the exception and stays on the base rule: `.button` never
+     declares it, so there is nothing to outrank.
+
+     `--font-size-base` is what keeps 375 on ONE line (label 260px -> 231px
+     against 243px of room). Below that the label is allowed to break instead
+     of pushing the page, which is why `overflow-wrap` is here too — an email
+     is a single unbreakable token otherwise. */
+  @media (max-width: 400px) {
+    :global(a.button.about__contact-button) {
+      min-width: 0;
+      font-size: var(--font-size-base);
+      white-space: normal;
+      overflow-wrap: anywhere;
     }
   }
 </style>

@@ -1,14 +1,28 @@
 ---
 import Icon from '../icon/Icon.astro';
+import type { IconName } from '../icon/Icon.astro';
 
 interface Props {
   type?: 'solid' | 'outlined';
   disabled?: boolean;
   href?: string;
   class?: string;
+  /* The trailing glyph. Defaults to the arrow every button shipped with, so
+     existing call sites are untouched. /about's Contact button (canvas
+     2901:1911) is the first to override it — Max swapped that instance's glyph
+     to an envelope while the LAYER is still named `right-arrow`, which is the
+     Button master's slot name. The name is not the glyph: the exported path
+     there is byte-identical to this project's `mail.svg`. */
+  icon?: IconName;
 }
 
-const { type = 'solid', disabled = false, href, class: className } = Astro.props;
+const {
+  type = 'solid',
+  disabled = false,
+  href,
+  class: className,
+  icon = 'arrow-right',
+} = Astro.props;
 const Tag = href ? 'a' : 'button';
 // External destinations (Behance, GitHub, ...) open in a new tab; internal
 // routes stay in-tab so ClientRouter transitions keep working (bug-038).
@@ -24,7 +38,7 @@ const isExternal = href?.startsWith('http');
   aria-disabled={href && disabled ? 'true' : undefined}
 >
   <span class="button__label"><slot /></span>
-  <Icon name="arrow-right" size={28} class="button__icon" />
+  <Icon name={icon} size={28} class="button__icon" />
 </Tag>
 
 <style>
@@ -33,6 +47,12 @@ const isExternal = href?.startsWith('http');
     align-items: center;
     justify-content: center;
     gap: var(--spacing-sm);
+    /* Canvas 2901:1911 carries min-width 240, not 320, and that difference is
+       deliberately NOT taken. It cannot bind on the button that surfaced it —
+       /about's Contact button is content-driven at 366px — but lowering it
+       would shrink PasswordGate's short "Enter" label from 320 to 240 on
+       another page. A library value that moves shipped pixels elsewhere is not
+       worth the tidiness. */
     min-width: 320px;
     padding: var(--spacing-md) var(--spacing-lg);
     border: none;
