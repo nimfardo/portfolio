@@ -106,13 +106,19 @@ export type IconName = keyof typeof icons;
 // tight export in its box while a full-frame export honours the glyph's own
 // placement in the frame; arrow-left was the widest gap at 0.947px.
 //
-// Four files are NOT the current Figma export — close, menu, handoff and
-// github. Their masters had already drifted from what shipped (menu's bars are
-// 8px apart in Figma and 6px here; handoff has a page-corner fold in code that
-// the master lacks; github is the 23px drawing comp-014 logged while the master
-// measures 20px). Taking Figma would have changed the site, so these keep the
+// Three files are NOT the current Figma export — close, menu and handoff.
+// Their masters had already drifted from what shipped (menu's bars are 8px
+// apart in Figma and 6px here; handoff has a page-corner fold in code that the
+// master lacks). Taking Figma would have changed the site, so these keep the
 // shipped artwork, re-framed onto the 28 viewBox. That drift is pre-existing
 // and still unreconciled — see wiki/log.md.
+//
+// github was the fourth until bug-063. It shipped as the 23px drawing comp-014
+// logged, against a 20px master, and in the nav's social row that read visibly
+// larger than linkedin (14.3px wide) and behance (18px) at the same size={32}.
+// Max picked the master, so the glyph is now scaled 17.5/23 and re-centred in
+// the 28 viewBox — 20px at size={32}, the one drift of the four resolved.
+// The path data is untouched; only the wrapping <g> transform changed.
 
 interface Props {
   name: IconName;
