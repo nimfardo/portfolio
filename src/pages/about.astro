@@ -24,6 +24,13 @@
 // `public/media/about/portrait.jpg` is STILL deliberately unreferenced, and no
 // longer a candidate for anything: it's the cat photo, and the canvas has no
 // slot holding it. Kept on disk under Max's "don't remove images" rule.
+//
+// `public/media/about/desk.jpg` joined it as of feat-097. Max re-pointed the
+// row-2 stack-bottom slot (2799:3371) at a party photo, and moved the desk
+// shot up to the hero as a wider crop — so the tight 791.5x468 desk crop has
+// no slot any more. It stays on disk under the same rule, NOT because
+// anything still reads it. Same for `portrait-beanie.jpg`, which is the green
+// beanie portrait the hero used to carry.
 import Layout from '@app/layouts/Layout.astro';
 import { Heading, HungaryFlag } from '@shared/ui';
 import { Media } from '@entities/media';
@@ -90,7 +97,7 @@ const ARROW_PATH =
 //   1    stack top       2793:3222     791.5x468   photography.jpg
 //   1    stack bottom    2793:3223     791.5x468   workshop.jpg
 //   2    stack top       2799:3370     791.5x468   wireframing.webm  (792x468)
-//   2    stack bottom    2799:3371     791.5x468   desk.jpg
+//   2    stack bottom    2799:3371     791.5x468   celebration.jpg
 //   2    tall (right)    2799:3368     791.5x1000  team.jpg
 //
 // Frames 2793:3220 and 2799:3370 are literally named `about-dt-lecture.webm`
@@ -151,8 +158,8 @@ const mediaRows: AboutMediaRow[] = [
       },
       {
         kind: 'image',
-        src: '/media/about/desk.jpg',
-        alt: 'A desk with paper wireframes, notes, and a competitor-analysis board on screen',
+        src: '/media/about/celebration.jpg',
+        alt: 'Max and a guest at an evening party, pink balloons and flower leis behind them',
       },
     ],
   },
