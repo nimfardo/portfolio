@@ -8,4 +8,9 @@ import { defineConfig } from 'astro/config';
 // don't want. Revisit only if a route needs on-demand rendering later.)
 export default defineConfig({
   output: 'static',
+  // Local-DX preference: the dev toolbar is the floating pill Astro injects at
+  // the bottom of every page in `astro dev`. It sits on top of the design and
+  // makes it hard to judge the real thing. Dev-only either way — it is never
+  // emitted into dist/, so this changes nothing about the deployed site.
+  devToolbar: { enabled: false },
 });
