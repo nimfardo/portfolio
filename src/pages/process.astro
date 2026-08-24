@@ -49,10 +49,30 @@ const buildBlocks: ContentBlock[] = [
     {
       /* Max added this hero to the canvas on 2026-08-16 (node 2712:2272) —
         the same bare media + "Scroll down" shape every case-study page
-        opens with, so it's ProjectHero verbatim. No `media`: the video
-        isn't shot yet, and the canvas shows the unset placeholder box. */
+        opens with, so it's ProjectHero verbatim.
+
+        Filled on 2026-08-24. It is an IMAGE, not the video the old note here
+        assumed was pending: Max set the image instance inside this frame
+        (`2712:2273`) to a wide shot of his desk mid-project. Exported at the
+        node's native 2x (3294x1600 for the 1647x800 box), so nothing is
+        downscaled at render. Passing `media` retires ProjectHero's
+        --placeholder branch with no other change, which is exactly what that
+        branch's own comment says it's there for.
+
+        `2712:2273` is easy to mistake for /about's hero — both pages use a
+        `project-hero-image` instance at 1647x800, so the node's dimensions
+        don't distinguish them. The parent frame does: 2712:2272 is this page,
+        2793:3169 is /about. */
     }
-    <ProjectHero scrollCue />
+    <ProjectHero
+      media={{
+        type: 'image',
+        image: '/media/process/hero.jpg',
+        imageAlt:
+          "Max's desk mid-project — paper wireframes and notes spread below a laptop and a monitor showing a competitor-analysis board",
+      }}
+      scrollCue
+    />
 
     <div class="process__lead section-grid">
       {
