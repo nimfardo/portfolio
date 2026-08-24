@@ -177,15 +177,27 @@ const mediaRows: AboutMediaRow[] = [
     <PageHeader title="About" class="about__header" />
 
     {
-      /* Canvas 2793:3169 — a 1647x800 crop of Max's portrait. Passing `media`
-        retires ProjectHero's --placeholder branch with no other change, which
-        is exactly what that component's own comment says it's there for. */
+      /* Canvas 2712:2273 (`project-hero-image`) — a 1647x800 crop, exported at
+        the node's native 2x. Passing `media` retires ProjectHero's
+        --placeholder branch with no other change, which is exactly what that
+        component's own comment says it's there for.
+
+        feat-097 swapped the subject: this was the green beanie portrait from
+        2793:3169, and is now a WIDE crop of the same desk scene that used to
+        sit in the row-2 stack-bottom slot below. Chase 2712:2273 — 2793:3169
+        is the old node and Max works by duplicating the page.
+
+        No ProjectHero change was needed and none was made: the export carries
+        square corners (checked — the corner pixels are image content, not a
+        baked radius), and the component has no border-radius, so the bare
+        variant's `aspect-ratio: 1647 / 800` still frames it exactly. */
     }
     <ProjectHero
       media={{
         type: 'image',
         image: '/media/about/hero.jpg',
-        imageAlt: 'Max Shturma in a green beanie against a rust-coloured backdrop',
+        imageAlt:
+          "Max's desk — paper wireframes and notes spread below a laptop and a monitor showing a competitor-analysis board",
       }}
       scrollCue
     />
