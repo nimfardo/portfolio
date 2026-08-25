@@ -5,11 +5,11 @@ import type { IconName } from '../icon/Icon.astro';
 interface Props {
   type?: 'solid' | 'outlined';
   /* Figma set 2006:327 gained a `size` property in feat-100. `md` is the
-     320x60 button the whole site already used; `sm` is the 48-tall one the
-     header CV button needs (canvas 2911:2071) — smaller text, a 24px glyph
-     instead of 28, and no min-width, because it sits in a 48px header row
-     rather than on a page. Same border/ink tokens and the same hover and
-     disabled contracts, which is why this is a variant and not a component. */
+     320x60 button the whole site already used; `sm` is the 40-tall header CV
+     button — 12px label, a 20px glyph instead of 28, and no min-width,
+     because it sits in a 48px header row rather than on a page. Same
+     border/ink tokens and the same hover and disabled contracts, which is why
+     this is a variant and not a component. */
   size?: 'md' | 'sm';
   disabled?: boolean;
   href?: string;
@@ -44,8 +44,8 @@ const Tag = href ? 'a' : 'button';
 // routes stay in-tab so ClientRouter transitions keep working (bug-038).
 // An explicit `external` wins over the heuristic — see the prop's note.
 const isExternal = external ?? href?.startsWith('http');
-// Canvas 2911:2071 draws the small button's glyph at 24, not 28.
-const iconSize = size === 'sm' ? 24 : 28;
+// sm draws its glyph at 20, md at 28 (Figma set 2006:327).
+const iconSize = size === 'sm' ? 20 : 28;
 ---
 
 <Tag
@@ -70,9 +70,9 @@ const iconSize = size === 'sm' ? 24 : 28;
     cursor: pointer;
     font-family: var(--font-family-body);
     font-weight: var(--font-weight-medium);
-    /* 0.04em, not a px value, so it tracks the size variant: 0.72px at md's
-       18px and 0.56px at sm's 14px — both exactly what the canvas carries
-       (2901:1911 and 2911:2071 respectively). */
+    /* 0.04em, not a px value, so it tracks the size variant on its own:
+       0.72px at md's 18px, 0.48px at sm's 12px. Figma carries the same 4%
+       on both text styles, so the two stay in step without a second rule. */
     letter-spacing: 0.04em;
     text-transform: uppercase;
     text-align: center;
@@ -95,27 +95,35 @@ const iconSize = size === 'sm' ? 24 : 28;
     line-height: var(--font-line-height-lg);
   }
 
-  /* --- size: sm (canvas 2911:2071, the header CV button) --- */
+  /* --- size: sm (the header CV button) --- */
   .button--sm {
-    gap: var(--spacing-md);
+    gap: 12px;
     /* No min-width on purpose. md's 320 floor exists so page-level CTAs share
-       a width; this one is 187px of content inside a 48px header row, where a
+       a width; this one is ~161px of content inside a 48px header row, where a
        floor would only push the theme-toggle around. */
-    /* Every value is the canvas number MINUS the 1px border, and that is not
-       fussiness: Figma strokes this frame on the INSIDE, so its 48x187 box
-       already contains the border, while CSS paints the border outside the
-       padding box. Taking 12/24/18 literally renders a 50px control in a 48px
-       header row — measured, it overhung by 1px top and bottom. Subtracting
-       the border lands on the canvas's OUTER dimensions: 48 tall, label 24
-       from the left edge, glyph 18 from the right.
 
-       The 24-left / 18-right asymmetry itself is canvas and must survive: the
-       download glyph's ink stops ~3.4px inside its 24px box at this size (its
-       28-viewBox art spans x 4..24), so 18 + 3.4 reads as ~21 against 24 on
-       the text side. Equalising them would look right-heavy. */
-    padding: 11px 17px 11px 23px;
-    font-size: var(--font-size-sm);
-    line-height: var(--font-line-height-sm);
+    /* Resized down from the first cut (187x48) on Max's review: canvas-exact
+       is not the same as right-sized. The design is drawn on a 1920 frame
+       whose header column is 1647 wide; at a 1440 window the site's header is
+       1287, so a fixed 187px button went from 11.4% of the row on canvas to
+       14.6% on screen — about a quarter heavier — while measuring as a
+       pixel-perfect match. Figma set 2006:327 and the header master were
+       moved to these same values in the same pass, so design and code did not
+       drift apart.
+
+       Every value here is the Figma number MINUS the 1px border, which is not
+       fussiness: Figma strokes this frame on the INSIDE (checked via
+       `strokeAlign`), so its 40px box already contains the border, while CSS
+       paints the border outside the padding box. Taken literally, 10/20/17
+       renders a 42px control in a 40px row — the same trap the 48px cut hit.
+
+       The 20-left / 17-right asymmetry is optical and must survive: the
+       download glyph's ink stops ~2.9px inside its 20px box (its 28-viewBox
+       art spans x 4..24), so 17 + 2.9 reads as ~20 against the 20 on the text
+       side. Equalising them would look right-heavy. */
+    padding: 9px 16px 9px 19px;
+    font-size: var(--font-size-xs);
+    line-height: var(--font-line-height-xs);
   }
 
   .button--solid {
