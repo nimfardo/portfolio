@@ -10,11 +10,10 @@
  *     from the viewer if they want it.
  *   * It must NOT carry a `download` attribute. `download` skips the browser's
  *     PDF viewer and drops a file straight into Downloads, which is the exact
- *     behaviour that requirement rules out. The label says "Download CV"
- *     because that is what a reader is looking for; the mechanism is
- *     open-then-save, and the two are allowed to differ.
+ *     behaviour that requirement rules out. The label is short ("CV"); the
+ *     mechanism is open-then-save, and the two are allowed to differ.
  */
 export const CV_HREF = '/max-shturma-cv.pdf';
 
-/** Header button copy (feat-100). Rendered uppercase by Button's own styles. */
-export const CV_LABEL = 'Download CV';
+/** Header button copy (feat-100, shortened feat-106). Rendered uppercase by Button's own styles. */
+export const CV_LABEL = 'CV';
