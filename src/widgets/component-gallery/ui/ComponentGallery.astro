@@ -1,0 +1,168 @@
+---
+// /system's component exhibit — every export from shared/ui/index.ts
+// (src/shared/ui/index.ts), rendered live, in the barrel's own order, so a
+// component added to the kit later shows up here without a second edit.
+// `IconName` is skipped: it's a type export, not a renderable value — the
+// only export in the barrel that isn't a component.
+//
+// Each component gets one instance per reasonable variant, taken from its
+// own Props interface (checked by reading the component, not guessed):
+// Button's type x size, InputField's text/password, etc. A no-prop
+// component (Divider, Logo, LoadingIndicator, PageNotFoundCat, HungaryFlag)
+// renders once.
+import {
+  Button,
+  ButtonText,
+  Divider,
+  Link,
+  Logo,
+  AnimatedLogo,
+  LoadingIndicator,
+  Icon,
+  IconBadge,
+  Heading,
+  InputField,
+  PageNotFoundCat,
+  HungaryFlag,
+} from '@shared/ui';
+import { CV_HREF } from '@shared/config';
+
+interface Props {
+  class?: string;
+}
+const { class: className } = Astro.props;
+---
+
+<div class:list={['component-gallery', className]}>
+  <section class="component-gallery__entry" data-reveal>
+    <p class="component-gallery__name">Button</p>
+    <div class="component-gallery__row">
+      <Button type="solid" size="md">Solid / md</Button>
+      <Button type="outlined" size="md">Outlined / md</Button>
+      <Button type="solid" size="sm">Solid / sm</Button>
+      <Button type="outlined" size="sm">Outlined / sm</Button>
+      <Button type="solid" size="md" disabled>
+        Disabled
+      </Button>
+    </div>
+  </section>
+
+  <section class="component-gallery__entry" data-reveal>
+    <p class="component-gallery__name">ButtonText</p>
+    <div class="component-gallery__row">
+      <ButtonText href={CV_HREF} external>Default</ButtonText>
+      <ButtonText disabled>Disabled</ButtonText>
+    </div>
+  </section>
+
+  <section class="component-gallery__entry" data-reveal>
+    <p class="component-gallery__name">Divider</p>
+    <div class="component-gallery__row component-gallery__row--block">
+      <Divider />
+    </div>
+  </section>
+
+  <section class="component-gallery__entry" data-reveal>
+    <p class="component-gallery__name">Link</p>
+    <div class="component-gallery__row">
+      <Link href="/">Back to the projects grid</Link>
+    </div>
+  </section>
+
+  <section class="component-gallery__entry" data-reveal>
+    <p class="component-gallery__name">Logo</p>
+    <div class="component-gallery__row">
+      <Logo />
+    </div>
+  </section>
+
+  <section class="component-gallery__entry" data-reveal>
+    <p class="component-gallery__name">AnimatedLogo</p>
+    <div class="component-gallery__row">
+      <AnimatedLogo />
+    </div>
+  </section>
+
+  <section class="component-gallery__entry" data-reveal>
+    <p class="component-gallery__name">LoadingIndicator</p>
+    <div class="component-gallery__row component-gallery__row--block">
+      <LoadingIndicator progress={60} />
+    </div>
+  </section>
+
+  <section class="component-gallery__entry" data-reveal>
+    <p class="component-gallery__name">Icon</p>
+    <div class="component-gallery__row component-gallery__row--center">
+      <Icon name="system" size={28} />
+      <Icon name="system" size={48} />
+    </div>
+  </section>
+
+  <section class="component-gallery__entry" data-reveal>
+    <p class="component-gallery__name">IconBadge</p>
+    <div class="component-gallery__row component-gallery__row--center">
+      <IconBadge icon="system" />
+      <IconBadge icon="system" size={32} />
+    </div>
+  </section>
+
+  <section class="component-gallery__entry" data-reveal>
+    <p class="component-gallery__name">Heading</p>
+    <div class="component-gallery__row">
+      <Heading>Section title</Heading>
+    </div>
+  </section>
+
+  <section class="component-gallery__entry" data-reveal>
+    <p class="component-gallery__name">InputField</p>
+    <div class="component-gallery__row">
+      <InputField label="Name" name="system-demo-text" type="text" placeholder="Ada Lovelace" />
+      <InputField label="Password" name="system-demo-password" type="password" />
+    </div>
+  </section>
+
+  <section class="component-gallery__entry" data-reveal>
+    <p class="component-gallery__name">PageNotFoundCat</p>
+    <div class="component-gallery__row component-gallery__row--center">
+      <PageNotFoundCat />
+    </div>
+  </section>
+
+  <section class="component-gallery__entry" data-reveal>
+    <p class="component-gallery__name">HungaryFlag</p>
+    <div class="component-gallery__row component-gallery__row--center">
+      <HungaryFlag />
+    </div>
+  </section>
+</div>
+
+<style>
+  .component-gallery {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-3xl);
+  }
+  .component-gallery__entry {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+  }
+  .component-gallery__name {
+    margin: 0;
+    font-family: monospace;
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+  }
+  .component-gallery__row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: var(--spacing-lg);
+  }
+  .component-gallery__row--center {
+    align-items: center;
+  }
+  .component-gallery__row--block {
+    display: block;
+  }
+</style>
