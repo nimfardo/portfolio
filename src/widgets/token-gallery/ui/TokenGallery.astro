@@ -1,0 +1,308 @@
+---
+// /system's token exhibit. Every swatch below is styled by the CSS custom
+// property it names — `style={`background: var(${t.name})`}` — and every
+// printed value comes from the same parse (`read-tokens.ts`) that produced
+// the swatch. There is nothing hand-typed here to drift from `tokens.css`.
+//
+// Categories mirror the file's own sections (Primitive/Semantic/Spacing/
+// Radius/Typography/Motion) via a name-prefix map in read-tokens.ts, not a
+// parse of the file's prose comments — the light-mode block's comment is
+// several sentences of rationale, not a category label, so prefix matching
+// is the more robust boundary.
+//
+// Figma correspondence (the story's acceptance criteria) is just the raw
+// `--token-name` printed next to its value: the naming already maps 1:1 to
+// the Figma Sandbox file's variable names (tokens.css's own header), so no
+// separate mapping table is built or maintained here.
+import Heading from '@shared/ui/heading/Heading.astro';
+import { tokensByCategory, LIGHT_OVERRIDES } from '../model/read-tokens';
+
+interface Props {
+  class?: string;
+}
+const { class: className } = Astro.props;
+
+const primitives = tokensByCategory('Primitive');
+const semantics = tokensByCategory('Semantic');
+const spacing = tokensByCategory('Spacing');
+const radius = tokensByCategory('Radius');
+const typography = tokensByCategory('Typography');
+const motion = tokensByCategory('Motion');
+
+// The scale ladder pairs each font-size-X with font-line-height-X by suffix
+// — the two are separate token families in the file, joined here only for
+// display, not stored as a joined fact anywhere.
+const sizeTokens = typography.filter((t) => t.name.startsWith('--font-size-'));
+const lineHeightByStep = new Map(
+  typography
+    .filter((t) => t.name.startsWith('--font-line-height-'))
+    .map((t) => [t.name.replace('--font-line-height-', ''), t]),
+);
+const scale = sizeTokens.map((size) => {
+  const step = size.name.replace('--font-size-', '');
+  return { step, size, lineHeight: lineHeightByStep.get(step) };
+});
+const familyToken = typography.find((t) => t.name === '--font-family-body')!;
+const weightTokens = typography.filter((t) => t.name.startsWith('--font-weight-'));
+
+const durations = motion.filter((t) => t.name.startsWith('--duration-'));
+const eases = motion.filter((t) => t.name.startsWith('--ease-'));
+// Two honest demos rather than one fabricated cross-product: durations are
+// compared against ONE fixed ease, and eases against ONE fixed duration —
+// the file never pairs a specific duration with a specific ease, so nothing
+// here invents that it does.
+const DURATION_DEMO_EASE = '--ease-fade';
+const EASE_DEMO_DURATION = '--duration-base';
+---
+
+<div class:list={['token-gallery', className]}>
+  <section class="token-gallery__section" data-reveal>
+    <Heading>Colors — Primitive</Heading>
+    <ul class="token-gallery__swatches">
+      {
+        primitives.map((t) => (
+          <li class="token-gallery__swatch">
+            <span class="token-gallery__chip" style={`background: var(${t.name})`} />
+            <code class="token-gallery__name">{t.name}</code>
+            <span class="token-gallery__value">{t.value}</span>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <section class="token-gallery__section" data-reveal>
+    <Heading>Colors — Semantic</Heading>
+    <ul class="token-gallery__swatches">
+      {
+        semantics.map((t) => (
+          <li class="token-gallery__swatch">
+            <span class="token-gallery__chip" style={`background: var(${t.name})`} />
+            <code class="token-gallery__name">{t.name}</code>
+            <span class="token-gallery__value">
+              dark {t.value} · light {LIGHT_OVERRIDES.get(t.name)}
+            </span>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <section class="token-gallery__section" data-reveal>
+    <Heading>Spacing</Heading>
+    <ul class="token-gallery__spacing">
+      {
+        spacing.map((t) => (
+          <li class="token-gallery__spacing-row">
+            <span class="token-gallery__spacing-bar" style={`width: var(${t.name})`} />
+            <code class="token-gallery__name">{t.name}</code>
+            <span class="token-gallery__value">{t.value}</span>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <section class="token-gallery__section" data-reveal>
+    <Heading>Radius</Heading>
+    <ul class="token-gallery__swatches">
+      {
+        radius.map((t) => (
+          <li class="token-gallery__swatch">
+            <span class="token-gallery__chip token-gallery__chip--radius" style={`border-radius: var(${t.name})`} />
+            <code class="token-gallery__name">{t.name}</code>
+            <span class="token-gallery__value">{t.value}</span>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <section class="token-gallery__section" data-reveal>
+    <Heading>Typography</Heading>
+    <p class="token-gallery__type-meta" style={`font-family: var(${familyToken.name})`}>
+      <code class="token-gallery__name">{familyToken.name}</code>
+      <span class="token-gallery__value">{familyToken.value}</span>
+    </p>
+    <ul class="token-gallery__type-weights">
+      {
+        weightTokens.map((t) => (
+          <li style={`font-weight: var(${t.name})`}>
+            <code class="token-gallery__name">{t.name}</code>
+            <span class="token-gallery__value">{t.value}</span>
+          </li>
+        ))
+      }
+    </ul>
+    <ul class="token-gallery__scale">
+      {
+        scale.map(({ step, size, lineHeight }) => (
+          <li class="token-gallery__scale-row">
+            <span
+              class="token-gallery__scale-sample"
+              style={`font-size: var(${size.name}); line-height: var(${lineHeight ? lineHeight.name : size.name});`}
+            >
+              Ag
+            </span>
+            <code class="token-gallery__name">{size.name}</code>
+            <span class="token-gallery__value">
+              {size.value}
+              {lineHeight ? ` / ${lineHeight.value} line-height` : ''}
+            </span>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <section class="token-gallery__section" data-reveal>
+    <Heading>Motion</Heading>
+    <p class="token-gallery__motion-caption">Durations, shown against a fixed {DURATION_DEMO_EASE}:</p>
+    <ul class="token-gallery__motion">
+      {
+        durations.map((d) => (
+          <li class="token-gallery__motion-row">
+            <span
+              class="token-gallery__motion-demo"
+              style={`transition-duration: var(${d.name}); transition-timing-function: var(${DURATION_DEMO_EASE});`}
+            />
+            <code class="token-gallery__name">{d.name}</code>
+            <span class="token-gallery__value">{d.value}</span>
+          </li>
+        ))
+      }
+    </ul>
+    <p class="token-gallery__motion-caption">Curves, shown against a fixed {EASE_DEMO_DURATION}:</p>
+    <ul class="token-gallery__motion">
+      {
+        eases.map((e) => (
+          <li class="token-gallery__motion-row">
+            <span
+              class="token-gallery__motion-demo"
+              style={`transition-duration: var(${EASE_DEMO_DURATION}); transition-timing-function: var(${e.name});`}
+            />
+            <code class="token-gallery__name">{e.name}</code>
+            <span class="token-gallery__value">{e.value}</span>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+</div>
+
+<style>
+  .token-gallery {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-4xl);
+  }
+
+  .token-gallery__section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+  }
+
+  .token-gallery__swatches,
+  .token-gallery__spacing,
+  .token-gallery__type-weights,
+  .token-gallery__motion {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-lg);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .token-gallery__swatch,
+  .token-gallery__spacing-row,
+  .token-gallery__motion-row {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-xs);
+    min-width: 140px;
+  }
+
+  .token-gallery__chip {
+    width: 64px;
+    height: 64px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--color-border-default);
+  }
+  .token-gallery__chip--radius {
+    background: var(--color-bg-accent);
+    /* border-radius arrives inline per token — this chip has no radius of its own to conflict with. */
+  }
+
+  .token-gallery__spacing-bar {
+    height: var(--spacing-md);
+    max-width: 100%;
+    background: var(--color-bg-accent);
+  }
+
+  .token-gallery__name {
+    font-family: monospace;
+    font-size: var(--font-size-xs);
+    color: var(--color-text-secondary);
+  }
+
+  .token-gallery__value {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-muted);
+  }
+
+  .token-gallery__type-meta {
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--spacing-sm);
+    font-size: var(--font-size-lg);
+    color: var(--color-text-primary);
+  }
+
+  .token-gallery__scale {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .token-gallery__scale-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--spacing-lg);
+  }
+  .token-gallery__scale-sample {
+    font-family: var(--font-family-body);
+    color: var(--color-text-primary);
+    min-width: 3ch;
+  }
+
+  .token-gallery__motion-caption {
+    margin: 0;
+    font-size: var(--font-size-sm);
+    color: var(--color-text-muted);
+  }
+  .token-gallery__motion-demo {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-sm);
+    background: var(--color-bg-accent);
+    transition-property: transform;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .token-gallery__motion-row:hover .token-gallery__motion-demo {
+      transform: translateX(48px);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .token-gallery__motion-demo {
+      transition: none;
+    }
+  }
+</style>
