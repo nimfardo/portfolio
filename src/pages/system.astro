@@ -9,11 +9,12 @@
 // it, so it's PageHeader straight into content, same shell the case-study
 // pages use minus ProjectHero.
 //
-// The lead paragraph (copy-025) is the story's <=60-word positioning
-// statement, framing the two-formats problem — a Figma-pretty portfolio
-// deletes the code, a GitHub profile deletes the taste (story's own
-// framing, wiki/log.md 2026-08-25). It's its own section so it stays
-// cuttable without touching the two gallery sections either side of it.
+// The lead paragraph (copy-025, opener added copy-026) is the story's
+// positioning statement: states the page's purpose plainly first, then
+// frames the two-formats problem — a Figma-pretty portfolio deletes the
+// code, a GitHub profile deletes the taste (story's own framing,
+// wiki/log.md 2026-08-25). It's its own section so it stays cuttable
+// without touching the two gallery sections either side of it.
 import Layout from '@app/layouts/Layout.astro';
 import { PageHeader } from '@widgets/page-header';
 import { TokenGallery } from '@widgets/token-gallery';
@@ -29,9 +30,10 @@ import { Heading } from '@shared/ui';
 
     <section class="system__section">
       <p class="section-prose" data-reveal>
-        I build in Figma and I ship in code. A Figma-pretty portfolio deletes the code. A
-        GitHub profile deletes the taste. This page deletes neither. Every token and
-        component below is the real one, live. Check both at once.
+        This is my design system — the tokens and components this site is built from, live
+        from the code. I build in Figma and I ship in code. A Figma-pretty portfolio deletes
+        the code. A GitHub profile deletes the taste. This page deletes neither. Check both
+        at once.
       </p>
     </section>
 
