@@ -7,7 +7,15 @@
 //
 // No hero: unlike /about and /process, this page has no media to introduce
 // it, so it's PageHeader straight into content, same shell the case-study
-// pages use minus ProjectHero.
+// pages use minus ProjectHero. The header carries a back arrow to /about
+// (one step back from here in the nav), the same showBack/backHref pair
+// [slug].astro uses to get back to the projects grid.
+//
+// Every section — Overview/Tokens/Components — runs on the site's own
+// .section-grid (aside label + body, global.css), the same composition
+// /about and every case study use. It used to stack a bare Heading above
+// full-width content instead, which is what read as inconsistent next to
+// the rest of the site (Max's review).
 //
 // The lead paragraph (copy-025, opener added copy-026) is the story's
 // positioning statement: states the page's purpose plainly first, then
@@ -26,10 +34,11 @@ import { Heading } from '@shared/ui';
   <main class="system">
     <h1 class="visually-hidden">System</h1>
 
-    <PageHeader title="System" class="system__header" />
+    <PageHeader title="System" showBack backHref="/about" class="system__header" />
 
-    <section class="system__section">
-      <p class="section-prose" data-reveal>
+    <section class="system__section section-grid">
+      <Heading class="section-grid__aside">Overview</Heading>
+      <p class="section-grid__body section-prose" data-reveal>
         This is my design system — the tokens and components this site is built from, live
         from the code. I build in Figma and I ship in code. A Figma-pretty portfolio deletes
         the code. A GitHub profile deletes the taste. This page deletes neither. Check both
@@ -37,24 +46,33 @@ import { Heading } from '@shared/ui';
       </p>
     </section>
 
-    <section class="system__section">
-      <Heading class="system__section-label">Tokens</Heading>
-      <TokenGallery />
+    <section class="system__section section-grid">
+      <Heading class="section-grid__aside">Tokens</Heading>
+      <div class="section-grid__body">
+        <TokenGallery />
+      </div>
     </section>
 
-    <section class="system__section">
-      <Heading class="system__section-label">Components</Heading>
-      <ComponentGallery />
+    <section class="system__section section-grid">
+      <Heading class="section-grid__aside">Components</Heading>
+      <div class="section-grid__body">
+        <ComponentGallery />
+      </div>
     </section>
   </main>
 </Layout>
 
 <style>
-  /* Same 160px section rhythm as /about and /process. `.system__header` and
-     `.system__section-label` are handed to PageHeader and Heading as props,
-     so each carries THAT component's own astro-cid rather than this page's
-     — a scoped rule would silently never match (bug-049, the same trap
-     about.astro's header comment documents). `:global()` on both. */
+  /* Same 160px section rhythm as /about and /process. `.system__header` is
+     handed to PageHeader as a prop, so it carries THAT component's own
+     astro-cid rather than this page's — a scoped rule would silently never
+     match (bug-049, the same trap about.astro's header comment documents).
+     `:global()` on it for that reason; kept on `.system__section` too even
+     though that class sits on a plain <section> in this same file (so a
+     scoped rule would already match it) — harmless, and matches the sibling
+     rule above rather than mixing scoping styles on adjacent selectors.
+     Aside-label spacing is `.section-grid`'s own job now (global.css) — no
+     page-local label rule needed. */
   .system {
     padding-bottom: 160px;
   }
@@ -64,9 +82,6 @@ import { Heading } from '@shared/ui';
   :global(.system__section) {
     padding: 0 40px;
     margin-top: 160px;
-  }
-  :global(.system__section-label) {
-    margin-bottom: var(--spacing-xl);
   }
 
   @media (max-width: 1023px) {
