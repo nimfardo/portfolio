@@ -13,17 +13,19 @@
 // have meant two copies of the pinned-colour rules (bug-040).
 import { Heading } from '@shared/ui';
 import { LinkCards } from '@entities/project';
-import type { LinkCard } from '@entities/project';
+import type { LinkCard, FeatureList } from '@entities/project';
 
 interface Props {
   heading: string;
   tags?: string[];
   description?: string;
+  /** enterpriseIt's "Features:" block — a bold label over a bulleted list. */
+  features?: FeatureList;
   linkCards?: LinkCard[];
   class?: string;
 }
 
-const { heading, tags, description, linkCards, class: className } = Astro.props;
+const { heading, tags, description, features, linkCards, class: className } = Astro.props;
 ---
 
 <section class:list={['section-grid', 'overview-section', className]}>
@@ -31,6 +33,18 @@ const { heading, tags, description, linkCards, class: className } = Astro.props;
   <div class="section-grid__body overview-section__body" data-reveal>
     <p class="section-prose overview-section__text"><slot /></p>
     {description && <p class="overview-section__description">{description}</p>}
+    {
+      features && (
+        <div class="overview-section__features">
+          <p class="overview-section__features-label">{features.label}</p>
+          <ul class="overview-section__features-list">
+            {features.items.map((item) => (
+              <li>{item}</li>
+            ))}
+          </ul>
+        </div>
+      )
+    }
     {linkCards && <LinkCards cards={linkCards} />}
     {
       tags && (
@@ -64,6 +78,35 @@ const { heading, tags, description, linkCards, class: className } = Astro.props;
     font-weight: var(--font-weight-regular);
     color: var(--color-text-emphasis);
     white-space: pre-line;
+  }
+  /* enterpriseIt's Features block (Figma 2928:2365). The label is Manrope/xl/bold
+     (2928:2340); the items reuse the description's Manrope/xl/regular-loose
+     ramp (2928:2348 carries the same style), so the two stay in step if that
+     ramp moves. 16px label-to-list is Figma's own gap: the list text sits at
+     y=44 under a 28px label. */
+  .overview-section__features {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+  }
+  .overview-section__features-label {
+    margin: 0;
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-xl);
+    line-height: var(--font-line-height-xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-text-emphasis);
+  }
+  .overview-section__features-list {
+    margin: 0;
+    /* Bullets hang outside the text column so the items align with the
+       statement above them, matching the canvas. */
+    padding-left: 1.5em;
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-xl);
+    line-height: var(--font-line-height-3xl);
+    font-weight: var(--font-weight-regular);
+    color: var(--color-text-emphasis);
   }
   .overview-section__tags {
     display: flex;

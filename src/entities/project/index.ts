@@ -12,6 +12,7 @@ export type {
   ProcessStepMedia,
   GalleryRow,
   LinkCard,
+  FeatureList,
   StatementSection,
   BlocksSection,
   BuildData,

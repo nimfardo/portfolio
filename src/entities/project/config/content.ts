@@ -3,6 +3,7 @@ import { artAnnanolli } from './art-annanolli';
 import { arvus } from './arvus';
 import { connectis } from './connectis';
 import { medicalSoftware } from './medicalSoftware';
+import { enterpriseIt } from './enterpriseIt';
 import { defenceSystems } from './defenceSystems';
 
 /**
@@ -18,5 +19,6 @@ export const PROJECT_CONTENT: Record<string, ProjectContent> = {
   arvus,
   connectis,
   medicalSoftware,
+  enterpriseIt,
   defenceSystems,
 };

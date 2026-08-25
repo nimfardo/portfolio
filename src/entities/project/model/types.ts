@@ -125,6 +125,18 @@ export interface LinkCard {
   href: string;
 }
 
+/** A bold label over a bulleted list, sitting under the overview statement —
+ * enterpriseIt's "Features:" block (Figma 2928:2365).
+ *
+ * A real <ul> rather than newline-separated `description` text, which is how
+ * defenceSystems gets its multi-line paragraph: the canvas list carries bullet glyphs,
+ * and `white-space: pre-line` on a <p> can reproduce the line breaks but not
+ * the bullets. */
+export interface FeatureList {
+  label: string;
+  items: string[];
+}
+
 /** Heading + big statement + optional smaller paragraph, no media — the
  * OverviewSection shape. defenceSystems's Challenge uses this; CONNECTIS's Challenge
  * is a media block (BlocksSection) instead. */
@@ -164,6 +176,7 @@ export interface ProjectContent {
     heading: string;
     text: string;
     description?: string;
+    features?: FeatureList;
     linkCards?: LinkCard[];
     tags?: string[];
   };
