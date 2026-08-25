@@ -11,7 +11,7 @@
 // The card markup itself now lives in entities/project's LinkCards — medicalSoftware
 // needed the same cards inside a ContentSection, so keeping them here would
 // have meant two copies of the pinned-colour rules (bug-040).
-import { Heading } from '@shared/ui';
+import { Heading, Link } from '@shared/ui';
 import { LinkCards } from '@entities/project';
 import type { LinkCard, FeatureList } from '@entities/project';
 
@@ -22,10 +22,14 @@ interface Props {
   /** enterpriseIt's "Features:" block — a bold label over a bulleted list. */
   features?: FeatureList;
   linkCards?: LinkCard[];
+  /** A single trailing proof link, rendered after tags. Optional so every
+   * other consumer renders unchanged — added for /about's one link to
+   * /system (story: system-as-exhibit). */
+  link?: { href: string; label: string };
   class?: string;
 }
 
-const { heading, tags, description, features, linkCards, class: className } = Astro.props;
+const { heading, tags, description, features, linkCards, link, class: className } = Astro.props;
 ---
 
 <section class:list={['section-grid', 'overview-section', className]}>
@@ -53,6 +57,13 @@ const { heading, tags, description, features, linkCards, class: className } = As
             <li class="overview-section__tag">{tag}</li>
           ))}
         </ul>
+      )
+    }
+    {
+      link && (
+        <p class="overview-section__link">
+          <Link href={link.href}>{link.label}</Link>
+        </p>
       )
     }
   </div>
@@ -115,6 +126,9 @@ const { heading, tags, description, features, linkCards, class: className } = As
     margin: 0;
     padding: 0;
     list-style: none;
+  }
+  .overview-section__link {
+    margin: 0;
   }
   .overview-section__tag {
     padding: 8px 14px;

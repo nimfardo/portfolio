@@ -1,0 +1,69 @@
+---
+// Story: planning/stories/system-as-exhibit.md. Spec: planning/specs/system-as-exhibit.md.
+// A demonstration, not a case study about the website — every value below is
+// read from the real token source at build time (TokenGallery) and every
+// component is the real shared/ui export, live (ComponentGallery). Nothing
+// on this page is hand-typed to match the system; it IS the system.
+//
+// No hero: unlike /about and /process, this page has no media to introduce
+// it, so it's PageHeader straight into content, same shell the case-study
+// pages use minus ProjectHero.
+//
+// The positioning paragraph (story acceptance criteria, <=60 words) is
+// copy-025's addition, not this task's — the page is a complete, correct
+// exhibit without it, which is what makes that paragraph cuttable rather
+// than load-bearing.
+import Layout from '@app/layouts/Layout.astro';
+import { PageHeader } from '@widgets/page-header';
+import { TokenGallery } from '@widgets/token-gallery';
+import { ComponentGallery } from '@widgets/component-gallery';
+import { Heading } from '@shared/ui';
+---
+
+<Layout title="System — Max Shturma">
+  <main class="system">
+    <h1 class="visually-hidden">System</h1>
+
+    <PageHeader title="System" class="system__header" />
+
+    <section class="system__section">
+      <Heading class="system__section-label">Tokens</Heading>
+      <TokenGallery />
+    </section>
+
+    <section class="system__section">
+      <Heading class="system__section-label">Components</Heading>
+      <ComponentGallery />
+    </section>
+  </main>
+</Layout>
+
+<style>
+  /* Same 160px section rhythm as /about and /process. `.system__header` and
+     `.system__section-label` are handed to PageHeader and Heading as props,
+     so each carries THAT component's own astro-cid rather than this page's
+     — a scoped rule would silently never match (bug-049, the same trap
+     about.astro's header comment documents). `:global()` on both. */
+  .system {
+    padding-bottom: 160px;
+  }
+  :global(.system__header) {
+    padding: 0 40px;
+  }
+  :global(.system__section) {
+    padding: 0 40px;
+    margin-top: 160px;
+  }
+  :global(.system__section-label) {
+    margin-bottom: var(--spacing-xl);
+  }
+
+  @media (max-width: 1023px) {
+    .system {
+      padding-bottom: var(--spacing-4xl);
+    }
+    :global(.system__section) {
+      margin-top: var(--spacing-4xl);
+    }
+  }
+</style>
