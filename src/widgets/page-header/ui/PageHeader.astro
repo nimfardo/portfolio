@@ -1,9 +1,23 @@
 ---
-// Figma "header" organism (2078:375 / 2118:1602): page-name + theme-toggle,
-// sitting above content on desktop. Desktop-only — mobile's own header
-// (widgets/navigation) is logo+hamburger only, and the mobile overlay
-// already carries the theme-toggle, so this would be redundant below 1024px.
-import { Icon } from '@shared/ui';
+// Figma "header" organism, now canvas 2910:2049: page-name on the left, and a
+// right group holding the Download CV button + theme-toggle. Sitting above
+// content on desktop. Desktop-only — mobile's own header (widgets/navigation)
+// is logo+hamburger only, and the mobile overlay already carries the
+// theme-toggle, so this would be redundant below 1024px.
+//
+// The CV button arrived in feat-100 and this component being desktop-only is
+// load-bearing for how it was wired: because nothing here renders below
+// 1024px, CV had to STAY in the mobile overlay's nav list. It is the sidebar
+// copy that went (see `overlayOnly` in navigation's nav-items). Max accepted
+// that "always visible" therefore means desktop; on phones CV is still one tap
+// inside the hamburger.
+//
+// The glyph is `download`, and the canvas will not tell you that by name — the
+// layer is called `right-arrow` (the Button master's slot name) while the
+// exported path is the project's own download icon scaled 28 -> 24, checked
+// coordinate by coordinate. Third time that trap has come up this week.
+import { Button, Icon } from '@shared/ui';
+import { CV_HREF, CV_LABEL } from '@shared/config';
 import { ThemeToggle } from '@features/theme-toggle';
 
 interface Props {
@@ -27,7 +41,19 @@ const { title, showBack = false, backHref = '/', class: className } = Astro.prop
     }
     <span class="page-header__title">{title}</span>
   </div>
-  <ThemeToggle />
+  <div class="page-header__actions">
+    <Button
+      type="outlined"
+      size="sm"
+      href={CV_HREF}
+      external
+      icon="download"
+      class="page-header__cv"
+    >
+      {CV_LABEL}
+    </Button>
+    <ThemeToggle />
+  </div>
 </div>
 
 <style>
@@ -52,6 +78,14 @@ const { title, showBack = false, backHref = '/', class: className } = Astro.prop
       display: flex;
       align-items: center;
       gap: var(--spacing-lg);
+    }
+    /* Canvas 2910:2069: the button ends at x=187 and the toggle group starts
+       at x=227, so the gap is 40 — not a spacing token, which stops at 32
+       (xl) and jumps to 48 (2xl). The same 40 the header's own margins use. */
+    .page-header__actions {
+      display: flex;
+      align-items: center;
+      gap: 40px;
     }
     /* Manrope/xl/regular, synced from the "header" master (node 2304:1538,
        bug-033). Was 2xl/bold with a hardcoded 48px line-height — that was

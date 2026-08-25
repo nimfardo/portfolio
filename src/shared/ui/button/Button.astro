@@ -101,12 +101,19 @@ const iconSize = size === 'sm' ? 24 : 28;
     /* No min-width on purpose. md's 320 floor exists so page-level CTAs share
        a width; this one is 187px of content inside a 48px header row, where a
        floor would only push the theme-toggle around. */
-    /* 24 left / 18 right is the canvas value and is NOT a typo to normalise.
-       The download glyph's ink stops ~3.4px inside its 24px box at this size
-       (its 28-viewBox art spans x 4..24), so 18 + 3.4 reads as ~21 against the
-       24 on the text side. Equal padding would look right-heavy — this is
-       optical, and matching the numbers would break the look it exists for. */
-    padding: 12px 18px 12px var(--spacing-lg);
+    /* Every value is the canvas number MINUS the 1px border, and that is not
+       fussiness: Figma strokes this frame on the INSIDE, so its 48x187 box
+       already contains the border, while CSS paints the border outside the
+       padding box. Taking 12/24/18 literally renders a 50px control in a 48px
+       header row — measured, it overhung by 1px top and bottom. Subtracting
+       the border lands on the canvas's OUTER dimensions: 48 tall, label 24
+       from the left edge, glyph 18 from the right.
+
+       The 24-left / 18-right asymmetry itself is canvas and must survive: the
+       download glyph's ink stops ~3.4px inside its 24px box at this size (its
+       28-viewBox art spans x 4..24), so 18 + 3.4 reads as ~21 against 24 on
+       the text side. Equalising them would look right-heavy. */
+    padding: 11px 17px 11px 23px;
     font-size: var(--font-size-sm);
     line-height: var(--font-line-height-sm);
   }

@@ -13,6 +13,13 @@ import { MobileNavToggle } from '@features/mobile-nav-toggle';
 import NavItem from './NavItem.astro';
 import { NAV_ITEMS } from '../model/nav-items';
 
+// The sidebar drops `overlayOnly` items; the overlay below keeps the full list.
+// That asymmetry IS the feature (feat-100): CV's desktop route is the header
+// button, but `PageHeader` does not render below 1024px, so the overlay is the
+// only place phones can reach the PDF. Filtering here rather than deleting the
+// item is what keeps both true.
+const DESKTOP_NAV_ITEMS = NAV_ITEMS.filter((item) => !item.overlayOnly);
+
 // GitHub joined in feat-082 (canvas node I2793:3257;2778:2970), which also
 // makes it site-wide rather than an /about card — the rebuilt page has no link
 // grid to hold one any more. It points at glacier-flow because the portfolio's
@@ -50,7 +57,7 @@ const currentPath = Astro.url.pathname;
     </a>
     <ul class="nav-desktop__items">
       {
-        NAV_ITEMS.map((item) => (
+        DESKTOP_NAV_ITEMS.map((item) => (
           <li>
             <NavItem
               href={item.href}
