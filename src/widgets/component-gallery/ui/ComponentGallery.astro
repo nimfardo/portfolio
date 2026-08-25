@@ -1,9 +1,18 @@
 ---
 // /system's component exhibit — every export from shared/ui/index.ts
-// (src/shared/ui/index.ts), rendered live, in the barrel's own order, so a
-// component added to the kit later shows up here without a second edit.
-// `IconName` is skipped: it's a type export, not a renderable value — the
-// only export in the barrel that isn't a component.
+// (src/shared/ui/index.ts), rendered live. `IconName` is skipped: it's a
+// type export, not a renderable value — the only export in the barrel
+// that isn't a component.
+//
+// Grouped by Atoms/Molecules, matching the Figma library's own
+// classification (figma-design-system memory): InputField is the one
+// molecule this barrel exports — every other export here is an atom in
+// Figma's — atoms/core section. No organism exists at this layer
+// (organisms live in widgets/, out of this gallery's scope, since it
+// only ever walks shared/ui). Order within each group is still the
+// barrel's own order, so a new atom/molecule added to the kit shows up
+// here without a second edit — only a genuinely new TIER needs a new
+// group added by hand.
 //
 // Each component gets one instance per reasonable variant, taken from its
 // own Props interface (checked by reading the component, not guessed):
@@ -34,6 +43,8 @@ const { class: className } = Astro.props;
 ---
 
 <div class:list={['component-gallery', className]}>
+  <p class="component-gallery__group-label">Atoms</p>
+
   <section class="component-gallery__entry" data-reveal>
     <p class="component-gallery__name">Button</p>
     <div class="component-gallery__row">
@@ -114,14 +125,6 @@ const { class: className } = Astro.props;
   </section>
 
   <section class="component-gallery__entry" data-reveal>
-    <p class="component-gallery__name">InputField</p>
-    <div class="component-gallery__row">
-      <InputField label="Name" name="system-demo-text" type="text" placeholder="Ada Lovelace" />
-      <InputField label="Password" name="system-demo-password" type="password" />
-    </div>
-  </section>
-
-  <section class="component-gallery__entry" data-reveal>
     <p class="component-gallery__name">PageNotFoundCat</p>
     <div class="component-gallery__row component-gallery__row--center">
       <PageNotFoundCat />
@@ -132,6 +135,16 @@ const { class: className } = Astro.props;
     <p class="component-gallery__name">HungaryFlag</p>
     <div class="component-gallery__row component-gallery__row--center">
       <HungaryFlag />
+    </div>
+  </section>
+
+  <p class="component-gallery__group-label">Molecules</p>
+
+  <section class="component-gallery__entry" data-reveal>
+    <p class="component-gallery__name">InputField</p>
+    <div class="component-gallery__row">
+      <InputField label="Name" name="system-demo-text" type="text" placeholder="Ada Lovelace" />
+      <InputField label="Password" name="system-demo-password" type="password" />
     </div>
   </section>
 </div>
@@ -152,6 +165,25 @@ const { class: className } = Astro.props;
     font-family: monospace;
     font-size: var(--font-size-sm);
     color: var(--color-text-secondary);
+  }
+  /* One tier below the page's own "Components" aside label (Heading, in
+     system.astro's section-grid) and one tier above each component's own
+     monospace name — a group needs to read as louder than an entry but
+     quieter than the section it lives in. Extra margin-top on every group
+     after the first is what separates Atoms from Molecules; the flex gap
+     alone already spaces every entry from its neighbor uniformly, so
+     without it the group boundary wouldn't read as a boundary. */
+  .component-gallery__group-label {
+    margin: 0;
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-bold);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--color-text-primary);
+  }
+  .component-gallery__group-label:not(:first-child) {
+    margin-top: var(--spacing-xl);
   }
   .component-gallery__row {
     display: flex;
