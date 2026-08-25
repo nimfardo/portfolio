@@ -417,14 +417,54 @@ const currentPath = Astro.url.pathname;
     justify-content: center;
     gap: var(--spacing-xl);
   }
+  /* `flex: 1` is what pushes the social row to the bottom, against the
+     divider, instead of letting it sit directly under the nav block with dead
+     space below. Master 2240:2 models it the same way: `nav-items` FILLs the
+     overlay and an inner frame FILLs again, so the four links centre in
+     whatever height is left and the socials land last. */
   .nav-mobile-overlay__items {
     display: flex;
+    flex: 1;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
     gap: var(--spacing-xl);
     list-style: none;
     margin: 0;
     padding: 0;
+  }
+  /* 48px rows, from the same master — the nav-item instances there are FIXED
+     at 48 rather than hugging their 34px of type. Worth taking for more than
+     fidelity: 34px is under the ~44px minimum tap target, and these are the
+     primary navigation on a phone. `min-height` rather than `height` so a
+     wrapped label can still grow. :global() because the class lands on
+     NavItem's own <a>, which carries that component's astro-cid, not this
+     one's. */
+  :global(.nav-mobile-overlay__items .nav-item) {
+    min-height: 48px;
+  }
+  /* The overlay CV button runs at the nav items' 18px, not the header's 14px
+     — instance override on 2932:461, which takes the button to 208x48. Sizing
+     it like the links is what makes it read as the fourth item in the list
+     rather than a control that wandered in. Mirrored as an override here
+     because Figma models it as one too, not as a size variant of button-text.
+
+     `a.button-text.…` at (0,2,1) is load-bearing, not verbosity: ButtonText's
+     own rule compiles to `.button-text[data-astro-cid-…]` = (0,2,0), so a bare
+     `:global(.nav-mobile-overlay__cv)` at (0,1,0) loses outright — measured,
+     the label stayed 14px. Matching at (0,2,0) would only TIE, and a tie
+     resolves on bundling order, which is the bug-002 non-determinism. One
+     element selector settles it. Third time this file's family of components
+     has needed exactly this. */
+  :global(a.button-text.nav-mobile-overlay__cv) {
+    font-size: var(--font-size-lg);
+    line-height: var(--font-line-height-lg);
+    /* BOLD, not the component's medium. The override on 2932:461 is the whole
+       `Manrope/lg/bold-CAPITALIZED` style — byte-for-byte the one the nav
+       items use — so the CV reads as the fourth link rather than a lighter
+       guest among them. Size alone left the label 3.6px narrow (204.4 against
+       the canvas's 208), which is what gave the missing weight away. */
+    font-weight: var(--font-weight-bold);
   }
   .nav-mobile-overlay__links {
     display: flex;

@@ -72,13 +72,16 @@ const { title, showBack = false, backHref = '/', class: className } = Astro.prop
       align-items: center;
       gap: var(--spacing-lg);
     }
-    /* Canvas 2910:2069: the button ends at x=187 and the toggle group starts
-       at x=227, so the gap is 40 — not a spacing token, which stops at 32
-       (xl) and jumps to 48 (2xl). The same 40 the header's own margins use. */
+    /* 16, re-measured off master 2078:375 after Max tightened it — the
+       `actions` group is 288 wide with the button at x=0 (174) and the toggle
+       frame at x=190. It was 40 when the button was an outlined 187x48 block;
+       a borderless text button needs less air beside it, or the two read as
+       unrelated items rather than one control cluster. `--spacing-md`, not a
+       raw 16, since 16 is on the ramp (unlike the 40 it replaces). */
     .page-header__actions {
       display: flex;
       align-items: center;
-      gap: 40px;
+      gap: var(--spacing-md);
     }
     /* Manrope/xl/regular, synced from the "header" master (node 2304:1538,
        bug-033). Was 2xl/bold with a hardcoded 48px line-height — that was
