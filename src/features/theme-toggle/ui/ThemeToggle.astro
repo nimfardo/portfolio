@@ -14,7 +14,10 @@ const { class: className } = Astro.props;
   data-theme-toggle
   aria-label="Toggle color theme"
 >
-  <span class="theme-toggle__label" data-theme-toggle-label>Dark</span>
+  <span class="theme-toggle__label">
+    <span class="theme-toggle__word theme-toggle__word--dark">Dark</span>
+    <span class="theme-toggle__word theme-toggle__word--light">Light</span>
+  </span>
   <span class="theme-toggle__track">
     <span class="theme-toggle__knob"></span>
   </span>
@@ -30,19 +33,26 @@ const { class: className } = Astro.props;
   // listeners on every subsequent swap.
   const STORAGE_KEY = 'theme';
 
-  function syncLabel(button: HTMLElement) {
+  // Which word shows is CSS's job now, keyed on [data-theme] like the track
+  // and knob beside it. This only mirrors the state for assistive tech.
+  //
+  // It used to write `label.textContent` here: the HTML shipped "Dark", and on
+  // a light-theme load this swapped in the wider "Light" one frame after
+  // paint. The actions row is right-aligned, so the CV button jumped left on
+  // every refresh — which is what Max was seeing as a jumping gap. Nothing
+  // that affects layout can wait for JS; `data-theme` is already set before
+  // first paint in Layout.astro, so CSS gets it right on frame one.
+  function syncPressed(button: HTMLElement) {
     const isLight = document.documentElement.dataset.theme === 'light';
-    const label = button.querySelector('[data-theme-toggle-label]');
-    if (label) label.textContent = isLight ? 'Light' : 'Dark';
     button.setAttribute('aria-pressed', String(isLight));
   }
 
-  function syncAllLabels() {
-    document.querySelectorAll<HTMLButtonElement>('[data-theme-toggle]').forEach(syncLabel);
+  function syncAllPressed() {
+    document.querySelectorAll<HTMLButtonElement>('[data-theme-toggle]').forEach(syncPressed);
   }
 
   function initThemeToggle() {
-    syncAllLabels();
+    syncAllPressed();
     bindOncePersisted<HTMLButtonElement>('[data-theme-toggle]', (button) => {
       button.addEventListener('click', () => {
         const isLight = document.documentElement.dataset.theme === 'light';
@@ -53,7 +63,7 @@ const { class: className } = Astro.props;
           document.documentElement.dataset.theme = 'light';
           localStorage.setItem(STORAGE_KEY, 'light');
         }
-        syncAllLabels();
+        syncAllPressed();
       });
     });
   }
@@ -77,6 +87,22 @@ const { class: className } = Astro.props;
     letter-spacing: 0.04em;
     text-transform: uppercase;
     color: var(--color-text-primary);
+  }
+
+  /* Both words ship in the markup and CSS picks one, the same way the track
+     and knob below pick their colours — so the label is right at first paint
+     instead of a frame late (see the script comment). `display: none` rather
+     than a reserved max-width box: hiding it outright keeps the label hugging
+     its text exactly as before, and reserving room for the wider "LIGHT"
+     would leave ~12px of dead space beside "DARK" in the other theme. */
+  .theme-toggle__word--light {
+    display: none;
+  }
+  :global([data-theme='light']) .theme-toggle__word--dark {
+    display: none;
+  }
+  :global([data-theme='light']) .theme-toggle__word--light {
+    display: inline;
   }
 
   .theme-toggle__track {
