@@ -4,8 +4,22 @@ import type { IconName } from '../icon/Icon.astro';
 
 interface Props {
   type?: 'solid' | 'outlined';
+  /* Figma set 2006:327 gained a `size` property in feat-100. `md` is the
+     320x60 button the whole site already used; `sm` is the 48-tall one the
+     header CV button needs (canvas 2911:2071) — smaller text, a 24px glyph
+     instead of 28, and no min-width, because it sits in a 48px header row
+     rather than on a page. Same border/ink tokens and the same hover and
+     disabled contracts, which is why this is a variant and not a component. */
+  size?: 'md' | 'sm';
   disabled?: boolean;
   href?: string;
+  /* Force the new-tab treatment. The default heuristic below only catches
+     absolute URLs, and the CV is a same-origin FILE (`/max-shturma-cv.pdf`) —
+     it has to open in a new tab because the ClientRouter cannot swap a PDF
+     into the SPA, but it would fail a `startsWith('http')` test. Explicit
+     beats widening the heuristic, which would start guessing about every
+     internal path with a dot in it. */
+  external?: boolean;
   class?: string;
   /* The trailing glyph. Defaults to the arrow every button shipped with, so
      existing call sites are untouched. /about's Contact button (canvas
@@ -18,19 +32,24 @@ interface Props {
 
 const {
   type = 'solid',
+  size = 'md',
   disabled = false,
   href,
+  external,
   class: className,
   icon = 'arrow-right',
 } = Astro.props;
 const Tag = href ? 'a' : 'button';
 // External destinations (Behance, GitHub, ...) open in a new tab; internal
 // routes stay in-tab so ClientRouter transitions keep working (bug-038).
-const isExternal = href?.startsWith('http');
+// An explicit `external` wins over the heuristic — see the prop's note.
+const isExternal = external ?? href?.startsWith('http');
+// Canvas 2911:2071 draws the small button's glyph at 24, not 28.
+const iconSize = size === 'sm' ? 24 : 28;
 ---
 
 <Tag
-  class:list={['button', `button--${type}`, className]}
+  class:list={['button', `button--${type}`, `button--${size}`, className]}
   href={href}
   target={isExternal ? '_blank' : undefined}
   rel={isExternal ? 'noopener noreferrer' : undefined}
@@ -38,7 +57,7 @@ const isExternal = href?.startsWith('http');
   aria-disabled={href && disabled ? 'true' : undefined}
 >
   <span class="button__label"><slot /></span>
-  <Icon name={icon} size={28} class="button__icon" />
+  <Icon name={icon} size={iconSize} class="button__icon" />
 </Tag>
 
 <style>
@@ -46,6 +65,23 @@ const isExternal = href?.startsWith('http');
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-family: var(--font-family-body);
+    font-weight: var(--font-weight-medium);
+    /* 0.04em, not a px value, so it tracks the size variant: 0.72px at md's
+       18px and 0.56px at sm's 14px — both exactly what the canvas carries
+       (2901:1911 and 2911:2071 respectively). */
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    text-align: center;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  /* --- size: md (the 320x60 button every page already used) --- */
+  .button--md {
     gap: var(--spacing-sm);
     /* Canvas 2901:1911 carries min-width 240, not 320, and that difference is
        deliberately NOT taken. It cannot bind on the button that surfaced it —
@@ -55,18 +91,24 @@ const isExternal = href?.startsWith('http');
        worth the tidiness. */
     min-width: 320px;
     padding: var(--spacing-md) var(--spacing-lg);
-    border: none;
-    background: none;
-    cursor: pointer;
-    font-family: var(--font-family-body);
     font-size: var(--font-size-lg);
     line-height: var(--font-line-height-lg);
-    font-weight: var(--font-weight-medium);
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    text-align: center;
-    text-decoration: none;
-    white-space: nowrap;
+  }
+
+  /* --- size: sm (canvas 2911:2071, the header CV button) --- */
+  .button--sm {
+    gap: var(--spacing-md);
+    /* No min-width on purpose. md's 320 floor exists so page-level CTAs share
+       a width; this one is 187px of content inside a 48px header row, where a
+       floor would only push the theme-toggle around. */
+    /* 24 left / 18 right is the canvas value and is NOT a typo to normalise.
+       The download glyph's ink stops ~3.4px inside its 24px box at this size
+       (its 28-viewBox art spans x 4..24), so 18 + 3.4 reads as ~21 against the
+       24 on the text side. Equal padding would look right-heavy — this is
+       optical, and matching the numbers would break the look it exists for. */
+    padding: 12px 18px 12px var(--spacing-lg);
+    font-size: var(--font-size-sm);
+    line-height: var(--font-line-height-sm);
   }
 
   .button--solid {
