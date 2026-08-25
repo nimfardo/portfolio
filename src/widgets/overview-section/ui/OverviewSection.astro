@@ -11,7 +11,7 @@
 // The card markup itself now lives in entities/project's LinkCards — medicalSoftware
 // needed the same cards inside a ContentSection, so keeping them here would
 // have meant two copies of the pinned-colour rules (bug-040).
-import { Heading, Link } from '@shared/ui';
+import { Heading, ButtonText } from '@shared/ui';
 import { LinkCards } from '@entities/project';
 import type { LinkCard, FeatureList } from '@entities/project';
 
@@ -62,7 +62,7 @@ const { heading, tags, description, features, linkCards, link, class: className 
     {
       link && (
         <p class="overview-section__link">
-          <Link href={link.href}>{link.label}</Link>
+          <ButtonText href={link.href} icon="arrow-right">{link.label}</ButtonText>
         </p>
       )
     }
