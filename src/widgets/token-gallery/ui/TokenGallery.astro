@@ -215,14 +215,21 @@ const EASE_DEMO_DURATION = '--duration-base';
     padding: 0;
   }
 
+  /* Fixed track width, not min-width: min-width lets each item grow to its
+     own content (a short "9999px" next to a long "dark #efcba6 · light
+     #4d2d0e"), so row 2's columns drift out of line with row 1's the moment
+     any two neighbors differ in content length — the "inconsistent
+     alignment" the token page was flagged for. A shared fixed basis makes
+     every row share the same tracks; the longest semantic value is the
+     constraint (200px fits it on one line at font-size-sm). */
   .token-gallery__swatch,
   .token-gallery__spacing-row,
   .token-gallery__motion-row {
     display: flex;
+    flex: 0 0 200px;
     flex-direction: column;
     align-items: flex-start;
     gap: var(--spacing-xs);
-    min-width: 140px;
   }
 
   .token-gallery__chip {
@@ -271,16 +278,21 @@ const EASE_DEMO_DURATION = '--duration-base';
     margin: 0;
     padding: 0;
   }
+  /* Grid, not flex: the "Ag" sample runs 12px (xs) to 128px (9xl), and a
+     flex row sizes the name/value pair to start right after whatever the
+     sample rendered at, so the ramp read as a staircase instead of a
+     table. A fixed sample column pins name/value to one vertical line
+     regardless of glyph size — 240px comfortably clears the 9xl sample. */
   .token-gallery__scale-row {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: 240px auto 1fr;
     align-items: baseline;
-    gap: var(--spacing-lg);
+    column-gap: var(--spacing-lg);
+    row-gap: var(--spacing-xs);
   }
   .token-gallery__scale-sample {
     font-family: var(--font-family-body);
     color: var(--color-text-primary);
-    min-width: 3ch;
   }
 
   .token-gallery__motion-caption {
