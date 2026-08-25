@@ -1,4 +1,5 @@
 export { default as Button } from './button/Button.astro';
+export { default as ButtonText } from './button-text/ButtonText.astro';
 export { default as Divider } from './divider/Divider.astro';
 export { default as Link } from './link/Link.astro';
 export { default as Logo } from './logo/Logo.astro';

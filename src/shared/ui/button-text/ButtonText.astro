@@ -1,0 +1,92 @@
+---
+// Figma `button-text` (component set 2931:34, atoms/core) — a borderless
+// button: label + trailing glyph, no fill, no stroke. Built from Max's spec
+// 2927:2331 and shipped as the CV affordance in both the desktop header and
+// the mobile overlay (feat-101).
+//
+// Why this is a SEPARATE component rather than a `type="text"` arm on Button:
+// Figma models it as its own set beside `button`, not as a variant inside it.
+// Mirroring that split is the point — the library and the code should agree on
+// what counts as one component.
+//
+// The padding here is the Figma number VERBATIM, which is worth stating
+// because the last two buttons both needed the opposite. `button` strokes
+// INSIDE in Figma, so its CSS padding had to be the canvas value minus 1px per
+// side or the control rendered 2px too tall. This one has no border at all
+// (its spec carries a stroke with `visible: false`), so there is nothing to
+// subtract and 10/17/10/20 transfers as-is.
+//
+// The 20-left / 17-right asymmetry is optical, same as `button--sm`: the
+// download glyph's ink stops ~2.9px inside its 20px box (28-viewBox art
+// spanning x 4..24), so 17 + 2.9 reads level with the 20 on the text side.
+import Icon from '../icon/Icon.astro';
+import type { IconName } from '../icon/Icon.astro';
+
+interface Props {
+  href?: string;
+  /* Explicit new-tab, for the same reason Button needs it: the CV is a
+     same-origin FILE, so it must open in a new tab (ClientRouter cannot swap a
+     PDF) while failing a `startsWith('http')` test. */
+  external?: boolean;
+  disabled?: boolean;
+  /* Defaults to `download` because the Figma master does — both placements are
+     the CV. Swappable per call site, exactly like the master's icon slot. */
+  icon?: IconName;
+  class?: string;
+}
+
+const { href, external, disabled = false, icon = 'download', class: className } = Astro.props;
+const Tag = href ? 'a' : 'button';
+const isExternal = external ?? href?.startsWith('http');
+---
+
+<Tag
+  class:list={['button-text', className]}
+  href={href}
+  target={isExternal ? '_blank' : undefined}
+  rel={isExternal ? 'noopener noreferrer' : undefined}
+  disabled={!href && disabled ? true : undefined}
+  aria-disabled={href && disabled ? 'true' : undefined}
+>
+  <span class="button-text__label"><slot /></span>
+  <Icon name={icon} size={20} class="button-text__icon" />
+</Tag>
+
+<style>
+  .button-text {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    /* Verbatim from Figma — no border to subtract. See the note above. */
+    padding: 10px 17px 10px 20px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-sm);
+    line-height: var(--font-line-height-sm);
+    font-weight: var(--font-weight-medium);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    text-align: center;
+    text-decoration: none;
+    white-space: nowrap;
+    color: var(--color-text-primary);
+  }
+
+  /* The glyph is never coloured separately — Icon paints `currentColor`, so it
+     inherits whatever the state below sets. That is what keeps label and glyph
+     from drifting apart, which is exactly the bug the Figma side hit when
+     `swapComponent` replaced one per-node fill binding with another. */
+  .button-text:hover:not(:disabled):not([aria-disabled='true']) {
+    color: var(--color-text-emphasis);
+  }
+  .button-text:disabled,
+  .button-text[aria-disabled='true'] {
+    color: var(--color-text-muted);
+    opacity: 0.4;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+</style>

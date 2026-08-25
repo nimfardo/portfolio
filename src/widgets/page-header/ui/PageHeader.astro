@@ -16,7 +16,7 @@
 // layer is called `right-arrow` (the Button master's slot name) while the
 // exported path is the project's own download icon scaled 28 -> 24, checked
 // coordinate by coordinate. Third time that trap has come up this week.
-import { Button, Icon } from '@shared/ui';
+import { ButtonText, Icon } from '@shared/ui';
 import { CV_HREF, CV_LABEL } from '@shared/config';
 import { ThemeToggle } from '@features/theme-toggle';
 
@@ -42,16 +42,9 @@ const { title, showBack = false, backHref = '/', class: className } = Astro.prop
     <span class="page-header__title">{title}</span>
   </div>
   <div class="page-header__actions">
-    <Button
-      type="outlined"
-      size="sm"
-      href={CV_HREF}
-      external
-      icon="download"
-      class="page-header__cv"
-    >
+    <ButtonText href={CV_HREF} external icon="download" class="page-header__cv">
       {CV_LABEL}
-    </Button>
+    </ButtonText>
     <ThemeToggle />
   </div>
 </div>

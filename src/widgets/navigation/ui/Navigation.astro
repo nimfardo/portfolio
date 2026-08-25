@@ -7,18 +7,12 @@
 // Logo: static SVG, not AnimatedLogo — Max didn't like the current Lottie
 // export (raw/max-logo.json) and will provide a replacement later.
 // AnimatedLogo.astro itself is untouched, just unused for now.
-import { Logo, Icon } from '@shared/ui';
+import { ButtonText, Logo, Icon } from '@shared/ui';
+import { CV_HREF, CV_LABEL } from '@shared/config';
 import { ThemeToggle } from '@features/theme-toggle';
 import { MobileNavToggle } from '@features/mobile-nav-toggle';
 import NavItem from './NavItem.astro';
 import { NAV_ITEMS } from '../model/nav-items';
-
-// The sidebar drops `overlayOnly` items; the overlay below keeps the full list.
-// That asymmetry IS the feature (feat-100): CV's desktop route is the header
-// button, but `PageHeader` does not render below 1024px, so the overlay is the
-// only place phones can reach the PDF. Filtering here rather than deleting the
-// item is what keeps both true.
-const DESKTOP_NAV_ITEMS = NAV_ITEMS.filter((item) => !item.overlayOnly);
 
 // GitHub joined in feat-082 (canvas node I2793:3257;2778:2970), which also
 // makes it site-wide rather than an /about card — the rebuilt page has no link
@@ -57,7 +51,7 @@ const currentPath = Astro.url.pathname;
     </a>
     <ul class="nav-desktop__items">
       {
-        DESKTOP_NAV_ITEMS.map((item) => (
+        NAV_ITEMS.map((item) => (
           <li>
             <NavItem
               href={item.href}
@@ -131,6 +125,19 @@ const currentPath = Astro.url.pathname;
           </li>
         ))
       }
+      {
+        /* CV sits INSIDE the list, after the three routes — canvas 2240:2 puts
+          it there, and the list is `align-items: center` in both places, so
+          the component's own 20/17 padding centres it without an override.
+          An earlier attempt zeroed the left padding to "align" it and pushed
+          the label 8.5px off-centre; the render caught what the assumption
+          missed. */
+      }
+      <li>
+        <ButtonText href={CV_HREF} external icon="download" class="nav-mobile-overlay__cv">
+          {CV_LABEL}
+        </ButtonText>
+      </li>
     </ul>
     <div class="nav-mobile-overlay__links">
       {
