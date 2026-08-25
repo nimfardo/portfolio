@@ -93,9 +93,18 @@ export interface ProcessStep {
  * discriminated union everywhere else — so the slots took the canonical type
  * instead.
  *
- * Gallery media is decorative on canvas (no per-slot caption authored), so the
- * image arm always carries `imageAlt: ''` and consumers render `alt=""`. That
- * decision is unchanged; it is just explicit now rather than implied. */
+ * Gallery slots carry REAL alt text. They used to carry `imageAlt: ''` on the
+ * reasoning that gallery media is decorative because the canvas authors no
+ * per-slot caption — but "no caption on canvas" is not the same as "conveys
+ * nothing", and these slots are product screens, paintings and team photos.
+ * Empty alt on them told a screen reader there was nothing to describe, which
+ * is a WCAG 1.1.1 failure rather than the exemption it was read as. Max called
+ * this in review.
+ *
+ * `imageAlt: ''` is still legal, and still correct for a slot that genuinely
+ * adds nothing beyond its neighbours — a decorative texture, or an image whose
+ * whole content is already in the caption beside it. It just has to be a
+ * per-slot judgement now, not the default. */
 export type GalleryRow =
   | { type: 'full'; image: ProjectMedia }
   | { type: 'split'; tall: ProjectMedia; stack: ProjectMedia[] };

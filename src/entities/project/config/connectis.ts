@@ -37,7 +37,12 @@ export const connectis = {
     // lines" pass covered the ContentSection captions and the retro, not this
     // slot. Active voice also leads with the change rather than the category.
     text: 'CONNECTIS replaces spreadsheets and phone calls with one command center for fleet operators.',
-    tags: ['Logistics', 'Solo design engineer', 'Research · UX/UI · Brand · Prototype · Motion', '2026'],
+    tags: [
+      'Logistics',
+      'Solo design engineer',
+      'Research · UX/UI · Brand · Prototype · Motion',
+      '2026',
+    ],
   },
   // Figma reverted the per-step icons (feat-028) back to plain numbers, and
   // dropped the media from steps 03/04 — `media` is optional now, and those
@@ -168,12 +173,27 @@ export const connectis = {
     {
       type: 'split',
       // Every gallery slot is a ProjectMedia since feat-041 (Arvus needed a
-      // video in a tall slot). Gallery media is decorative on canvas, so
-      // imageAlt is deliberately empty — that renders alt="", unchanged.
-      tall: { type: 'image', image: `${M}/gallery-2.jpg`, imageAlt: '' },
+      // video in a tall slot). Alt text is real now — these three were empty
+      // on the decorative-media reasoning the GalleryRow doc comment retires.
+      tall: {
+        type: 'image',
+        image: `${M}/gallery-2.jpg`,
+        imageAlt:
+          'The fleet map at night with a vehicle card over it — a Hyundai Ioniq 5 at 40% battery and 76 km/h — beside a health score of 89% split into healthy, warning and critical counts',
+      },
       stack: [
-        { type: 'image', image: `${M}/gallery-3.jpg`, imageAlt: '' },
-        { type: 'image', image: `${M}/gallery-4.jpg`, imageAlt: '' },
+        {
+          type: 'image',
+          image: `${M}/gallery-3.jpg`,
+          imageAlt:
+            'Hand-drawn wireframes on spiral pads, shot in black and white — sheets labelled Dashboard and Analytics and Reports, pencilled out beside the pencil that drew them',
+        },
+        {
+          type: 'image',
+          image: `${M}/gallery-4.jpg`,
+          imageAlt:
+            'The CONNECTIS app icon on a dark grid — a letter C drawn as a network of connected nodes',
+        },
       ],
     },
   ] satisfies GalleryRow[],

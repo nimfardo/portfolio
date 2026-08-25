@@ -2,8 +2,13 @@
 // Project detail-page gallery — a sequence of rows, each either a
 // full-width slot or a tall slot + N stacked slots (the two shapes
 // that exist on the Figma canvas so far, see entities/project's
-// GalleryRow). Gallery media is decorative on canvas (no per-slot alt
-// authored), so configs pass `imageAlt: ''` and every <img> renders alt="".
+// GalleryRow). Every slot carries real alt text — the empty `imageAlt: ''`
+// these all used to pass was a WCAG 1.1.1 failure, not the decorative-image
+// exemption it was written as. See the GalleryRow doc comment.
+//
+// Note that an empty alt still serialises here as a bare `alt` attribute
+// rather than `alt=""`. Those are equivalent in HTML, so a genuinely
+// decorative slot is still announced correctly.
 //
 // Every slot is a ProjectMedia now (feat-041), so any of them can be a
 // video — Arvus's tall slot is one. Image slots render a bare <img>, exactly

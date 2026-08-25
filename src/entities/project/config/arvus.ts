@@ -1,4 +1,10 @@
-import type { BlocksSection, ContentBlock, GalleryRow, ProjectMedia, ProjectContent } from '../model/types';
+import type {
+  BlocksSection,
+  ContentBlock,
+  GalleryRow,
+  ProjectMedia,
+  ProjectContent,
+} from '../model/types';
 
 // Content pulled from the live Figma canvas (Project Page/Arvus, node
 // 2523:1717) as fixed by copy-012 and copy-014, not
@@ -118,12 +124,14 @@ export const arvus = {
         {
           type: 'image',
           image: `${M}/gallery-2.jpg`,
-          imageAlt: '',
+          imageAlt:
+            'An operator monitor for the Westfield Parking Complex — a parking-deck camera feed above a car stopped at the barrier, with the incident table below flagging one row critical in red',
         },
         {
           type: 'image',
           image: `${M}/gallery-3.jpg`,
-          imageAlt: '',
+          imageAlt:
+            'The integrator view — a 3D floor plan with device markers placed through it on a tablet, beside the full grid of colour-coded device icons',
         },
       ],
     },

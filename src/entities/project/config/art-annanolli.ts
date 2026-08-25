@@ -1,4 +1,10 @@
-import type { BlocksSection, ContentBlock, GalleryRow, ProjectMedia, ProjectContent } from '../model/types';
+import type {
+  BlocksSection,
+  ContentBlock,
+  GalleryRow,
+  ProjectMedia,
+  ProjectContent,
+} from '../model/types';
 
 // Content pulled from the live Figma canvas (Project Page/Generic filled for
 // Art Annanolli, node 2595:9635), not reference/content/copy-deck.md — the deck
@@ -93,8 +99,8 @@ export const artAnnanolli = {
     ] satisfies ContentBlock[],
   },
   // The `split` shape CONNECTIS, medicalSoftware and Arvus all use. Tall slot is a
-  // video (feat-041); both stacked slots are decorative on canvas, so they
-  // carry alt='' like every other gallery still on the site.
+  // video (feat-041); both stacked slots carry real alt text, like every other
+  // gallery on the site now (see the GalleryRow doc comment).
   gallery: [
     {
       type: 'split',
@@ -108,12 +114,14 @@ export const artAnnanolli = {
         {
           type: 'image',
           image: `${M}/gallery-2.jpg`,
-          imageAlt: '',
+          imageAlt:
+            "One of Tero's paintings — lemons on the branch over washes of pale turquoise, signed in the corner",
         },
         {
           type: 'image',
           image: `${M}/gallery-3.jpg`,
-          imageAlt: '',
+          imageAlt:
+            'The Taideteokset gallery page on the finished site — category tabs, a year selector, and a row of artwork cards with a round-cropped bird painting centred',
         },
       ],
     },
