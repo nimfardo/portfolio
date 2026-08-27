@@ -36,7 +36,13 @@ import ProjectCard from './ProjectCard.astro';
 <style>
   .project-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    /* minmax(0, 1fr), not bare 1fr: a bare 1fr track's minimum width
+       defaults to auto (its content's min-content size), so a card with
+       wide content (e.g. the NDA badge, or a long name) can force its
+       column wider than its fair share once the grid is narrow enough —
+       confirmed uneven (237/197/271px) in /system's narrower gallery
+       column, though the wide home-page grid never exposed it. */
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     /* 40px — Figma project-grid's real itemSpacing (row and column both),
        re-pulled after Max's update. Not on the token scale. */
     gap: 40px;
@@ -44,7 +50,7 @@ import ProjectCard from './ProjectCard.astro';
 
   @media (max-width: 1023px) {
     .project-grid {
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: var(--spacing-lg);
     }
   }
