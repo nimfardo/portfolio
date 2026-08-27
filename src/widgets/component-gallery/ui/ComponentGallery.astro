@@ -58,6 +58,7 @@ import {
   AnimatedLogo,
   LoadingIndicator,
   Icon,
+  ICON_NAMES,
   IconBadge,
   Heading,
   InputField,
@@ -93,9 +94,15 @@ const profileLinksDemo: ProfileLink[] = [{ label: 'Link', icon: 'arrow-right', h
 
   <section class="component-gallery__entry" data-reveal>
     <p class="component-gallery__name">Icon</p>
-    <div class="component-gallery__row component-gallery__row--center">
-      <Icon name="system" size={28} />
-      <Icon name="system" size={48} />
+    <div class="component-gallery__icons">
+      {
+        ICON_NAMES.map((name) => (
+          <div class="component-gallery__icon">
+            <Icon name={name} size={28} />
+            <span class="component-gallery__icon-label">{name}</span>
+          </div>
+        ))
+      }
     </div>
   </section>
 
@@ -304,5 +311,27 @@ const profileLinksDemo: ProfileLink[] = [{ label: 'Link', icon: 'arrow-right', h
   }
   .component-gallery__row--block {
     display: block;
+  }
+  /* The full icon library (Max's reference: every icon/* master in one
+     grid, name printed under each glyph) — auto-fill so the count of
+     columns follows the container width instead of a fixed number, the
+     same reasoning TokenGallery's card grid already uses. */
+  .component-gallery__icons {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(64px, 1fr));
+    gap: var(--spacing-lg);
+  }
+  .component-gallery__icon {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-xs);
+    text-align: center;
+  }
+  .component-gallery__icon-label {
+    font-family: monospace;
+    font-size: var(--font-size-xs);
+    color: var(--color-text-muted);
+    word-break: break-word;
   }
 </style>
