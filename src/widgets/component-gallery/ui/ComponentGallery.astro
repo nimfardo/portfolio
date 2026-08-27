@@ -21,19 +21,19 @@
 // renders once.
 //
 // Organisms is a short list of the widgets that demo cleanly standalone —
-// PageHeader, ProfileLinks, IndustriesBar, ProjectGrid, VideoSection,
-// ProjectGallery. Case-study section widgets (ProjectHero, ContentSection,
-// BuildSection, Retrospective, ProcessAccordion) and the utility widgets
-// (PasswordGate, NoContent) are cut on Max's review — this exhibit is the
-// design system, not a second case-study page.
+// PageHeader, IndustriesBar, ProjectGrid, VideoSection, ProjectGallery.
+// Case-study section widgets (ProjectHero, ContentSection, BuildSection,
+// Retrospective, ProcessAccordion) and the utility widgets (PasswordGate,
+// NoContent) are cut on Max's review — this exhibit is the design system,
+// not a second case-study page.
 //
-// Most surviving Organisms use real, already-shipped data (VideoSection and
+// Surviving Organisms use real, already-shipped data (VideoSection and
 // ProjectGallery pull CONNECTIS's case-study content, ProjectGrid renders
 // the real PROJECTS list) — the same principle ButtonText's own demo already
 // applies by reusing the real CV_HREF instead of a fake link. ProfileLinks
-// is the deliberate exception: Max asked for generic placeholder cards here
-// instead of his real LinkedIn/Behance/GitHub/CV links, so the demo data
-// below is invented on purpose, not an oversight.
+// moved to Molecules instead of staying here (Max's call): a single card is
+// the more honest unit to demo the component at, and it renders generic
+// placeholder data rather than Max's real LinkedIn/Behance/GitHub/CV links.
 //
 // Three widgets are deliberately EXCLUDED, not overlooked:
 //   - Navigation: already live as this very page's own persistent chrome.
@@ -80,17 +80,12 @@ interface Props {
 }
 const { class: className } = Astro.props;
 
-// Generic placeholder cards, not Max's real profile links (Max's review):
-// this demo used to reuse the real LinkedIn/Behance/GitHub/CV URLs
-// Navigation.astro renders site-wide — he asked for a plain generic
-// instance here instead. Labels/icons/hrefs are arbitrary, not meant to
-// represent any real link.
-const profileLinksDemo: ProfileLink[] = [
-  { label: 'Link one', icon: 'arrow-right', href: '#' },
-  { label: 'Link two', icon: 'arrow-right', href: '#' },
-  { label: 'Link three', icon: 'arrow-right', href: '#' },
-  { label: 'Download', icon: 'download', href: '#', variant: 'accent', download: true },
-];
+// One generic placeholder card, not Max's real profile links (Max's
+// review): this demo used to reuse the real LinkedIn/Behance/GitHub/CV URLs
+// Navigation.astro renders site-wide — he asked for a plain generic single
+// card here instead, moved to Molecules. Label/icon/href are arbitrary, not
+// meant to represent any real link.
+const profileLinksDemo: ProfileLink[] = [{ label: 'Link', icon: 'arrow-right', href: '#' }];
 ---
 
 <div class:list={['component-gallery', className]}>
@@ -200,6 +195,13 @@ const profileLinksDemo: ProfileLink[] = [
   </section>
 
   <section class="component-gallery__entry" data-reveal>
+    <p class="component-gallery__name">ProfileLinks</p>
+    <div class="component-gallery__row component-gallery__row--block">
+      <ProfileLinks cards={profileLinksDemo} />
+    </div>
+  </section>
+
+  <section class="component-gallery__entry" data-reveal>
     <p class="component-gallery__name">CtaCard</p>
     <div class="component-gallery__row component-gallery__row--block">
       <CtaCard
@@ -218,13 +220,6 @@ const profileLinksDemo: ProfileLink[] = [
     <p class="component-gallery__name">PageHeader</p>
     <div class="component-gallery__row component-gallery__row--block">
       <PageHeader title="Page Title" showBack backHref="#" />
-    </div>
-  </section>
-
-  <section class="component-gallery__entry" data-reveal>
-    <p class="component-gallery__name">ProfileLinks</p>
-    <div class="component-gallery__row component-gallery__row--block">
-      <ProfileLinks cards={profileLinksDemo} />
     </div>
   </section>
 
