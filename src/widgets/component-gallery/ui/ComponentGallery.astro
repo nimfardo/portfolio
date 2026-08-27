@@ -1,24 +1,54 @@
 ---
 // /system's component exhibit — every export from shared/ui/index.ts
-// (src/shared/ui/index.ts), rendered live. `IconName` is skipped: it's a
-// type export, not a renderable value — the only export in the barrel
-// that isn't a component.
+// (src/shared/ui/index.ts), rendered live, plus a curated Organisms group
+// pulling from widgets/. `IconName` is skipped: it's a type export, not a
+// renderable value — the only export in the barrel that isn't a component.
 //
-// Grouped by Atoms/Molecules, matching the Figma library's own
-// classification (figma-design-system memory): InputField is the one
-// molecule this barrel exports — every other export here is an atom in
-// Figma's — atoms/core section. No organism exists at this layer
-// (organisms live in widgets/, out of this gallery's scope, since it
-// only ever walks shared/ui). Order within each group is still the
-// barrel's own order, so a new atom/molecule added to the kit shows up
-// here without a second edit — only a genuinely new TIER needs a new
-// group added by hand.
+// Grouped by Atoms/Molecules/Organisms, matching the Figma library's own
+// classification (figma-design-system memory) for the first two tiers.
+// Organisms has no Figma equivalent to match against — this project's
+// widgets/ layer is a code-only concept — so that group is scoped by hand
+// instead of walked automatically.
+//
+// Atoms opens on Icon/IconBadge (Max's call) rather than Button — this
+// barrel's icon library is the atom that reads as "our design system" at a
+// glance, ahead of any single control.
 //
 // Each component gets one instance per reasonable variant, taken from its
 // own Props interface (checked by reading the component, not guessed):
 // Button's type x size, InputField's text/password, etc. A no-prop
 // component (Divider, Logo, LoadingIndicator, PageNotFoundCat, HungaryFlag)
 // renders once.
+//
+// Organisms is a short list of the widgets that demo cleanly standalone —
+// PageHeader, ProfileLinks, IndustriesBar, ProjectGrid, VideoSection,
+// ProjectGallery. Case-study section widgets (ProjectHero, ContentSection,
+// BuildSection, Retrospective, ProcessAccordion) and the utility widgets
+// (PasswordGate, NoContent) are cut on Max's review — this exhibit is the
+// design system, not a second case-study page.
+//
+// Most surviving Organisms use real, already-shipped data (VideoSection and
+// ProjectGallery pull CONNECTIS's case-study content, ProjectGrid renders
+// the real PROJECTS list) — the same principle ButtonText's own demo already
+// applies by reusing the real CV_HREF instead of a fake link. ProfileLinks
+// is the deliberate exception: Max asked for generic placeholder cards here
+// instead of his real LinkedIn/Behance/GitHub/CV links, so the demo data
+// below is invented on purpose, not an oversight.
+//
+// Three widgets are deliberately EXCLUDED, not overlooked:
+//   - Navigation: already live as this very page's own persistent chrome.
+//     A second instance would duplicate the DOM ids its own script depends
+//     on (#nav-desktop, #mobile-nav-overlay) and stack a second `position:
+//     fixed` sidebar/overlay over the real one — not a demo, a second nav.
+//   - Preloader: same category of global, one-time app chrome
+//     (`position: fixed; inset: 0`), gated by sessionStorage to run once
+//     per browser session. A second instance either blacks out the whole
+//     gallery (session flag not yet set) or renders permanently invisible
+//     (flag already set by the real one higher in the DOM) — neither shows
+//     anything.
+//   - ProcessRail: pinned to a dedicated ~6600px-tall section computed from
+//     a real step count and viewport height (see widgets/process-rail's own
+//     model). It has no meaning inside a normal-flow gallery entry.
 import {
   Button,
   ButtonText,
@@ -31,19 +61,56 @@ import {
   IconBadge,
   Heading,
   InputField,
+  CtaCard,
   PageNotFoundCat,
   HungaryFlag,
 } from '@shared/ui';
 import { CV_HREF } from '@shared/config';
+import { connectis } from '@entities/project';
+import { PageHeader } from '@widgets/page-header';
+import { ProfileLinks } from '@widgets/profile-links';
+import type { ProfileLink } from '@widgets/profile-links';
+import { IndustriesBar } from '@widgets/industries-bar';
+import { ProjectGrid } from '@widgets/project-grid';
+import { VideoSection } from '@widgets/video-section';
+import { ProjectGallery } from '@widgets/project-gallery';
 
 interface Props {
   class?: string;
 }
 const { class: className } = Astro.props;
+
+// Generic placeholder cards, not Max's real profile links (Max's review):
+// this demo used to reuse the real LinkedIn/Behance/GitHub/CV URLs
+// Navigation.astro renders site-wide — he asked for a plain generic
+// instance here instead. Labels/icons/hrefs are arbitrary, not meant to
+// represent any real link.
+const profileLinksDemo: ProfileLink[] = [
+  { label: 'Link one', icon: 'arrow-right', href: '#' },
+  { label: 'Link two', icon: 'arrow-right', href: '#' },
+  { label: 'Link three', icon: 'arrow-right', href: '#' },
+  { label: 'Download', icon: 'download', href: '#', variant: 'accent', download: true },
+];
 ---
 
 <div class:list={['component-gallery', className]}>
   <p class="component-gallery__group-label">Atoms</p>
+
+  <section class="component-gallery__entry" data-reveal>
+    <p class="component-gallery__name">Icon</p>
+    <div class="component-gallery__row component-gallery__row--center">
+      <Icon name="system" size={28} />
+      <Icon name="system" size={48} />
+    </div>
+  </section>
+
+  <section class="component-gallery__entry" data-reveal>
+    <p class="component-gallery__name">IconBadge</p>
+    <div class="component-gallery__row component-gallery__row--center">
+      <IconBadge icon="system" />
+      <IconBadge icon="system" size={32} />
+    </div>
+  </section>
 
   <section class="component-gallery__entry" data-reveal>
     <p class="component-gallery__name">Button</p>
@@ -102,22 +169,6 @@ const { class: className } = Astro.props;
   </section>
 
   <section class="component-gallery__entry" data-reveal>
-    <p class="component-gallery__name">Icon</p>
-    <div class="component-gallery__row component-gallery__row--center">
-      <Icon name="system" size={28} />
-      <Icon name="system" size={48} />
-    </div>
-  </section>
-
-  <section class="component-gallery__entry" data-reveal>
-    <p class="component-gallery__name">IconBadge</p>
-    <div class="component-gallery__row component-gallery__row--center">
-      <IconBadge icon="system" />
-      <IconBadge icon="system" size={32} />
-    </div>
-  </section>
-
-  <section class="component-gallery__entry" data-reveal>
     <p class="component-gallery__name">Heading</p>
     <div class="component-gallery__row">
       <Heading>Section title</Heading>
@@ -147,6 +198,63 @@ const { class: className } = Astro.props;
       <InputField label="Password" name="system-demo-password" type="password" />
     </div>
   </section>
+
+  <section class="component-gallery__entry" data-reveal>
+    <p class="component-gallery__name">CtaCard</p>
+    <div class="component-gallery__row component-gallery__row--block">
+      <CtaCard
+        href="/system"
+        image="/media/about/system-cta.jpg"
+        imageAlt=""
+        heading="My design system"
+        caption="Tokens and components, live from the code."
+      />
+    </div>
+  </section>
+
+  <p class="component-gallery__group-label">Organisms</p>
+
+  <section class="component-gallery__entry" data-reveal>
+    <p class="component-gallery__name">PageHeader</p>
+    <div class="component-gallery__row component-gallery__row--block">
+      <PageHeader title="Page Title" showBack backHref="#" />
+    </div>
+  </section>
+
+  <section class="component-gallery__entry" data-reveal>
+    <p class="component-gallery__name">ProfileLinks</p>
+    <div class="component-gallery__row component-gallery__row--block">
+      <ProfileLinks cards={profileLinksDemo} />
+    </div>
+  </section>
+
+  <section class="component-gallery__entry" data-reveal>
+    <p class="component-gallery__name">IndustriesBar</p>
+    <div class="component-gallery__row component-gallery__row--block">
+      <IndustriesBar />
+    </div>
+  </section>
+
+  <section class="component-gallery__entry" data-reveal>
+    <p class="component-gallery__name">ProjectGrid</p>
+    <div class="component-gallery__row component-gallery__row--block">
+      <ProjectGrid />
+    </div>
+  </section>
+
+  <section class="component-gallery__entry" data-reveal>
+    <p class="component-gallery__name">VideoSection</p>
+    <div class="component-gallery__row component-gallery__row--block">
+      <VideoSection src={connectis.video.src} poster={connectis.video.poster} alt={connectis.video.alt} />
+    </div>
+  </section>
+
+  <section class="component-gallery__entry" data-reveal>
+    <p class="component-gallery__name">ProjectGallery</p>
+    <div class="component-gallery__row component-gallery__row--block">
+      <ProjectGallery rows={connectis.gallery} />
+    </div>
+  </section>
 </div>
 
 <style>
@@ -160,19 +268,24 @@ const { class: className } = Astro.props;
     flex-direction: column;
     gap: var(--spacing-md);
   }
+  /* Matches `.token-gallery__name` (TokenGallery.astro) exactly —
+     `--color-text-primary`, not the more saturated `--color-text-secondary`
+     this used to carry, so a component name reads as a label rather than
+     competing for attention with the components themselves (feat-112). */
   .component-gallery__name {
     margin: 0;
     font-family: monospace;
     font-size: var(--font-size-sm);
-    color: var(--color-text-secondary);
+    color: var(--color-text-primary);
   }
   /* One tier below the page's own "Components" aside label (Heading, in
      system.astro's section-grid) and one tier above each component's own
      monospace name — a group needs to read as louder than an entry but
      quieter than the section it lives in. Extra margin-top on every group
-     after the first is what separates Atoms from Molecules; the flex gap
-     alone already spaces every entry from its neighbor uniformly, so
-     without it the group boundary wouldn't read as a boundary. */
+     after the first is what separates Atoms from Molecules from Organisms;
+     the flex gap alone already spaces every entry from its neighbor
+     uniformly, so without it the group boundary wouldn't read as a
+     boundary. Matches `.token-gallery__group-label` byte-for-byte. */
   .component-gallery__group-label {
     margin: 0;
     font-family: var(--font-family-body);
