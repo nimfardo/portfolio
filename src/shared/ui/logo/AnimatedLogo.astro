@@ -1,10 +1,12 @@
 ---
 // Header/nav logo — real Lottie animation of the monogram (exported from
-// max-logo.aep, 20 frames / 30fps, raw/max-logo.json → public/media/logo/).
+// max-logo.aep, 30 frames / 30fps, raw/max-logo.json → public/media/logo/;
+// resynced feat-116, replacing the export Max had rejected the first time).
 // Rest state (frame 0) looks identical to the static Logo.astro glyph.
 // Hover plays forward to the last frame and freezes there; unhover plays
 // the same clip in reverse back to frame 0 — a small hover-reveal detail,
-// not a looping/ambient animation.
+// not a looping/ambient animation. Wired into Navigation's desktop sidebar
+// logo as of feat-116; the mobile header/overlay logos stay static Logo.
 //
 // The Lottie's fill colors are baked in at export time (not currentColor —
 // Lottie shape fills don't follow CSS custom properties without runtime

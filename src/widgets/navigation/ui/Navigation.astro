@@ -4,10 +4,12 @@
 // (Figma mock, node 2239:387 / 2240:2, signed off 2026-07-24). Both render
 // server-side; CSS media queries pick which is visible — no JS/FOUC needed
 // for the layout switch itself, only for the overlay's open/close state.
-// Logo: static SVG, not AnimatedLogo — Max didn't like the current Lottie
-// export (raw/max-logo.json) and will provide a replacement later.
-// AnimatedLogo.astro itself is untouched, just unused for now.
-import { ButtonText, Logo, Icon } from '@shared/ui';
+// Logo: the desktop sidebar uses AnimatedLogo (hover plays the monogram
+// forward, unhover reverses it) now that Max's replacement export landed
+// (feat-116, raw/max-logo.json). Mobile header and overlay stay on the
+// plain static Logo — no hover on touch, and duplicating the Lottie web
+// component there would cost weight for an interaction that can't fire.
+import { ButtonText, Logo, AnimatedLogo, Icon } from '@shared/ui';
 import { CV_HREF, CV_LABEL } from '@shared/config';
 import { ThemeToggle } from '@features/theme-toggle';
 import { MobileNavToggle } from '@features/mobile-nav-toggle';
@@ -47,7 +49,7 @@ const currentPath = Astro.url.pathname;
 <nav id="nav-desktop" class="nav-desktop" aria-label="Primary" transition:persist>
   <div class="nav-desktop__top">
     <a href="/" aria-label="Home">
-      <Logo size={64} />
+      <AnimatedLogo size={64} />
     </a>
     <ul class="nav-desktop__items">
       {
