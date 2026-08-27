@@ -89,6 +89,10 @@ const isPassword = type === 'password';
     align-items: center;
     gap: var(--spacing-sm);
     width: 100%;
+    /* Fixed, not content-sized: the password variant's 28px eye toggle is
+       taller than text's 20px line-height, so without this the two types
+       render 8px apart (61px vs 69px) sitting side by side. */
+    min-height: 69px;
     padding: 20px 24px;
     background: var(--color-bg-subtle);
     border-bottom: 1px solid var(--color-border-strong);
