@@ -17,17 +17,20 @@
 // full-width content instead, which is what read as inconsistent next to
 // the rest of the site (Max's review).
 //
-// The lead paragraph (copy-025, opener added copy-026) is the story's
-// positioning statement: states the page's purpose plainly first, then
-// frames the two-formats problem — a Figma-pretty portfolio deletes the
-// code, a GitHub profile deletes the taste (story's own framing,
-// wiki/log.md 2026-08-25). It's its own section so it stays cuttable
-// without touching the two gallery sections either side of it.
+// The lead paragraph (copy-025/026, cut to two sentences copy-028) states
+// the page's purpose plainly and stops — the earlier version also framed
+// "a Figma-pretty portfolio deletes the code, a GitHub profile deletes the
+// taste," but Max asked for shorter and that framing now lives implicitly
+// in the Repository card instead (feat-112). It's its own section so it
+// stays cuttable without touching the Overview lead or either gallery.
+// Repository opens the page rather than closing it (feat-114, Max's
+// review) — the "go verify it yourself" proof leads now, ahead of the
+// exhibit it backs up, rather than following it.
 import Layout from '@app/layouts/Layout.astro';
 import { PageHeader } from '@widgets/page-header';
 import { TokenGallery } from '@widgets/token-gallery';
 import { ComponentGallery } from '@widgets/component-gallery';
-import { Heading } from '@shared/ui';
+import { Heading, CtaCard } from '@shared/ui';
 ---
 
 <Layout title="System — Max Shturma">
@@ -36,13 +39,31 @@ import { Heading } from '@shared/ui';
 
     <PageHeader title="System" showBack backHref="/about" class="system__header" />
 
+    {
+      /* Repository (feat-112, moved to the top per feat-114/Max's review):
+        same CtaCard as /about's "System" card, pointed at the public export
+        instead. Opens the page rather than closing it now — the "go verify
+        it yourself" proof leads, ahead of the tokens/components exhibit it
+        backs up. */
+    }
+    <section class="system__section section-grid">
+      <Heading class="section-grid__aside">Repository</Heading>
+      <div class="section-grid__body" data-reveal>
+        <CtaCard
+          href="https://github.com/nimfardo/portfolio"
+          image="/media/about/system-cta.jpg"
+          imageAlt=""
+          heading="The public repo"
+          caption="The commit history behind everything above."
+        />
+      </div>
+    </section>
+
     <section class="system__section section-grid">
       <Heading class="section-grid__aside">Overview</Heading>
       <p class="section-grid__body section-prose" data-reveal>
-        This is my design system — the tokens and components this site is built from, live
-        from the code. I build in Figma and I ship in code. A Figma-pretty portfolio deletes
-        the code. A GitHub profile deletes the taste. This page deletes neither. Check both
-        at once.
+        Design system — the tokens and components this site is built from, live from the
+        code. I build in Figma and I ship in code.
       </p>
     </section>
 
