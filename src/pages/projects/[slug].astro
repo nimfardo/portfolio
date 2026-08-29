@@ -18,8 +18,13 @@ import { PROJECTS, PROJECT_CONTENT } from '@entities/project';
 // written (currently only CONNECTIS) — clicking any other card used to
 // 404. `content` is undefined for a slug with no entry in PROJECT_CONTENT;
 // the template falls back to the No Content state for those.
+//
+// 'gallery' is excluded: it's served by the static projects/gallery.astro
+// sibling file instead (a live Unsplash-fed page, not a PROJECT_CONTENT
+// case study) — leaving it in here would make this file's getStaticPaths
+// try to own /projects/gallery too and collide with that route.
 export function getStaticPaths() {
-  return PROJECTS.map((meta) => ({
+  return PROJECTS.filter((meta) => meta.slug !== 'gallery').map((meta) => ({
     params: { slug: meta.slug },
     props: { meta, content: PROJECT_CONTENT[meta.slug] },
   }));

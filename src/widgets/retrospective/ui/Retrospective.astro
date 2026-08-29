@@ -6,9 +6,17 @@ interface Props {
   heading: string;
   /** Optional since feat-033 — defenceSystems's closing section has no Behance link. */
   behanceUrl?: string;
+  /** A second, generic external link+label pair — feat-122's Gallery page
+   * needs "Check on Unsplash" instead of Behance, and every existing
+   * project's `behanceUrl` stays exactly as-is rather than being
+   * generalized into this (would touch every project's content file for
+   * no reason). Independent of behanceUrl; a page could carry both, though
+   * none does today. */
+  linkLabel?: string;
+  linkHref?: string;
 }
 
-const { heading, behanceUrl } = Astro.props;
+const { heading, behanceUrl, linkLabel, linkHref } = Astro.props;
 ---
 
 <section class="section-grid retrospective">
@@ -19,6 +27,13 @@ const { heading, behanceUrl } = Astro.props;
       behanceUrl && (
         <Button type="solid" href={behanceUrl} class="retrospective__button">
           Check on Behance
+        </Button>
+      )
+    }
+    {
+      linkHref && linkLabel && (
+        <Button type="solid" href={linkHref} class="retrospective__button">
+          {linkLabel}
         </Button>
       )
     }

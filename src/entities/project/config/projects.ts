@@ -104,4 +104,15 @@ export const PROJECTS: Project[] = [
     access: 'public',
     thumbnail: '/media/khvyliasti/thumbnail.jpg',
   },
+  // Not a case study — a live Unsplash-fed gallery, served by the static
+  // pages/projects/gallery.astro route rather than PROJECT_CONTENT (see
+  // that file's own comment). Card art is the Figma-designed
+  // media/photo-gallery composite (node 3067:3889), exported once same as
+  // every other thumbnail.
+  {
+    slug: 'gallery',
+    name: 'Gallery',
+    access: 'public',
+    thumbnail: '/media/gallery/thumbnail.jpg',
+  },
 ];

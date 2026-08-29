@@ -1,0 +1,78 @@
+---
+// Static sibling route to [slug].astro, not a slug it handles — Astro
+// resolves a literal file route (/projects/gallery.astro) before the
+// dynamic [slug] catch-all for an exact path match, so this file wins over
+// [slug].astro for /projects/gallery. [slug].astro's getStaticPaths
+// excludes the 'gallery' PROJECTS entry for the same reason: without that,
+// both routes would try to own the same path.
+//
+// Shaped like a normal case-study page (Figma "Project Page/Gallery",
+// node 3069:3918, reuses the same Hero/Overview/Retrospective vocabulary
+// every project page does) with one exception: the gallery grid itself
+// (widgets/photo-wall) is live — fetched from Max's Unsplash account in the
+// visitor's browser — since PROJECT_CONTENT's static, build-time shape has
+// no way to express "however many photos happen to be on Unsplash right
+// now." Hero and thumbnail are static exports from Figma, same as every
+// other project — only the grid mirrors Unsplash live.
+import Layout from '@app/layouts/Layout.astro';
+import { HighlightText } from '@shared/ui';
+import { PageHeader } from '@widgets/page-header';
+import { ProjectHero } from '@widgets/project-hero';
+import { OverviewSection } from '@widgets/overview-section';
+import { Retrospective } from '@widgets/retrospective';
+import { PhotoWall } from '@widgets/photo-wall';
+import { UNSPLASH_USERNAME, UNSPLASH_UTM_PARAMS } from '@entities/photo';
+
+const unsplashProfileUrl = `https://unsplash.com/@${UNSPLASH_USERNAME}?${UNSPLASH_UTM_PARAMS}`;
+---
+
+<Layout title="Gallery — Max Shturma">
+  <main class="project-page">
+    <PageHeader title="Gallery" showBack backHref="/" class="project-page__header" />
+
+    <ProjectHero
+      media={{ type: 'image', image: '/media/gallery/hero.jpg', imageAlt: 'A boat on open water, one of Max’s Unsplash photos' }}
+      scrollCue
+    />
+
+    <div class="project-page__sections">
+      <OverviewSection heading="Project Overview" tags={['Photography', 'Photographer', 'Travelling · Hobby', '2018–Present']}>
+        <HighlightText text="These are photos I've taken over the years and posted on **Unsplash**." />
+      </OverviewSection>
+
+      <PhotoWall />
+
+      <Retrospective heading="What I've Learned" linkLabel="Check on Unsplash" linkHref={unsplashProfileUrl}>
+        <HighlightText text="Photography is an enjoyable way to save moments of life into pixels, with control over the process and light to get the result I want. It's a **meditative process** of dialing in aperture and ISO." />
+      </Retrospective>
+    </div>
+  </main>
+</Layout>
+
+<style>
+  /* Identical to [slug].astro's own page wrapper — copied rather than
+     extracted into a shared partial. One other user of this exact CSS
+     doesn't earn a new shared file yet; if a third project-shaped page
+     shows up, that's the point to factor it out. */
+  :global(.project-page__header) {
+    padding: 0 40px;
+  }
+  .project-page__sections {
+    display: flex;
+    flex-direction: column;
+    gap: 160px;
+    padding: 160px 40px;
+  }
+  @media (max-width: 1023px) {
+    .project-page__sections {
+      gap: var(--spacing-4xl);
+      padding: var(--spacing-4xl) 40px;
+    }
+  }
+  @media (max-width: 767px) {
+    .project-page__sections {
+      gap: var(--spacing-4xl);
+      padding: var(--spacing-4xl) 24px;
+    }
+  }
+</style>

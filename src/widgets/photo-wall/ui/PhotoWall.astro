@@ -1,0 +1,237 @@
+---
+// Live gallery grid for /projects/gallery — the one section on that page
+// that isn't static/authored like every other project's content. The shell
+// below is all this component renders server-side: a status line and an
+// empty grid, both behind data-* hooks. The <script> fetches
+// entities/photo's live Unsplash list on the client and builds the actual
+// rows — tall photo + 2 stacked, alternating sides by row index, matching
+// the Figma composition (Project Page/Gallery, node 3069:3918) — since the
+// row count depends on how many photos are live on Unsplash right now,
+// there's no way to know it at build time.
+---
+
+<div class="photo-wall" data-photo-wall>
+  <p class="photo-wall__status" data-photo-wall-status>Loading photos…</p>
+  <div class="photo-wall__grid" data-photo-wall-grid></div>
+</div>
+
+<script>
+  import { fetchUserPhotos, UNSPLASH_USERNAME } from '@entities/photo';
+  import type { Photo } from '@entities/photo';
+  import { initScrollReveal, staggerDelay } from '@shared/lib';
+
+  function buildTile(photo: Photo, revealDelay: string): HTMLAnchorElement {
+    const tile = document.createElement('a');
+    tile.className = 'photo-wall__tile';
+    tile.href = photo.photoPageUrl;
+    tile.target = '_blank';
+    tile.rel = 'noopener noreferrer';
+    tile.setAttribute('data-reveal', '');
+    tile.style.setProperty('--reveal-delay', revealDelay);
+
+    const img = document.createElement('img');
+    img.src = photo.url;
+    img.alt = photo.alt;
+    img.loading = 'lazy';
+    tile.appendChild(img);
+
+    // Required by the Unsplash API Guidelines: a visible credit linking the
+    // photographer's profile and the photo's own Unsplash page (both links
+    // point at photo.photoPageUrl here — the profile link lives on the name
+    // inside the credit... actually both destinations matter, so the whole
+    // caption links to the photo page and the photographer's name is its own
+    // link to their profile).
+    const credit = document.createElement('span');
+    credit.className = 'photo-wall__credit';
+    credit.textContent = 'Photo by ';
+    const photographer = document.createElement('a');
+    photographer.href = photo.photographerUrl;
+    photographer.target = '_blank';
+    photographer.rel = 'noopener noreferrer';
+    photographer.textContent = photo.photographerName;
+    photographer.addEventListener('click', (e) => e.stopPropagation());
+    credit.appendChild(photographer);
+    credit.append(' on Unsplash');
+    tile.appendChild(credit);
+
+    return tile;
+  }
+
+  function buildRow(group: Photo[], side: 'left' | 'right', delayBase: number): HTMLElement {
+    if (group.length === 1) {
+      const full = document.createElement('div');
+      full.className = 'photo-wall__full';
+      full.appendChild(buildTile(group[0], staggerDelay(delayBase, 60)));
+      return full;
+    }
+
+    const row = document.createElement('div');
+    row.className = side === 'right' ? 'photo-wall__row photo-wall__row--reverse' : 'photo-wall__row';
+
+    const tall = document.createElement('div');
+    tall.className = 'photo-wall__tall';
+    tall.appendChild(buildTile(group[0], staggerDelay(delayBase, 60)));
+
+    const stack = document.createElement('div');
+    stack.className = 'photo-wall__stack';
+    group.slice(1).forEach((photo, i) => {
+      stack.appendChild(buildTile(photo, staggerDelay(delayBase + i + 1, 60)));
+    });
+
+    row.append(tall, stack);
+    return row;
+  }
+
+  async function initPhotoWall(): Promise<void> {
+    const wall = document.querySelector<HTMLElement>('[data-photo-wall]');
+    if (!wall) return;
+    const status = wall.querySelector<HTMLElement>('[data-photo-wall-status]');
+    const grid = wall.querySelector<HTMLElement>('[data-photo-wall-grid]');
+    if (!status || !grid) return;
+
+    try {
+      const photos = await fetchUserPhotos(UNSPLASH_USERNAME);
+      if (photos.length === 0) {
+        status.textContent = 'No photos yet.';
+        return;
+      }
+
+      for (let i = 0; i < photos.length; i += 3) {
+        const group = photos.slice(i, i + 3);
+        const side = (i / 3) % 2 === 0 ? 'left' : 'right';
+        grid.appendChild(buildRow(group, side, i));
+      }
+      status.remove();
+      initScrollReveal();
+    } catch {
+      status.textContent = "Couldn't load photos from Unsplash right now.";
+    }
+  }
+
+  document.addEventListener('astro:page-load', initPhotoWall);
+</script>
+
+<style>
+  .photo-wall {
+    display: flex;
+    flex-direction: column;
+  }
+  .photo-wall__status {
+    margin: 0;
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-sm);
+    line-height: var(--font-line-height-sm);
+    color: var(--color-text-secondary);
+  }
+  .photo-wall__grid {
+    display: flex;
+    flex-direction: column;
+    gap: 64px;
+  }
+
+  /* :global() below — every element inside .photo-wall__grid is created by
+     the <script> above via document.createElement, so none of it carries
+     this file's astro-cid scoping attribute (same reason ProjectCard's
+     .project-card__arrow rule needs :global(), see that file). Scoped
+     selectors would silently never match script-generated markup. */
+  :global(.photo-wall__row) {
+    display: flex;
+    gap: 64px;
+  }
+  :global(.photo-wall__row--reverse) {
+    flex-direction: row-reverse;
+  }
+  :global(.photo-wall__tall) {
+    flex: 1;
+    min-width: 0;
+    aspect-ratio: 791.5 / 1000;
+  }
+  :global(.photo-wall__stack) {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 64px;
+  }
+  :global(.photo-wall__stack .photo-wall__tile) {
+    aspect-ratio: 791.5 / 468;
+  }
+  :global(.photo-wall__full .photo-wall__tile) {
+    aspect-ratio: 1647 / 1000;
+  }
+  :global(.photo-wall__tile) {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+  :global(.photo-wall__tall .photo-wall__tile) {
+    height: 100%;
+  }
+  :global(.photo-wall__tile img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  :global(.photo-wall__credit) {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: var(--spacing-md);
+    /* Fixed values, not theme tokens — this caption sits directly on a
+       photo of unknown brightness, same reasoning as defenceSystems's baked-fill
+       card ink (bug-040): it must not flip with the site theme. */
+    background: linear-gradient(to top, rgba(17, 10, 3, 0.7), transparent);
+    color: #f5ede1;
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-xs);
+    line-height: var(--font-line-height-xs);
+    transition: opacity var(--duration-fast) var(--ease-fade);
+  }
+  :global(.photo-wall__credit a) {
+    color: inherit;
+    text-decoration: underline;
+  }
+  /* Touch devices never fire a sustained :hover, so the credit stays
+     visible there by default (opacity is 1 unless this query overrides
+     it) — same reasoning as ProjectCard's footer. */
+  @media (hover: hover) and (pointer: fine) {
+    :global(.photo-wall__credit) {
+      opacity: 0;
+    }
+    :global(.photo-wall__tile:hover .photo-wall__credit) {
+      opacity: 1;
+    }
+  }
+
+  @media (max-width: 1023px) {
+    .photo-wall__grid {
+      gap: var(--spacing-4xl);
+    }
+    :global(.photo-wall__row) {
+      gap: var(--spacing-4xl);
+    }
+    :global(.photo-wall__stack) {
+      gap: var(--spacing-4xl);
+    }
+  }
+  @media (max-width: 767px) {
+    .photo-wall__grid {
+      gap: var(--spacing-3xl);
+    }
+    :global(.photo-wall__row),
+    :global(.photo-wall__row--reverse) {
+      flex-direction: column;
+      gap: var(--spacing-3xl);
+    }
+    :global(.photo-wall__tall) {
+      aspect-ratio: 1647 / 1000;
+    }
+    :global(.photo-wall__stack) {
+      gap: var(--spacing-3xl);
+    }
+  }
+</style>
