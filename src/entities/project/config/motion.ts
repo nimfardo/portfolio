@@ -35,7 +35,7 @@ export const motion = {
   } satisfies HeroMedia,
   overview: {
     heading: 'Project Overview',
-    text: 'Some of my design works are in motion. I’m passionate about creating an enjoyable experience that delights users through microanimations and motion design. Here I’ve collected some of my works (the first ones are Lottie JSON files).',
+    text: "Motion is a collection of UI microinteractions and Lottie animations from a few of the products I've designed.",
     tags: ['Motion design', '2021–Present'],
   },
   // Row one is a tall video beside a stack of two Lottie slots (AdQuanto over
