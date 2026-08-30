@@ -40,9 +40,9 @@ const { title, hideNav = false } = Astro.props;
       // NOTE: this tracks the BROWSER/OS theme, which is what colours the tab
       // strip — deliberately not the site's own `theme` localStorage toggle.
       (function () {
-        var q = matchMedia('(prefers-color-scheme: light)');
+        const q = matchMedia('(prefers-color-scheme: light)');
         function apply() {
-          var el = document.getElementById('favicon');
+          const el = document.getElementById('favicon');
           if (el) el.href = q.matches ? '/favicon-light.svg' : '/favicon.svg';
         }
         apply();
