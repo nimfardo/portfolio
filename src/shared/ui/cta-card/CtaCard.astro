@@ -1,0 +1,136 @@
+---
+// A full clickable card: background photo + dark scrim, heading + caption,
+// trailing arrow. First built for About's "See the system" link (Figma node
+// 2964:2287, copy-027) as page-local markup; extracted here once /system's
+// Repository card (feat-112) became a second consumer, so the visual stays
+// in one place instead of two copies of the same scrim/overlay rules.
+import Icon from '../icon/Icon.astro';
+
+interface Props {
+  href: string;
+  external?: boolean;
+  image: string;
+  imageAlt: string;
+  heading: string;
+  /** Optional — /system's Repository card drops it (Max's review), every
+   * other consumer keeps the supporting line under the heading. */
+  caption?: string;
+  class?: string;
+}
+
+const { href, external, image, imageAlt, heading, caption, class: className } = Astro.props;
+const isExternal = external ?? href.startsWith('http');
+---
+
+<a
+  href={href}
+  class:list={['cta-card', className]}
+  target={isExternal ? '_blank' : undefined}
+  rel={isExternal ? 'noopener noreferrer' : undefined}
+>
+  <img src={image} alt={imageAlt} class="cta-card__image" />
+  <div class="cta-card__scrim"></div>
+  <div class="cta-card__content">
+    <p class="cta-card__heading">{heading}</p>
+    {caption && <p class="cta-card__caption">{caption}</p>}
+  </div>
+  <Icon name="arrow-right" size={32} class="cta-card__arrow" />
+</a>
+
+<style>
+  .cta-card {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-xl);
+    overflow: hidden;
+    padding: 80px 40px;
+    text-decoration: none;
+    transition: filter var(--duration-base) var(--ease-fade);
+  }
+  /* Minimal hover in the reference vocabulary (feat-034, see LinkCards): a
+     subtle brightness lift on the card face + the arrow nudging along its
+     own glyph direction (up-right), plus a slow bg-photo zoom (Max's
+     review) — the same "picture breathes" cue as the card's other hover
+     motion. Started at 1.06 and was still too noticeable (Max's review,
+     round 2) — 1.03 (half) reads as depth, not a distracting lunge. Gated
+     to real pointers so touch devices never get a stuck hover state. */
+  @media (hover: hover) and (pointer: fine) {
+    .cta-card:hover {
+      filter: brightness(1.08);
+    }
+    .cta-card:hover :global(.cta-card__arrow) {
+      transform: translate(3px, -3px);
+    }
+    .cta-card:hover .cta-card__image {
+      transform: scale(1.03);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .cta-card,
+    .cta-card__image,
+    :global(.cta-card__arrow) {
+      transition: none;
+    }
+  }
+  .cta-card__image {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--duration-slow) var(--ease-fade);
+  }
+  .cta-card__scrim {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+  }
+  .cta-card__content {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  /* Heading, caption and arrow sit on the card's own dark photo + scrim,
+     not the page surface, so — same bug as LinkCards' footer (2026-08-09) —
+     they must stay pinned to the cream primitive instead of the
+     theme-flipping emphasis tokens; those go near-black in light mode and
+     nearly disappear against the scrim. */
+  .cta-card__heading {
+    margin: 0;
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-3xl);
+    line-height: var(--font-line-height-3xl);
+    font-weight: var(--font-weight-bold);
+    letter-spacing: -0.01em;
+    color: var(--color-obsidian-amber-50);
+  }
+  .cta-card__caption {
+    margin: 0;
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-sm);
+    line-height: var(--font-line-height-sm);
+    font-weight: var(--font-weight-regular);
+    color: var(--color-obsidian-amber-50);
+  }
+  :global(.cta-card__arrow) {
+    position: relative;
+    flex-shrink: 0;
+    color: var(--color-obsidian-amber-50);
+    transition: transform var(--duration-base) var(--ease-fade);
+  }
+
+  @media (max-width: 767px) {
+    .cta-card {
+      flex-wrap: wrap;
+      gap: var(--spacing-md);
+      padding: var(--spacing-xl) var(--spacing-lg);
+    }
+    .cta-card__heading {
+      font-size: var(--font-size-2xl);
+      line-height: var(--font-line-height-2xl);
+    }
+  }
+</style>

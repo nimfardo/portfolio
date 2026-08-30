@@ -1,0 +1,26 @@
+---
+// Renders a plain string, except any `**phrase**`-wrapped run is painted
+// text/primary instead of the ambient text-emphasis — the code-side
+// equivalent of the per-run text-color highlight Figma's text nodes carry
+// (see e.g. defenceSystems.ts's "defense-tech projects."). Content configs author the
+// markers directly in their `text` fields; nothing else parses markdown.
+interface Props {
+  text: string;
+}
+
+const { text } = Astro.props;
+const parts = text.split(/(\*\*[^*]+\*\*)/g).filter((part) => part.length > 0);
+---
+
+{
+  parts.map((part) => {
+    const match = part.match(/^\*\*([^*]+)\*\*$/);
+    return match ? <span class="highlight-text">{match[1]}</span> : part;
+  })
+}
+
+<style>
+  .highlight-text {
+    color: var(--color-text-primary);
+  }
+</style>
