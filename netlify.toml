@@ -1,0 +1,12 @@
+# Static build — no adapter, no functions (see astro.config.mjs's own
+# comment on why @astrojs/netlify was dropped in feat-003). Netlify serves
+# dist/ directly; 404.html is auto-detected as the custom 404 page for a
+# static publish directory, no redirect rule needed.
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  # Matches package.json's engines.node floor (Astro 7 requirement).
+  # Netlify's own default build image is older than this.
+  NODE_VERSION = "22.12.0"
