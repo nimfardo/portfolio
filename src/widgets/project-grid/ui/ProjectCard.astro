@@ -27,7 +27,6 @@ const { project, revealDelay, eager } = Astro.props;
         project.access === 'nda' && (
           <span class="project-card__nda">
             <Icon name="locker" size={16} />
-            NDA
           </span>
         )
       }
@@ -119,18 +118,11 @@ const { project, revealDelay, eager } = Astro.props;
   .project-card__nda {
     display: inline-flex;
     align-items: center;
-    gap: var(--spacing-sm);
-    padding: 8px 14px;
-    border: 1px solid var(--color-border-strong);
+    justify-content: center;
+    padding: var(--spacing-sm);
+    border: 1px solid var(--color-border-emphasis);
     border-radius: var(--radius-full);
-    font-family: var(--font-family-body);
-    font-size: var(--font-size-xs);
-    line-height: var(--font-line-height-xs);
-    font-weight: var(--font-weight-regular);
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
     color: var(--color-text-emphasis);
-    white-space: nowrap;
   }
   /* :global() required — `class="project-card__arrow"` merges onto Icon's
      own rendered <span> (class:list={['icon', className]}), so the element
