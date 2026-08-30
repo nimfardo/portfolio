@@ -24,7 +24,7 @@ const { class: className } = Astro.props;
 </button>
 
 <script>
-  import { bindOncePersisted } from '@shared/lib';
+  import { bindOncePersisted, initCvRole } from '@shared/lib';
 
   // The desktop toggle (PageHeader) is fresh, unpersisted markup on every
   // page — needs (re)binding after each `astro:page-load`. The mobile
@@ -64,6 +64,7 @@ const { class: className } = Astro.props;
           localStorage.setItem(STORAGE_KEY, 'light');
         }
         syncAllPressed();
+        initCvRole();
       });
     });
   }

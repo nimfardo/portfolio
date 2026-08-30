@@ -29,16 +29,28 @@ export const CV_LABEL = 'CV';
  * server-rendered default (no-JS / no-param fallback) — unchanged on purpose,
  * so an existing recruiter link to the bare PDF keeps working.
  *
- * `design-systems-designer` and `senior-designer` ship as placeholder copies
- * of the same default PDF until Max exports the real ones from Figma frames
- * 2857:10/:14 and 2857:18/:22 (STATE.md, still owed as of 2026-08-23).
+ * Each role also ships a dark and a light PDF (rendered by
+ * `scripts/cv-pdf/render.mjs` straight from the site's own tokens/template),
+ * matching whichever theme the visitor is currently in — `cv-role.ts` reads
+ * `document.documentElement.dataset.theme` the same way the theme toggle
+ * itself does. `CV_HREF`'s file is the dark/design-engineer entry below.
  */
 export type CvRole = 'design-engineer' | 'design-systems-designer' | 'senior-designer';
+export type CvTheme = 'dark' | 'light';
 
 export const CV_DEFAULT_ROLE: CvRole = 'design-engineer';
 
-export const CV_ROLE_HREFS: Record<CvRole, string> = {
-  'design-engineer': CV_HREF,
-  'design-systems-designer': '/max-shturma-cv-design-systems-designer.pdf',
-  'senior-designer': '/max-shturma-cv-senior-designer.pdf',
+export const CV_ROLE_HREFS: Record<CvRole, Record<CvTheme, string>> = {
+  'design-engineer': {
+    dark: CV_HREF,
+    light: '/max-shturma-cv-light.pdf',
+  },
+  'design-systems-designer': {
+    dark: '/max-shturma-cv-design-systems-designer.pdf',
+    light: '/max-shturma-cv-design-systems-designer-light.pdf',
+  },
+  'senior-designer': {
+    dark: '/max-shturma-cv-senior-designer.pdf',
+    light: '/max-shturma-cv-senior-designer-light.pdf',
+  },
 };

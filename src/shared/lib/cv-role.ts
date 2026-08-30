@@ -26,8 +26,17 @@ function resolveRole(): CvRole {
   return isCvRole(stored) ? stored : CV_DEFAULT_ROLE;
 }
 
+// Same theme signal the toggle itself reads/writes (Layout.astro's pre-paint
+// script, ThemeToggle.astro's click handler) — dark is the default, same as
+// everywhere else in the site.
+function resolveTheme(): 'dark' | 'light' {
+  return document.documentElement.dataset.theme === 'light' ? 'light' : 'dark';
+}
+
+// Re-run from ThemeToggle's click handler too, not just astro:page-load —
+// toggling theme never navigates, so nothing else would refresh the href.
 export function initCvRole() {
-  const href = CV_ROLE_HREFS[resolveRole()];
+  const href = CV_ROLE_HREFS[resolveRole()][resolveTheme()];
   document.querySelectorAll<HTMLAnchorElement>(CV_LINK_SELECTOR).forEach((link) => {
     link.href = href;
   });
