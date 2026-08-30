@@ -15,6 +15,13 @@ import type { Project } from '../model/types';
  * canvas order changes again, edit the array AND re-check that file; a comment
  * saying "matches Figma" is not evidence that it does.
  *
+ * Re-synced 2026-08-29: Seismo dropped from the grid entirely (Max deleted
+ * its card on canvas, no code-side content ever existed for it), MeTest and
+ * Logofolio swapped, and Motion is new — a 13th card with grid-only data,
+ * no `PROJECT_CONTENT` entry yet since its copy is still being written.
+ * `reference/architecture/sitemap.md` still lists Seismo and is owed the
+ * same re-check the comment above warns about.
+ *
  * `category`/`tags` are omitted (not guessed) for medicalSoftware and the 5
  * name-TBD projects — copy-deck.md marks these explicitly TBD pending Max.
  * ProjectCard renders without that row when absent.
@@ -81,28 +88,26 @@ export const PROJECTS: Project[] = [
     thumbnail: '/media/art-annanolli/thumbnail.jpg',
   },
   {
-    slug: 'logofolio',
-    name: 'Logofolio',
-    access: 'public',
-    thumbnail: '/media/logofolio/thumbnail.jpg',
-  },
-  {
     slug: 'metest',
     name: 'MeTest',
     access: 'public',
     thumbnail: '/media/metest/thumbnail.jpg',
   },
   {
-    slug: 'seismo',
-    name: 'Seismo',
+    slug: 'logofolio',
+    name: 'Logofolio',
     access: 'public',
-    thumbnail: '/media/seismo/thumbnail.png',
+    thumbnail: '/media/logofolio/thumbnail.jpg',
   },
+  // Case-study content landed 2026-08-29 (config/motion.ts). Card art is a
+  // get_screenshot export of the composited Figma card (node 2006:224),
+  // cropped to the standard 515x400. category/tags stay omitted here (same
+  // as medicalSoftware) pending copy-deck.md's Project cards table.
   {
-    slug: 'khvyliasti',
-    name: 'Khvyliasti',
+    slug: 'motion',
+    name: 'Motion',
     access: 'public',
-    thumbnail: '/media/khvyliasti/thumbnail.jpg',
+    thumbnail: '/media/motion/thumbnail.jpg',
   },
   // Not a case study — a live Unsplash-fed gallery, served by the static
   // pages/projects/gallery.astro route rather than PROJECT_CONTENT (see
@@ -114,5 +119,11 @@ export const PROJECTS: Project[] = [
     name: 'Gallery',
     access: 'public',
     thumbnail: '/media/gallery/thumbnail.jpg',
+  },
+  {
+    slug: 'khvyliasti',
+    name: 'Khvyliasti',
+    access: 'public',
+    thumbnail: '/media/khvyliasti/thumbnail.jpg',
   },
 ];

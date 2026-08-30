@@ -82,14 +82,43 @@ export interface ProcessStep {
   body: string;
 }
 
-/** One row of a project's detail-page gallery — the two layout shapes that
- * exist on the Figma canvas so far: a full-width slot, or a tall slot beside
- * N stacked slots.
+/** A gallery slot that can also hold a looping Lottie animation on a solid
+ * background — Motion's gallery is the first non-hero use of Lottie (three
+ * of its six slots: AdQuanto, underground, loadium, each exported with a
+ * flat background color since the animation layers themselves are
+ * transparent). A dedicated arm on top of `ProjectMedia` rather than widening
+ * that union itself, for the same reason `HeroMedia` stays separate:
+ * ProjectGallery's `slot.type === 'image' ? … : <video>` binary ternary would
+ * otherwise silently push a Lottie through the video branch. */
+export type GalleryMedia =
+  | ProjectMedia
+  | {
+      type: 'lottie';
+      /** The .json animation, played by entities/media. */
+      src: string;
+      alt: string;
+      /** CSS background behind the animation. A fixed export color, NOT a
+       * theme token — same rule as HeroMedia's lottie arm. */
+      background: string;
+    };
+
+/** One row of a project's detail-page gallery — the layout shapes that exist
+ * on the Figma canvas so far: a full-width slot, a tall slot beside N
+ * stacked slots, or a pair of equal-height slots side by side.
  *
- * Every slot is a `ProjectMedia`, the same image|video union already backing
- * the hero, process steps, ContentSection and BuildSection (feat-041). Arvus's
- * gallery puts a video in the tall slot, and a `string | ProjectMedia` shim
- * would have left two representations of one thing — a plain path here and a
+ * `pair` is not just `split` with a one-item `stack`: `split`'s `tall` side
+ * is hardcoded to the 791.5:1000 ratio (it's meant to visually anchor a
+ * multi-item stack, e.g. two 468-tall slots + the gap between them), so
+ * forcing a lone 468-tall slot's counterpart into that box stretches it
+ * ~55% too tall — object-fit:cover hides this on a video by just cropping
+ * more, but a same-height sibling then has nothing to stretch to and leaves
+ * dead space below it. Motion's second gallery row (motion-car.webm +
+ * loadium.json) is genuinely two 791.5x468 boxes side by side on canvas
+ * (node 3083:5522), not a tall+stack — hence this third arm.
+ *
+ * Every slot is a `GalleryMedia` (feat-041 made it `ProjectMedia`; Motion's
+ * Lottie slots widened it further), and a `string | GalleryMedia` shim would
+ * have left two representations of one thing — a plain path here and a
  * discriminated union everywhere else — so the slots took the canonical type
  * instead.
  *
@@ -106,8 +135,9 @@ export interface ProcessStep {
  * whole content is already in the caption beside it. It just has to be a
  * per-slot judgement now, not the default. */
 export type GalleryRow =
-  | { type: 'full'; image: ProjectMedia }
-  | { type: 'split'; tall: ProjectMedia; stack: ProjectMedia[] };
+  | { type: 'full'; image: GalleryMedia }
+  | { type: 'split'; tall: GalleryMedia; stack: GalleryMedia[] }
+  | { type: 'pair'; left: GalleryMedia; right: GalleryMedia };
 
 /** A clickable sub-brand card in the overview (defenceSystems's subBrandOne.example /
  * subBrandTwo.example pair, feat-033). The card face's background is a CSS
@@ -174,6 +204,10 @@ export interface ProjectContent {
   hero: HeroMedia;
   overview: {
     heading: string;
+    /** A media slot above the statement — Logofolio's construction diagram
+     * for its "Mdt" mark, the first project whose Overview carried one.
+     * Every other page renders unchanged since this is optional. */
+    image?: ProjectMedia;
     text: string;
     description?: string;
     features?: FeatureList;
@@ -191,5 +225,12 @@ export interface ProjectContent {
     text: string;
     /** Optional — defenceSystems's closing section has no Behance link. */
     behanceUrl?: string;
+    /** A second, generic external link+label pair — mirrors
+     * Retrospective.astro's own `linkLabel`/`linkHref` props. Motion's
+     * closing section links to Dribbble rather than Behance, so it needed a
+     * non-Behance-specific field; independent of `behanceUrl`, a page could
+     * carry both, though none does today. */
+    linkLabel?: string;
+    linkHref?: string;
   };
 }

@@ -10,6 +10,7 @@ export type {
   ContentBlock,
   ProcessStep,
   ProcessStepMedia,
+  GalleryMedia,
   GalleryRow,
   LinkCard,
   FeatureList,

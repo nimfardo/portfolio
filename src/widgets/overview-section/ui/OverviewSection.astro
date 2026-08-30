@@ -11,30 +11,39 @@
 // The card markup itself now lives in entities/project's LinkCards — medicalSoftware
 // needed the same cards inside a ContentSection, so keeping them here would
 // have meant two copies of the pinned-colour rules (bug-040).
-import { Heading, ButtonText } from '@shared/ui';
+import { Heading } from '@shared/ui';
+import { Media } from '@entities/media';
 import { LinkCards } from '@entities/project';
-import type { LinkCard, FeatureList } from '@entities/project';
+import type { LinkCard, FeatureList, ProjectMedia } from '@entities/project';
 
 interface Props {
   heading: string;
+  /** A media slot above the statement — Logofolio's construction diagram
+   * for its "Mdt" mark, the first Overview to carry one. Every other page
+   * omits it and renders unchanged. */
+  image?: ProjectMedia;
   tags?: string[];
   description?: string;
   /** enterpriseIt's "Features:" block — a bold label over a bulleted list. */
   features?: FeatureList;
   linkCards?: LinkCard[];
-  /** A single trailing proof link, rendered after tags. Optional so every
-   * other consumer renders unchanged — added for /about's one link to
-   * /system (story: system-as-exhibit). */
-  link?: { href: string; label: string };
   class?: string;
 }
 
-const { heading, tags, description, features, linkCards, link, class: className } = Astro.props;
+const { heading, image, tags, description, features, linkCards, class: className } = Astro.props;
 ---
 
 <section class:list={['section-grid', 'overview-section', className]}>
   <Heading class="section-grid__aside overview-section__heading">{heading}</Heading>
   <div class="section-grid__body overview-section__body" data-reveal>
+    {
+      image &&
+        (image.type === 'image' ? (
+          <img class="overview-section__image" src={image.image} alt={image.imageAlt} loading="lazy" />
+        ) : (
+          <Media type="video" class="overview-section__image" src={image.src} poster={image.poster} alt={image.alt} />
+        ))
+    }
     <p class="section-prose overview-section__text"><slot /></p>
     {description && <p class="overview-section__description">{description}</p>}
     {
@@ -59,13 +68,6 @@ const { heading, tags, description, features, linkCards, link, class: className 
         </ul>
       )
     }
-    {
-      link && (
-        <p class="overview-section__link">
-          <ButtonText href={link.href} icon="arrow-right">{link.label}</ButtonText>
-        </p>
-      )
-    }
   </div>
 </section>
 
@@ -78,6 +80,16 @@ const { heading, tags, description, features, linkCards, link, class: className 
     display: flex;
     flex-direction: column;
     gap: 64px;
+  }
+  /* :global() — the video branch's class merges onto Media's own rendered
+     root <div> (that component's own astro-cid, not this one's); still
+     matches the plain <img> in the image branch, so one rule covers both.
+     1071x630 is Logofolio's own frame size, not a shared ratio — this slot
+     has one consumer so far. */
+  :global(.overview-section__image) {
+    width: 100%;
+    aspect-ratio: 1071 / 630;
+    object-fit: cover;
   }
   /* Figma text style Manrope/xl/regular-loose (node 2487:2264) — the
      smaller paragraph defenceSystems runs under its statement lines. */
@@ -126,9 +138,6 @@ const { heading, tags, description, features, linkCards, link, class: className 
     margin: 0;
     padding: 0;
     list-style: none;
-  }
-  .overview-section__link {
-    margin: 0;
   }
   .overview-section__tag {
     padding: 8px 14px;

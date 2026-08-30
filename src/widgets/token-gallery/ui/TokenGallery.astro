@@ -14,7 +14,15 @@
 // `--token-name` printed next to its value: the naming already maps 1:1 to
 // the Figma Sandbox file's variable names (tokens.css's own header), so no
 // separate mapping table is built or maintained here.
-import Heading from '@shared/ui/heading/Heading.astro';
+//
+// Category titles ("Colors — Primitive" etc.) used to render through the
+// shared Heading atom — the exact same component as the page's own
+// Overview/Tokens/Components labels one level up, so a category read as a
+// peer of the page's own sections instead of a child of "Tokens" (Max's
+// review). `.token-gallery__group-label` is a smaller, plain-text style
+// instead — sized and coloured to match `.component-gallery__group-label`
+// (ComponentGallery.astro) exactly, so the two galleries share one visual
+// language for "this is a subgroup, not a section" (feat-112).
 import { tokensByCategory, LIGHT_OVERRIDES } from '../model/read-tokens';
 
 interface Props {
@@ -57,30 +65,15 @@ const EASE_DEMO_DURATION = '--duration-base';
 
 <div class:list={['token-gallery', className]}>
   <section class="token-gallery__section" data-reveal>
-    <Heading>Colors — Primitive</Heading>
-    <ul class="token-gallery__swatches">
+    <p class="token-gallery__group-label">Colors — Primitive</p>
+    <ul class="token-gallery__cards">
       {
         primitives.map((t) => (
-          <li class="token-gallery__swatch">
+          <li class="token-gallery__card">
             <span class="token-gallery__chip" style={`background: var(${t.name})`} />
-            <code class="token-gallery__name">{t.name}</code>
-            <span class="token-gallery__value">{t.value}</span>
-          </li>
-        ))
-      }
-    </ul>
-  </section>
-
-  <section class="token-gallery__section" data-reveal>
-    <Heading>Colors — Semantic</Heading>
-    <ul class="token-gallery__swatches">
-      {
-        semantics.map((t) => (
-          <li class="token-gallery__swatch">
-            <span class="token-gallery__chip" style={`background: var(${t.name})`} />
-            <code class="token-gallery__name">{t.name}</code>
-            <span class="token-gallery__value">
-              dark {t.value} · light {LIGHT_OVERRIDES.get(t.name)}
+            <span class="token-gallery__card-text">
+              <code class="token-gallery__name">{t.name}</code>
+              <span class="token-gallery__value">{t.value}</span>
             </span>
           </li>
         ))
@@ -89,14 +82,37 @@ const EASE_DEMO_DURATION = '--duration-base';
   </section>
 
   <section class="token-gallery__section" data-reveal>
-    <Heading>Spacing</Heading>
-    <ul class="token-gallery__spacing">
+    <p class="token-gallery__group-label">Colors — Semantic</p>
+    <ul class="token-gallery__cards">
+      {
+        semantics.map((t) => (
+          <li class="token-gallery__card">
+            <span class="token-gallery__chip" style={`background: var(${t.name})`} />
+            <span class="token-gallery__card-text">
+              <code class="token-gallery__name">{t.name}</code>
+              <span class="token-gallery__value">
+                dark {t.value} · light {LIGHT_OVERRIDES.get(t.name)}
+              </span>
+            </span>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <section class="token-gallery__section" data-reveal>
+    <p class="token-gallery__group-label">Spacing</p>
+    <ul class="token-gallery__cards">
       {
         spacing.map((t) => (
-          <li class="token-gallery__spacing-row">
-            <span class="token-gallery__spacing-bar" style={`width: var(${t.name})`} />
-            <code class="token-gallery__name">{t.name}</code>
-            <span class="token-gallery__value">{t.value}</span>
+          <li class="token-gallery__card">
+            <span class="token-gallery__chip token-gallery__chip--spacing">
+              <span class="token-gallery__spacing-bar" style={`width: var(${t.name})`} />
+            </span>
+            <span class="token-gallery__card-text">
+              <code class="token-gallery__name">{t.name}</code>
+              <span class="token-gallery__value">{t.value}</span>
+            </span>
           </li>
         ))
       }
@@ -104,14 +120,19 @@ const EASE_DEMO_DURATION = '--duration-base';
   </section>
 
   <section class="token-gallery__section" data-reveal>
-    <Heading>Radius</Heading>
-    <ul class="token-gallery__swatches">
+    <p class="token-gallery__group-label">Radius</p>
+    <ul class="token-gallery__cards">
       {
         radius.map((t) => (
-          <li class="token-gallery__swatch">
-            <span class="token-gallery__chip token-gallery__chip--radius" style={`border-radius: var(${t.name})`} />
-            <code class="token-gallery__name">{t.name}</code>
-            <span class="token-gallery__value">{t.value}</span>
+          <li class="token-gallery__card">
+            <span
+              class="token-gallery__chip token-gallery__chip--radius"
+              style={`border-radius: var(${t.name})`}
+            />
+            <span class="token-gallery__card-text">
+              <code class="token-gallery__name">{t.name}</code>
+              <span class="token-gallery__value">{t.value}</span>
+            </span>
           </li>
         ))
       }
@@ -119,7 +140,7 @@ const EASE_DEMO_DURATION = '--duration-base';
   </section>
 
   <section class="token-gallery__section" data-reveal>
-    <Heading>Typography</Heading>
+    <p class="token-gallery__group-label">Typography</p>
     <p class="token-gallery__type-meta" style={`font-family: var(${familyToken.name})`}>
       <code class="token-gallery__name">{familyToken.name}</code>
       <span class="token-gallery__value">{familyToken.value}</span>
@@ -136,7 +157,7 @@ const EASE_DEMO_DURATION = '--duration-base';
     </ul>
     <ul class="token-gallery__scale">
       {
-        scale.map(({ step, size, lineHeight }) => (
+        scale.map(({ size, lineHeight }) => (
           <li class="token-gallery__scale-row">
             <span
               class="token-gallery__scale-sample"
@@ -156,33 +177,41 @@ const EASE_DEMO_DURATION = '--duration-base';
   </section>
 
   <section class="token-gallery__section" data-reveal>
-    <Heading>Motion</Heading>
+    <p class="token-gallery__group-label">Motion</p>
     <p class="token-gallery__motion-caption">Durations, shown against a fixed {DURATION_DEMO_EASE}:</p>
-    <ul class="token-gallery__motion">
+    <ul class="token-gallery__cards">
       {
         durations.map((d) => (
-          <li class="token-gallery__motion-row">
-            <span
-              class="token-gallery__motion-demo"
-              style={`transition-duration: var(${d.name}); transition-timing-function: var(${DURATION_DEMO_EASE});`}
-            />
-            <code class="token-gallery__name">{d.name}</code>
-            <span class="token-gallery__value">{d.value}</span>
+          <li class="token-gallery__card">
+            <span class="token-gallery__chip token-gallery__chip--motion">
+              <span
+                class="token-gallery__motion-demo"
+                style={`transition-duration: var(${d.name}); transition-timing-function: var(${DURATION_DEMO_EASE});`}
+              />
+            </span>
+            <span class="token-gallery__card-text">
+              <code class="token-gallery__name">{d.name}</code>
+              <span class="token-gallery__value">{d.value}</span>
+            </span>
           </li>
         ))
       }
     </ul>
     <p class="token-gallery__motion-caption">Curves, shown against a fixed {EASE_DEMO_DURATION}:</p>
-    <ul class="token-gallery__motion">
+    <ul class="token-gallery__cards">
       {
         eases.map((e) => (
-          <li class="token-gallery__motion-row">
-            <span
-              class="token-gallery__motion-demo"
-              style={`transition-duration: var(${EASE_DEMO_DURATION}); transition-timing-function: var(${e.name});`}
-            />
-            <code class="token-gallery__name">{e.name}</code>
-            <span class="token-gallery__value">{e.value}</span>
+          <li class="token-gallery__card">
+            <span class="token-gallery__chip token-gallery__chip--motion">
+              <span
+                class="token-gallery__motion-demo"
+                style={`transition-duration: var(${EASE_DEMO_DURATION}); transition-timing-function: var(${e.name});`}
+              />
+            </span>
+            <span class="token-gallery__card-text">
+              <code class="token-gallery__name">{e.name}</code>
+              <span class="token-gallery__value">{e.value}</span>
+            </span>
           </li>
         ))
       }
@@ -203,38 +232,55 @@ const EASE_DEMO_DURATION = '--duration-base';
     gap: var(--spacing-lg);
   }
 
-  .token-gallery__swatches,
-  .token-gallery__spacing,
-  .token-gallery__type-weights,
-  .token-gallery__motion {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--spacing-lg);
+  /* One tier below the page's own "Tokens" aside label (Heading, in
+     system.astro's section-grid) and matched byte-for-byte against
+     ComponentGallery's `.component-gallery__group-label` — same size,
+     weight, casing and colour, so "this is a subgroup" reads identically in
+     both galleries. */
+  .token-gallery__group-label {
+    margin: 0;
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-bold);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--color-text-primary);
+  }
+
+  /* Card grid — every Primitive/Semantic/Spacing/Radius/Motion token is a
+     bordered, rounded panel (swatch left, name+value stacked right)
+     instead of the old bare flex-wrap list. auto-fill keeps the grid
+     honest at any width: it never leaves a lone card stranded on its own
+     row the way a fixed column count would at odd container widths. */
+  .token-gallery__cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: var(--spacing-md);
     list-style: none;
     margin: 0;
     padding: 0;
   }
-
-  /* Fixed track width, not min-width: min-width lets each item grow to its
-     own content (a short "9999px" next to a long "dark #efcba6 · light
-     #4d2d0e"), so row 2's columns drift out of line with row 1's the moment
-     any two neighbors differ in content length — the "inconsistent
-     alignment" the token page was flagged for. A shared fixed basis makes
-     every row share the same tracks; the longest semantic value is the
-     constraint (200px fits it on one line at font-size-sm). */
-  .token-gallery__swatch,
-  .token-gallery__spacing-row,
-  .token-gallery__motion-row {
+  .token-gallery__card {
     display: flex;
-    flex: 0 0 200px;
+    align-items: center;
+    gap: var(--spacing-md);
+    min-width: 0;
+    padding: var(--spacing-md);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-md);
+    background: var(--color-bg-subtle);
+  }
+  .token-gallery__card-text {
+    display: flex;
     flex-direction: column;
-    align-items: flex-start;
     gap: var(--spacing-xs);
+    min-width: 0;
   }
 
   .token-gallery__chip {
-    width: 64px;
-    height: 64px;
+    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
     border-radius: var(--radius-sm);
     border: 1px solid var(--color-border-default);
   }
@@ -242,17 +288,56 @@ const EASE_DEMO_DURATION = '--duration-base';
     background: var(--color-bg-accent);
     /* border-radius arrives inline per token — this chip has no radius of its own to conflict with. */
   }
-
+  /* Spacing and Motion chips have no colour of their own — they're a
+     bounded 48px frame holding a small demo (a bar, a translating square)
+     instead of a flat fill, so every card in the grid still reads at one
+     consistent size regardless of what the token actually measures. */
+  .token-gallery__chip--spacing,
+  .token-gallery__chip--motion {
+    display: flex;
+    align-items: center;
+    background: var(--color-bg-muted);
+    overflow: hidden;
+  }
+  .token-gallery__chip--spacing {
+    padding: 0 var(--spacing-xs);
+  }
   .token-gallery__spacing-bar {
-    height: var(--spacing-md);
+    height: var(--spacing-sm);
     max-width: 100%;
     background: var(--color-bg-accent);
   }
+  .token-gallery__chip--motion {
+    justify-content: center;
+  }
+  .token-gallery__motion-demo {
+    width: 16px;
+    height: 16px;
+    border-radius: var(--radius-sm);
+    background: var(--color-bg-accent);
+    transition-property: transform;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .token-gallery__card:hover .token-gallery__motion-demo {
+      transform: translateX(16px);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .token-gallery__motion-demo {
+      transition: none;
+    }
+  }
 
+  /* Name and value share one restrained palette across the whole page:
+     `--color-text-secondary` (a vivid, saturated orange reserved elsewhere
+     for links/accents) used to carry every token name, which is what read
+     as "too many colored texts" fighting the swatches themselves for
+     attention. `--color-text-primary` is the same ramp at a much lower
+     saturation — legible and on-brand without competing. */
   .token-gallery__name {
     font-family: monospace;
     font-size: var(--font-size-xs);
-    color: var(--color-text-secondary);
+    color: var(--color-text-primary);
   }
 
   .token-gallery__value {
@@ -268,6 +353,14 @@ const EASE_DEMO_DURATION = '--duration-base';
     gap: var(--spacing-sm);
     font-size: var(--font-size-lg);
     color: var(--color-text-primary);
+  }
+  .token-gallery__type-weights {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-lg);
+    list-style: none;
+    margin: 0;
+    padding: 0;
   }
 
   .token-gallery__scale {
@@ -299,22 +392,5 @@ const EASE_DEMO_DURATION = '--duration-base';
     margin: 0;
     font-size: var(--font-size-sm);
     color: var(--color-text-muted);
-  }
-  .token-gallery__motion-demo {
-    width: 32px;
-    height: 32px;
-    border-radius: var(--radius-sm);
-    background: var(--color-bg-accent);
-    transition-property: transform;
-  }
-  @media (hover: hover) and (pointer: fine) {
-    .token-gallery__motion-row:hover .token-gallery__motion-demo {
-      transform: translateX(48px);
-    }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .token-gallery__motion-demo {
-      transition: none;
-    }
   }
 </style>

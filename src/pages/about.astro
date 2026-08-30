@@ -35,7 +35,7 @@
 // from a different node (`2712:2273`). That is a separate export, not this
 // file reused, and it does not live in this folder.
 import Layout from '@app/layouts/Layout.astro';
-import { Button, Heading, HungaryFlag } from '@shared/ui';
+import { Button, Heading, HungaryFlag, CtaCard } from '@shared/ui';
 import { Media } from '@entities/media';
 import { PageHeader } from '@widgets/page-header';
 import { ProjectHero } from '@widgets/project-hero';
@@ -211,12 +211,33 @@ const mediaRows: AboutMediaRow[] = [
         'Research & usability testing',
         'Mentoring',
       ]}
-      link={{ href: '/system', label: 'See the system' }}
     >
       I'm Max Shturma, a design engineer. Nine years of generalist UX/UI and product design — sole
       designer on some products, part of an existing team on others. The last year I've been
       building what I design, in code: Claude Code, Supabase, and I deploy it myself.
     </OverviewSection>
+
+    {
+      /* CTA card, Figma node 2964:2287 (copy-027). Replaces the old plain
+        ButtonText link that used to render inside OverviewSection's `link`
+        prop — that prop is now dead everywhere and removed from the widget.
+        Its own section-grid row, aside "System", matching the page's own
+        PageHeader title on /system rather than the mockup's first-draft
+        "Portfolio" label. Markup lives in the shared CtaCard component
+        (feat-112) once /system's Repository card became a second consumer. */
+    }
+    <section class="about__section section-grid">
+      <Heading class="section-grid__aside">System</Heading>
+      <div class="section-grid__body" data-reveal>
+        <CtaCard
+          href="/system"
+          image="/media/about/system-cta.jpg"
+          imageAlt=""
+          heading="My design system"
+          caption="Tokens and components, live from the code."
+        />
+      </div>
+    </section>
 
     <section class="about__section section-grid">
       <Heading class="section-grid__aside">Industries</Heading>

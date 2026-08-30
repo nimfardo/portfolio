@@ -1,6 +1,6 @@
 ---
 import Layout from '@app/layouts/Layout.astro';
-import { Heading } from '@shared/ui';
+import { Heading, HighlightText } from '@shared/ui';
 import { PageHeader } from '@widgets/page-header';
 import { ProjectHero } from '@widgets/project-hero';
 import { OverviewSection } from '@widgets/overview-section';
@@ -61,12 +61,13 @@ const processBlocks =
           <div class="project-page__sections">
             <OverviewSection
               heading={content.overview.heading}
+              image={content.overview.image}
               description={content.overview.description}
               features={content.overview.features}
               linkCards={content.overview.linkCards}
               tags={content.overview.tags}
             >
-              {content.overview.text}
+              <HighlightText text={content.overview.text} />
             </OverviewSection>
 
             {challengeBlocks && (
@@ -77,7 +78,7 @@ const processBlocks =
                 heading={challengeStatement.heading}
                 description={challengeStatement.description}
               >
-                {challengeStatement.text}
+                <HighlightText text={challengeStatement.text} />
               </OverviewSection>
             )}
 
@@ -122,8 +123,10 @@ const processBlocks =
               <Retrospective
                 heading={content.retrospective.heading}
                 behanceUrl={content.retrospective.behanceUrl}
+                linkLabel={content.retrospective.linkLabel}
+                linkHref={content.retrospective.linkHref}
               >
-                {content.retrospective.text}
+                <HighlightText text={content.retrospective.text} />
               </Retrospective>
             )}
           </div>

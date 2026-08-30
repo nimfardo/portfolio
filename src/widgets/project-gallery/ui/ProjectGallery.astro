@@ -1,8 +1,11 @@
 ---
-// Project detail-page gallery — a sequence of rows, each either a
-// full-width slot or a tall slot + N stacked slots (the two shapes
-// that exist on the Figma canvas so far, see entities/project's
-// GalleryRow). Every slot carries real alt text — the empty `imageAlt: ''`
+// Project detail-page gallery — a sequence of rows, each a full-width slot,
+// a tall slot + N stacked slots, or a pair of equal-height slots side by
+// side (the three shapes that exist on the Figma canvas so far, see
+// entities/project's GalleryRow — `pair` exists because forcing a lone
+// 468-tall slot into the `tall` shape's 1000-ratio box, as `split` would,
+// stretches it and leaves dead space next to it; see that type's doc
+// comment). Every slot carries real alt text — the empty `imageAlt: ''`
 // these all used to pass was a WCAG 1.1.1 failure, not the decorative-image
 // exemption it was written as. See the GalleryRow doc comment.
 //
@@ -16,6 +19,10 @@
 // explicit with no attribute pass-through, so `data-reveal` cannot land on
 // its root. That wrapper carries the sizing class and Media's own root is
 // stretched to fill it, the same arrangement VideoSection uses.
+//
+// A slot can also be a Lottie (Motion's AdQuanto/underground/loadium) — same
+// wrapper-div shape as video, plus an inline `background` style since the
+// animation layers themselves are transparent (see GalleryMedia).
 //
 // All three branches are written inline rather than extracted to a shared
 // slot component on purpose: an <img> rendered from a child component would
@@ -45,7 +52,7 @@ const { rows, class: className } = Astro.props;
             loading="lazy"
             data-reveal
           />
-        ) : (
+        ) : row.image.type === 'video' ? (
           <div class="project-gallery__full" data-reveal>
             <Media
               type="video"
@@ -55,7 +62,52 @@ const { rows, class: className } = Astro.props;
               alt={row.image.alt}
             />
           </div>
+        ) : (
+          <div
+            class="project-gallery__full"
+            data-reveal
+            style={`background: ${row.image.background}`}
+          >
+            <Media
+              type="lottie"
+              class="project-gallery__media"
+              src={row.image.src}
+              alt={row.image.alt}
+            />
+          </div>
         )
+      ) : row.type === 'pair' ? (
+        <div class="project-gallery__row">
+          {[row.left, row.right].map((slot) =>
+            slot.type === 'image' ? (
+              <img
+                class="project-gallery__pair-item"
+                src={slot.image}
+                alt={slot.imageAlt}
+                loading="lazy"
+                data-reveal
+              />
+            ) : slot.type === 'video' ? (
+              <div class="project-gallery__pair-item" data-reveal>
+                <Media
+                  type="video"
+                  class="project-gallery__media"
+                  src={slot.src}
+                  poster={slot.poster}
+                  alt={slot.alt}
+                />
+              </div>
+            ) : (
+              <div
+                class="project-gallery__pair-item"
+                data-reveal
+                style={`background: ${slot.background}`}
+              >
+                <Media type="lottie" class="project-gallery__media" src={slot.src} alt={slot.alt} />
+              </div>
+            ),
+          )}
+        </div>
       ) : (
         <div class="project-gallery__row">
           {row.tall.type === 'image' ? (
@@ -66,13 +118,26 @@ const { rows, class: className } = Astro.props;
               loading="lazy"
               data-reveal
             />
-          ) : (
+          ) : row.tall.type === 'video' ? (
             <div class="project-gallery__tall" data-reveal>
               <Media
                 type="video"
                 class="project-gallery__media"
                 src={row.tall.src}
                 poster={row.tall.poster}
+                alt={row.tall.alt}
+              />
+            </div>
+          ) : (
+            <div
+              class="project-gallery__tall"
+              data-reveal
+              style={`background: ${row.tall.background}`}
+            >
+              <Media
+                type="lottie"
+                class="project-gallery__media"
+                src={row.tall.src}
                 alt={row.tall.alt}
               />
             </div>
@@ -87,13 +152,25 @@ const { rows, class: className } = Astro.props;
                   data-reveal
                   style={`--reveal-delay: ${staggerDelay(i, 100)}`}
                 />
-              ) : (
+              ) : slot.type === 'video' ? (
                 <div data-reveal style={`--reveal-delay: ${staggerDelay(i, 100)}`}>
                   <Media
                     type="video"
                     class="project-gallery__media"
                     src={slot.src}
                     poster={slot.poster}
+                    alt={slot.alt}
+                  />
+                </div>
+              ) : (
+                <div
+                  data-reveal
+                  style={`--reveal-delay: ${staggerDelay(i, 100)}; background: ${slot.background}`}
+                >
+                  <Media
+                    type="lottie"
+                    class="project-gallery__media"
+                    src={slot.src}
                     alt={slot.alt}
                   />
                 </div>
@@ -115,6 +192,7 @@ const { rows, class: className } = Astro.props;
     gap: 64px;
   }
   .project-gallery__full {
+    position: relative;
     width: 100%;
     aspect-ratio: 1647 / 1000;
     object-fit: cover;
@@ -124,6 +202,7 @@ const { rows, class: className } = Astro.props;
     gap: 64px;
   }
   .project-gallery__tall {
+    position: relative;
     flex: 1;
     min-width: 0;
     aspect-ratio: 791.5 / 1000;
@@ -136,21 +215,48 @@ const { rows, class: className } = Astro.props;
     flex-direction: column;
     gap: 64px;
   }
+  /* `pair` row: two equal 468-tall boxes side by side (Motion's car+loadium
+     row, node 3083:5522) — same per-slot ratio as a stack item, just not
+     stacked. Shares `.project-gallery__row`'s flex+gap for the outer box. */
+  .project-gallery__pair-item {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+    aspect-ratio: 791.5 / 468;
+    object-fit: cover;
+  }
   /* `> *` rather than `> img`, so a video slot's wrapper div gets the same
      box. object-fit is inert on the div and does the work on the <img>;
-     Media supplies its own object-fit: cover for the <video>. */
+     Media supplies its own object-fit: cover for the <video>.
+     `position: relative` matters here specifically: these boxes are the
+     MAIN axis of a column flex container (.project-gallery__stack), and a
+     percentage height on a normal-flow child doesn't reliably resolve
+     against a flex item sized only by `aspect-ratio` on that axis (it's a
+     real spec/engine quirk, not just a Chrome bug — the "definite size for
+     percentage children" guarantee flexbox gives a stretched CROSS-axis
+     item doesn't extend to the MAIN axis). That let Motion's stacked Lottie
+     slots ignore their 468px aspect ratio and stretch to evenly split
+     whatever height was left over, dragging the whole row (and the tall
+     video beside it) taller than intended. Anchoring `.project-gallery__media`
+     with `position: absolute; inset: 0` below sidesteps the percentage
+     entirely — the immediate `.project-gallery__tall` sibling wasn't
+     affected only because it sits in the ROW's cross axis, which flexbox
+     does mark definite once stretched. */
   .project-gallery__stack > * {
+    position: relative;
     width: 100%;
     aspect-ratio: 791.5 / 468;
     object-fit: cover;
   }
   /* :global() — the class merges onto Media's own rendered root <div>, not a
      descendant of this component (the classlist-merge pattern every Icon and
-     VideoSection consumer hits). Stretches Media to fill whichever sizing box
-     wraps it above. */
+     VideoSection consumer hits). `inset: 0` on an absolutely-positioned box
+     fills its positioned ancestor's used size directly, unlike a percentage
+     height/width which can fail to resolve there (see the comment on
+     `.project-gallery__stack > *`). */
   :global(.project-gallery__media) {
-    width: 100%;
-    height: 100%;
+    position: absolute;
+    inset: 0;
   }
 
   @media (max-width: 1023px) {

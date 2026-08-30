@@ -36,7 +36,7 @@ export const connectis = {
     // wording was 105 and laid out at 4 — copy-009's "every body text at 3
     // lines" pass covered the ContentSection captions and the retro, not this
     // slot. Active voice also leads with the change rather than the category.
-    text: 'CONNECTIS replaces spreadsheets and phone calls with one command center for fleet operators.',
+    text: 'CONNECTIS replaces spreadsheets and phone calls with **one command center** for fleet operators.',
     tags: [
       'Logistics',
       'Solo design engineer',
@@ -96,7 +96,7 @@ export const connectis = {
           image: `${M}/challenge.jpg`,
           imageAlt: 'CONNECTIS — a fleet operations manager in a glass-walled meeting room',
         },
-        text: 'Transform fragmented data into prioritized actions to prevent downtime.',
+        text: 'Transform fragmented data into prioritized actions to **prevent downtime**.',
       },
     ] satisfies ContentBlock[],
   },
@@ -113,7 +113,7 @@ export const connectis = {
           poster: `${M}/brand-development-poster.jpg`,
           alt: 'CONNECTIS brand identity — the connected-network monogram drawn on its geometric construction grid, the app icon sitting in a macOS dock, and the Michroma typeface specimen',
         },
-        text: 'Geometric precision: a Michroma wordmark and one connected network mark for the fleet.',
+        text: 'Geometric precision: a Michroma wordmark and **one connected network mark** for the fleet.',
       },
       {
         media: {
@@ -122,7 +122,7 @@ export const connectis = {
           poster: `${M}/design-system-poster.jpg`,
           alt: "CONNECTIS's token architecture — a radial map of the two tiers, then the reference layer's full colour ramps, then the semantic layer wired on top of them",
         },
-        text: 'A 2-tiered token system — reference layer feeding a semantic layer built for the product.',
+        text: 'A **2-tiered token system** — reference layer feeding a semantic layer built for the product.',
       },
     ] satisfies ContentBlock[],
   },
@@ -137,7 +137,7 @@ export const connectis = {
           poster: `${M}/build-poster.jpg`,
           alt: 'Building CONNECTIS — a Claude Code session running in the terminal, then the dashboard it produced: fleet health score, live incident map, and the action-needed queue',
         },
-        text: 'Full auth and role-based access, sign-in to sign-out. Supabase simulates a fleet of 50+ vehicles.',
+        text: 'Full auth and role-based access, sign-in to sign-out. Supabase simulates a **fleet of 50+ vehicles**.',
       },
       // The Glacier Flow block is shared with defenceSystems's Build section — same
       // video file (public/media/shared/), same text, synced from canvas
@@ -149,7 +149,7 @@ export const connectis = {
           poster: '/media/shared/glacier-flow-poster.jpg',
           alt: "Glacier Flow's title card, then a scroll through the template's public GitHub README — core idea, folder map, and the gated task workflow",
         },
-        text: 'I use Glacier Flow, a Claude Code template: folder routing, a knowledge base, and gated tasks.',
+        text: 'I use Glacier Flow, a Claude Code template: folder routing, a knowledge base, and **gated tasks**.',
       },
     ] satisfies ContentBlock[],
     stats: [
@@ -199,7 +199,7 @@ export const connectis = {
   ] satisfies GalleryRow[],
   retrospective: {
     heading: "What I've Learned",
-    text: 'A production-ready PoC built and validated in record time, proving the value before writing code.',
+    text: 'A production-ready PoC built and validated in **record time**, proving the value before writing code.',
     behanceUrl: 'https://www.behance.net/gallery/251016127/CONNECTIS-Fleet-Intelligence-Platform',
   },
 } satisfies ProjectContent;

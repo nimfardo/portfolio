@@ -44,19 +44,23 @@ import { Heading, CtaCard } from '@shared/ui';
         same CtaCard as /about's "System" card, pointed at the public export
         instead. Opens the page rather than closing it now — the "go verify
         it yourself" proof leads, ahead of the tokens/components exhibit it
-        backs up. */
+        backs up.
+
+        Full-bleed, no aside label and no caption (Max's review, round 2):
+        every other section keeps the section-grid aside+body split, but this
+        one card IS the section — it doesn't need a "Repository" label beside
+        it or a supporting line under the heading, so it drops section-grid
+        entirely and just runs the full content-container width. Own bg photo
+        (Figma node 3101:5561) rather than the shared system-cta.jpg /about's
+        card still uses. */
     }
-    <section class="system__section section-grid">
-      <Heading class="section-grid__aside">Repository</Heading>
-      <div class="section-grid__body" data-reveal>
-        <CtaCard
-          href="https://github.com/nimfardo/portfolio"
-          image="/media/about/system-cta.jpg"
-          imageAlt=""
-          heading="The public repo"
-          caption="The commit history behind everything above."
-        />
-      </div>
+    <section class="system__section" data-reveal>
+      <CtaCard
+        href="https://github.com/nimfardo/portfolio"
+        image="/media/about/repo-cta.jpg"
+        imageAlt=""
+        heading="The public repo"
+      />
     </section>
 
     <section class="system__section section-grid">
@@ -93,7 +97,21 @@ import { Heading, CtaCard } from '@shared/ui';
      scoped rule would already match it) — harmless, and matches the sibling
      rule above rather than mixing scoping styles on adjacent selectors.
      Aside-label spacing is `.section-grid`'s own job now (global.css) — no
-     page-local label rule needed. */
+     page-local label rule needed.
+
+     Repository is first, straight under PageHeader — this page has no hero
+     to carry the 160px rhythm's first hop (unlike /about and /process, whose
+     first section's 160px measures from the hero, not the header). PageHeader
+     already ships its own 40px margin-bottom, so giving Repository the same
+     160px as every other section stacked both and produced a 200px gap under
+     the header instead of the site's normal 40px. `:first-of-type` zeroes
+     just that one gap and leaves the 160px rhythm intact from Repository
+     onward (Max's review).
+
+     Gated to the same >=1024px range PageHeader itself renders at — below
+     that PageHeader is `display: none` (widgets/navigation's mobile header
+     takes over) and the mobile override two blocks down already gives every
+     section, first included, the site's other top offset. */
   .system {
     padding-bottom: 160px;
   }
@@ -103,6 +121,11 @@ import { Heading, CtaCard } from '@shared/ui';
   :global(.system__section) {
     padding: 0 40px;
     margin-top: 160px;
+  }
+  @media (min-width: 1024px) {
+    :global(.system__section:first-of-type) {
+      margin-top: 0;
+    }
   }
 
   @media (max-width: 1023px) {

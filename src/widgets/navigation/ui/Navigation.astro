@@ -18,10 +18,8 @@ import { NAV_ITEMS } from '../model/nav-items';
 
 // GitHub joined in feat-082 (canvas node I2793:3257;2778:2970), which also
 // makes it site-wide rather than an /about card — the rebuilt page has no link
-// grid to hold one any more. It points at glacier-flow because the portfolio's
-// own repo stays private (Max's call, 2026-08-17): glacier-flow is public and
-// already linked from three case studies, so it is the one real code artifact a
-// reader can open.
+// grid to hold one any more. Points at the profile (Max's call, 2026-08-29,
+// overriding the earlier glacier-flow-only choice).
 const SOCIAL_LINKS = [
   {
     name: 'linkedin' as const,
@@ -29,7 +27,7 @@ const SOCIAL_LINKS = [
     label: 'LinkedIn',
   },
   { name: 'behance' as const, href: 'https://www.behance.net/shturma', label: 'Behance' },
-  { name: 'github' as const, href: 'https://github.com/nimfardo/glacier-flow', label: 'GitHub' },
+  { name: 'github' as const, href: 'https://github.com/nimfardo', label: 'GitHub' },
 ];
 
 const currentPath = Astro.url.pathname;
