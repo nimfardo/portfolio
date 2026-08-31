@@ -68,11 +68,18 @@ import { PROCESS_STEPS } from '../model/steps';
        position once both settle. */
     overflow-anchor: none;
   }
-  .workflow-step {
+  /* Figma's own divider-accordion vectors only ever sit BETWEEN items —
+     there's no divider above item 01 or below item 16 (confirmed via the
+     frame's node metadata), so :last-child drops its own bottom border
+     instead of every step carrying one unconditionally. */
+  .workflow-step:not(:last-child) {
     border-bottom: 1px solid var(--color-border-default);
   }
-  .workflow-step:first-child {
-    border-top: 1px solid var(--color-border-default);
+  /* With no divider above item 01 to split 40/40 with the lead paragraph,
+     Figma gives it a flat 64px gap instead — every other item's 40px
+     top padding stays untouched. */
+  .workflow-step:first-child .workflow-step__summary {
+    padding-top: 64px;
   }
 
   /* Header row — identical treatment to ProcessAccordion's, since Figma's
