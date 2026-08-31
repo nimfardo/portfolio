@@ -105,11 +105,12 @@ const { heading, image, tags, list, description, features, linkCards, class: cla
     aspect-ratio: 1071 / 630;
     object-fit: cover;
   }
-  /* About's skills list (Figma node 3183:2633, copy-037) — same type ramp
-     as .section-prose above it (Manrope/4xl/medium), just split into real
-     list items instead of one run-on paragraph. 16px item gap matches
-     Figma's own listSpacing; bullets hang outside the text column like
-     .overview-section__features-list below. */
+  /* About's skills list (Figma node 3183:2633, copy-037) — Manrope/xl/
+     regular-loose, the same ramp .overview-section__description below uses,
+     not the 4xl/medium statement above it (checked directly against the
+     node's own text style, not assumed from its neighbor). 16px item gap
+     matches Figma's own listSpacing; bullets hang outside the text column
+     like .overview-section__features-list below. */
   .overview-section__list {
     display: flex;
     flex-direction: column;
@@ -118,10 +119,10 @@ const { heading, image, tags, list, description, features, linkCards, class: cla
     padding-left: 1.5em;
     list-style: disc;
     font-family: var(--font-family-body);
-    font-size: var(--font-size-4xl);
-    line-height: var(--font-line-height-5xl);
-    letter-spacing: -0.4px;
-    font-weight: var(--font-weight-medium);
+    font-size: var(--font-size-xl);
+    line-height: var(--font-line-height-3xl);
+    letter-spacing: -0.2px;
+    font-weight: var(--font-weight-regular);
     color: var(--color-text-emphasis);
   }
   /* Figma text style Manrope/xl/regular-loose (node 2487:2264) — the
