@@ -21,6 +21,27 @@ const { title, hideNav = false } = Astro.props;
 <!doctype html>
 <html lang="en">
   <head>
+    <script is:inline async src="https://www.googletagmanager.com/gtag/js?id=G-5FMLZKD7C7"
+    ></script>
+    <script is:inline>
+      // send_page_view is off here because ClientRouter swaps pages without a
+      // full reload, so gtag's automatic page_view (fired once, on this
+      // config call) would only ever count the very first page of a session.
+      // astro:page-load fires once for that initial load and again after
+      // every swap, so hooking page_view there counts every page uniformly.
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag('js', new Date());
+      gtag('config', 'G-5FMLZKD7C7', { send_page_view: false });
+      document.addEventListener('astro:page-load', () => {
+        gtag('event', 'page_view', {
+          page_location: location.href,
+          page_title: document.title,
+        });
+      });
+    </script>
     <meta charset="utf-8" />
     <link rel="icon" href="/favicon.ico" sizes="32x32" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" id="favicon" />
