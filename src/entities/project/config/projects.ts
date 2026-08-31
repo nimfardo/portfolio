@@ -25,17 +25,32 @@ import type { Project } from '../model/types';
  * `category`/`tags` are omitted (not guessed) for medicalSoftware and the 5
  * name-TBD projects — copy-deck.md marks these explicitly TBD pending Max.
  * ProjectCard renders without that row when absent.
+ *
+ * `name` here is the GRID CARD label only — [slug].astro reads the real
+ * brand name from each project's own PROJECT_CONTENT.name instead, so
+ * changing this field never touches the actual case-study page. As of
+ * 2026-08-31 (copy-035) these are deliberately domain/industry labels, not
+ * brand names — clearer for a first-time visitor scanning the grid, and for
+ * the 5 NDA cards it also means the grid no longer names the client at all.
+ * Each label was pulled from that project's own overview.tags[0] ("the
+ * domain slot", per art-annanolli.ts's own comment) where content exists;
+ * MeTest had none (no metest.ts — "No Content Yet" state) and was confirmed
+ * directly by Max (steel-plate cutting / metal fabrication, serving metal,
+ * construction and shipbuilding industries). Khvyliasti is a deliberate
+ * exception — also no written content, and Max chose to keep the brand name
+ * rather than guess a domain off its logo alone. Don't silently "fix" that
+ * inconsistency or invent a domain for it without asking him.
  */
 export const PROJECTS: Project[] = [
   {
     slug: 'medicalSoftware',
-    name: 'medicalSoftware',
+    name: 'Medical Software',
     access: 'nda',
     thumbnail: '/media/medicalSoftware/thumbnail.jpg',
   },
   {
     slug: 'connectis',
-    name: 'CONNECTIS',
+    name: 'Logistics Platform',
     category: 'Enterprise · Logistics',
     tags: ['ux', 'ui', 'design system', 'code'],
     access: 'public',
@@ -43,7 +58,7 @@ export const PROJECTS: Project[] = [
   },
   {
     slug: 'defenceSystems',
-    name: 'defenceSystems',
+    name: 'Military Systems',
     category: 'Military',
     tags: ['brand', 'ux', 'ui', 'motion'],
     access: 'nda',
@@ -51,7 +66,7 @@ export const PROJECTS: Project[] = [
   },
   {
     slug: 'arvus',
-    name: 'Arvus',
+    name: 'Security Console',
     category: 'Security · B2B',
     tags: ['ux', 'ui', 'brand', 'motion'],
     access: 'public',
@@ -59,7 +74,7 @@ export const PROJECTS: Project[] = [
   },
   {
     slug: 'enterpriseIt',
-    name: 'enterpriseIt',
+    name: 'Enterprise IT',
     category: 'Enterprise tools',
     tags: ['ux', 'ui', 'dashboards'],
     access: 'nda',
@@ -67,7 +82,7 @@ export const PROJECTS: Project[] = [
   },
   {
     slug: 'eLearning',
-    name: 'eLearning',
+    name: 'E-Learning Platform',
     category: 'E-learning',
     tags: ['ux', 'ui', 'design system'],
     access: 'nda',
@@ -75,7 +90,7 @@ export const PROJECTS: Project[] = [
   },
   {
     slug: 'socialVideo',
-    name: 'socialVideo',
+    name: 'Social Media App',
     category: 'Social video',
     tags: ['ux', 'ui', 'motion', 'design system'],
     access: 'nda',
@@ -83,19 +98,19 @@ export const PROJECTS: Project[] = [
   },
   {
     slug: 'art-annanolli',
-    name: 'Art Annanolli',
+    name: 'Art Portfolio',
     access: 'public',
     thumbnail: '/media/art-annanolli/thumbnail.jpg',
   },
   {
     slug: 'metest',
-    name: 'MeTest',
+    name: 'Metal Fabrication',
     access: 'public',
     thumbnail: '/media/metest/thumbnail.jpg',
   },
   {
     slug: 'logofolio',
-    name: 'Logofolio',
+    name: 'Logo Design',
     access: 'public',
     thumbnail: '/media/logofolio/thumbnail.jpg',
   },
@@ -105,7 +120,7 @@ export const PROJECTS: Project[] = [
   // as medicalSoftware) pending copy-deck.md's Project cards table.
   {
     slug: 'motion',
-    name: 'Motion',
+    name: 'Motion Design',
     access: 'public',
     thumbnail: '/media/motion/thumbnail.jpg',
   },
@@ -116,7 +131,7 @@ export const PROJECTS: Project[] = [
   // every other thumbnail.
   {
     slug: 'gallery',
-    name: 'Gallery',
+    name: 'Photography',
     access: 'public',
     thumbnail: '/media/gallery/thumbnail.jpg',
   },
