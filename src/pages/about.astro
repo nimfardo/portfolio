@@ -194,25 +194,14 @@ const mediaRows: AboutMediaRow[] = [
     {
       /* Lead copy is copy-036 (Figma node 2793:3161's Lead text, re-updated by
         Max) — replaces copy-024, which dropped off after the paragraph no
-        longer names specific tools. The tag list is unchanged from what
-        shipped: the canvas still carries all eight pills including
-        "Git & deploy". Skills list is copy-037, new to this pass — Figma
-        node 3183:2633, ported from a run-on paragraph into a real bulleted
-        list for readability. */
+        longer names specific tools. The eight-pill tag row that used to sit
+        under the skills list is gone on Max's call. Skills list is copy-037
+        — Figma node 3183:2633, ported from a run-on paragraph into a real
+        bulleted list for readability. */
     }
     <OverviewSection
       heading="Since 2017"
       class="about__section"
-      tags={[
-        'Design systems',
-        '3-tier tokens',
-        'Atomic components',
-        'Interaction & motion (Lottie)',
-        'Prototyping in code',
-        'Git & deploy',
-        'Research & usability testing',
-        'Mentoring',
-      ]}
       list={[
         'UX research (interviews, competitor analysis, user testing)',
         'A/B testing for improvement & conversion',
@@ -282,13 +271,6 @@ const mediaRows: AboutMediaRow[] = [
           </div>
         </div>
       </div>
-    </section>
-
-    <section class="about__section section-grid">
-      <Heading class="section-grid__aside">Hobbies</Heading>
-      <p class="section-grid__body section-prose" data-reveal>
-        Photography, gothic typography, motion design, acoustic guitar.
-      </p>
     </section>
 
     {
