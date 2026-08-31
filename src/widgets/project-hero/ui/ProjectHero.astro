@@ -205,10 +205,11 @@ const hasCard = Boolean(eyebrow && headline);
       animation: none;
     }
   }
-  /* No mouse on touch devices — the icon doesn't make sense there, the
-     "Scroll down" text alone still carries the cue. */
+  /* Dropped entirely on mobile, per Max's call (Figma node 2793:3170) —
+     previously only the icon hid here and the "Scroll down" text stayed,
+     but the cue reads as unnecessary chrome on a touch device either way. */
   @media (max-width: 767px) {
-    :global(.project-hero__scroll-icon) {
+    .project-hero__scroll-cue {
       display: none;
     }
   }
