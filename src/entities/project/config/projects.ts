@@ -43,18 +43,18 @@ import type { Project } from '../model/types';
  */
 export const PROJECTS: Project[] = [
   {
-    slug: 'medicalSoftware',
-    name: 'Medical Software',
-    access: 'nda',
-    thumbnail: '/media/medicalSoftware/thumbnail.jpg',
-  },
-  {
     slug: 'connectis',
     name: 'Logistics Platform',
     category: 'Enterprise · Logistics',
     tags: ['ux', 'ui', 'design system', 'code'],
     access: 'public',
     thumbnail: '/media/connectis/thumbnail.jpg',
+  },
+  {
+    slug: 'medicalSoftware',
+    name: 'Medical Software',
+    access: 'nda',
+    thumbnail: '/media/medicalSoftware/thumbnail.jpg',
   },
   {
     slug: 'defenceSystems',
