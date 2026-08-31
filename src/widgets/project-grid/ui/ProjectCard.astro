@@ -21,8 +21,9 @@ const { project, revealDelay, eager } = Astro.props;
     <img src={project.thumbnail} alt={project.name} loading={eager ? undefined : 'lazy'} />
     {
       project.access === 'nda' && (
-        <div class="project-card__nda-mask" data-nda-mask>
-          <Icon name="locker" size={32} />
+        <div class="project-card__nda-plate" data-nda-mask>
+          <Icon name="locker" size={16} />
+          <span>Confidential — walkthrough on request</span>
         </div>
       )
     }
@@ -30,13 +31,6 @@ const { project, revealDelay, eager } = Astro.props;
   <div class="project-card__footer">
     <span class="project-card__name">{project.name}</span>
     <span class="project-card__meta">
-      {
-        project.access === 'nda' && (
-          <span class="project-card__nda">
-            <Icon name="locker" size={16} />
-          </span>
-        )
-      }
       <Icon name="arrow-right" size={28} class="project-card__arrow" />
     </span>
   </div>
@@ -63,26 +57,36 @@ const { project, revealDelay, eager } = Astro.props;
     height: 100%;
     object-fit: cover;
   }
-  /* Figma's nda-mask component (node 3178:2582) — a near-transparent tint
-     that exists mainly to give backdrop-filter something to blur, with the
-     locker icon centered over it. Hidden by ProjectGrid's script once
-     isNdaUnlocked() is true (one shared password unlocks every NDA card
+  /* Figma's nda-plate component (node 3178:2582) — a solid, bottom-anchored
+     caption bar. Replaces the old full-bleed backdrop-blur + centered lock
+     icon, which went muddy on busy photos and carried no label. The photo
+     above the plate stays sharp and in color. Hidden by ProjectGrid's script
+     once isNdaUnlocked() is true (one shared password unlocks every NDA card
      site-wide, not just the one the visitor entered it on). */
-  .project-card__nda-mask {
+  .project-card__nda-plate {
     position: absolute;
-    inset: 0;
+    inset: auto 0 0 0;
     display: flex;
     align-items: center;
-    justify-content: center;
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    background: rgba(17, 17, 17, 0.01);
-    color: var(--color-icon-default);
+    gap: var(--spacing-sm);
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: var(--color-bg-accent);
+    color: var(--color-icon-on-accent);
+  }
+  .project-card__nda-plate span {
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-sm);
+    line-height: var(--font-line-height-sm);
+    font-weight: var(--font-weight-medium);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--color-text-on-accent);
+    white-space: nowrap;
   }
   /* Explicit override — this rule's own `display: flex` above ties the
      `[hidden]` attribute selector on specificity, so the attribute alone
      can't be trusted to actually hide it once unlocked. */
-  .project-card__nda-mask[hidden] {
+  .project-card__nda-plate[hidden] {
     display: none;
   }
 
@@ -143,15 +147,6 @@ const { project, revealDelay, eager } = Astro.props;
     align-items: center;
     flex-shrink: 0;
     gap: var(--spacing-md);
-  }
-  .project-card__nda {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: var(--spacing-sm);
-    border: 1px solid var(--color-border-emphasis);
-    border-radius: var(--radius-full);
-    color: var(--color-text-emphasis);
   }
   /* :global() required — `class="project-card__arrow"` merges onto Icon's
      own rendered <span> (class:list={['icon', className]}), so the element
