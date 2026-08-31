@@ -72,7 +72,12 @@ import ProjectCard from './ProjectCard.astro';
   @media (max-width: 767px) {
     .project-grid {
       grid-template-columns: 1fr;
-      gap: var(--spacing-md);
+      /* Not --spacing-md (16px): that's the same gap ProjectCard already
+         uses between its own image and footer, so a flat 16px here read as
+         one continuous list instead of separate cards. --spacing-lg keeps
+         the same ~1.5x ratio the 1023px breakpoint already has against that
+         16px internal gap. */
+      gap: var(--spacing-lg);
     }
   }
 </style>

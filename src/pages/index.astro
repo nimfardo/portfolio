@@ -23,4 +23,13 @@ import { ProjectGrid } from '@widgets/project-grid';
       padding-top: 0;
     }
   }
+
+  /* Max's call: 40px side gutters were eating too much of a phone screen —
+     16px lets each card run noticeably bigger. */
+  @media (max-width: 767px) {
+    .home {
+      padding-left: 16px;
+      padding-right: 16px;
+    }
+  }
 </style>
