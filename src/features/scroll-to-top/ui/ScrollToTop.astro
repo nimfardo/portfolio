@@ -20,33 +20,68 @@ const { class: className } = Astro.props;
   aria-label="Scroll to top"
   transition:persist
 >
+  {
+    /* Ring's stroke-dashoffset is driven by --scroll-progress (set in the
+     * script below), inherited from the button. pathLength="100" normalizes
+     * the rect's actual perimeter to 100 units, so dasharray/dashoffset are
+     * plain 0-100 percentages regardless of the button's real pixel size. */
+  }
+  <svg class="scroll-to-top__ring" width="60" height="60" viewBox="0 0 60 60" aria-hidden="true">
+    <rect
+      x="0.5"
+      y="0.5"
+      width="59"
+      height="59"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1"
+      pathLength="100"
+    />
+  </svg>
   <Icon name="arrow-up" size={28} />
 </button>
 
 <script>
   import { bindOncePersisted, prefersReducedMotion } from '@shared/lib';
 
-  // Persists across ClientRouter swaps (transition:persist) — bindOncePersisted
-  // stops the scroll/click listeners from stacking on repeat astro:page-load.
+  // Recomputes maxScroll fresh every call (not cached) so it stays correct
+  // across resizes and content reflow without a separate resize listener.
+  function syncScrollToTop(button: HTMLButtonElement) {
+    const scrollY = window.scrollY;
+    button.classList.toggle('is-visible', scrollY > window.innerHeight);
+
+    const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+    const progress = maxScroll > 0 ? Math.min(Math.max(scrollY / maxScroll, 0), 1) : 0;
+    button.style.setProperty('--scroll-progress', progress.toFixed(4));
+  }
+
+  // Persists across ClientRouter swaps (transition:persist), so the button is
+  // the same DOM node on every page. bindOncePersisted stops the scroll/click
+  // listeners from stacking on repeat astro:page-load — but visibility and
+  // scroll progress are page-specific and must be re-synced on EVERY load
+  // regardless of binding, or a persisted node would keep showing the
+  // previous page's progress until the reader's next scroll event.
   function initScrollToTop() {
-    bindOncePersisted<HTMLButtonElement>('[data-scroll-to-top]', (button) => {
+    const button = document.querySelector<HTMLButtonElement>('[data-scroll-to-top]');
+    if (!button) return;
+    syncScrollToTop(button);
+
+    bindOncePersisted<HTMLButtonElement>('[data-scroll-to-top]', (el) => {
       let ticking = false;
-      const sync = () => {
-        button.classList.toggle('is-visible', window.scrollY > window.innerHeight);
-        ticking = false;
-      };
       window.addEventListener(
         'scroll',
         () => {
           if (ticking) return;
           ticking = true;
-          requestAnimationFrame(sync);
+          requestAnimationFrame(() => {
+            syncScrollToTop(el);
+            ticking = false;
+          });
         },
         { passive: true },
       );
-      sync();
 
-      button.addEventListener('click', () => {
+      el.addEventListener('click', () => {
         window.scrollTo({ top: 0, behavior: prefersReducedMotion() ? 'auto' : 'smooth' });
       });
     });
@@ -66,7 +101,7 @@ const { class: className } = Astro.props;
     justify-content: center;
     width: 60px;
     height: 60px;
-    border: 1px solid var(--color-border-accent);
+    border: none;
     background: var(--color-bg-default);
     color: var(--color-text-accent);
     cursor: pointer;
@@ -76,7 +111,6 @@ const { class: className } = Astro.props;
     transition:
       opacity var(--duration-base) var(--ease-fade),
       transform var(--duration-base) var(--ease-fade),
-      border-color var(--duration-base) var(--ease-fade),
       color var(--duration-base) var(--ease-fade);
   }
   .scroll-to-top.is-visible {
@@ -85,8 +119,26 @@ const { class: className } = Astro.props;
     transform: translateY(0);
   }
   .scroll-to-top:hover {
-    border-color: var(--color-border-emphasis);
     color: var(--color-text-emphasis);
+  }
+
+  /* Replaces the old constant 1px border: the rect's stroke-dashoffset
+     tracks --scroll-progress (0-1, set in the script above), so the stroke
+     draws in clockwise from the top-left corner as the page scrolls rather
+     than sitting fully drawn at a constant weight. */
+  .scroll-to-top__ring {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    color: var(--color-border-accent);
+    transition: color var(--duration-base) var(--ease-fade);
+  }
+  .scroll-to-top__ring rect {
+    stroke-dasharray: 100;
+    stroke-dashoffset: calc(100 - (var(--scroll-progress, 0) * 100));
+  }
+  .scroll-to-top:hover .scroll-to-top__ring {
+    color: var(--color-border-emphasis);
   }
 
   @media (max-width: 767px) {
