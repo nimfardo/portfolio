@@ -3,15 +3,21 @@
 // this page closes that 404. (/about is still outstanding.)
 //
 // Structure follows Max's Figma frame (node 2124:1834): a lead statement in
-// the 66% column, the 16-step rail, then the Build section. BuildSection is
-// reused verbatim from the case-study pages — it already renders a hardcoded
-// "Build" heading, one media+text block and an optional GitHub button, which
-// is exactly what the canvas has.
+// the 66% column, the 16-step accordion, then the Build section. BuildSection
+// is reused verbatim from the case-study pages — it already renders a
+// hardcoded "Build" heading, one media+text block and an optional GitHub
+// button, which is exactly what the canvas has.
+//
+// The 16 steps were a pinned horizontal-scroll rail (ProcessRail) through
+// feat-092; feat-1XX retired it for the site's standard vertical scroll —
+// Max's call, site-wide — as a vertical accordion (WorkflowAccordion),
+// designed in Figma first as a content variant of the case-study Accordion
+// component before this port.
 import Layout from '@app/layouts/Layout.astro';
 import { Heading } from '@shared/ui';
 import { PageHeader } from '@widgets/page-header';
 import { ProjectHero } from '@widgets/project-hero';
-import { ProcessRail } from '@widgets/process-rail';
+import { WorkflowAccordion } from '@widgets/workflow-accordion';
 import { BuildSection } from '@widgets/build-section';
 import type { ContentBlock } from '@entities/project';
 
@@ -101,7 +107,7 @@ const buildBlocks: ContentBlock[] = [
       </p>
     </div>
 
-    <ProcessRail />
+    <WorkflowAccordion />
 
     <div class="process__build">
       <BuildSection blocks={buildBlocks} githubUrl="https://github.com/nimfardo/glacier-flow" />

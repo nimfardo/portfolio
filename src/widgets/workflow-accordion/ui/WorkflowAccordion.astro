@@ -1,0 +1,209 @@
+---
+// Native <details>/<summary> — Figma's "Process Accordion" component
+// (open=true|false variants; a new sibling of the case-study Accordion,
+// same header treatment — 80x80 IconBadge number, title, plus/minus — but
+// with an icon + one-line action + output-file pills body instead of
+// media + paragraph, since that's the shape PROCESS_STEPS actually has).
+//
+// Replaces ProcessRail, the old pinned horizontal-scroll carousel: this
+// page (and the site generally, per Max's call) no longer uses horizontal
+// scroll. All 16 steps start closed, and only one can be open at a time —
+// see shared/lib/accordion.ts for how that's enforced (shared with
+// ProcessAccordion, which has the identical single-open/WAAPI-height
+// interaction over different content).
+import { Icon, IconBadge } from '@shared/ui';
+import { staggerDelay } from '@shared/lib';
+import { PROCESS_STEPS } from '../model/steps';
+---
+
+<div class="workflow-accordion">
+  {
+    PROCESS_STEPS.map((step, index) => (
+      <details
+        class="workflow-step"
+        data-reveal
+        style={`--reveal-delay: ${staggerDelay(index, 80, 4)}`}
+      >
+        <summary class="workflow-step__summary">
+          <IconBadge class="workflow-step__number-badge">
+            <span class="workflow-step__number">{step.number}</span>
+          </IconBadge>
+          <span class="workflow-step__title-row">
+            <span class="workflow-step__title">{step.title}</span>
+            <span class="workflow-step__icon-swap">
+              <Icon name="plus" size={32} class="workflow-step__icon workflow-step__icon--closed" />
+              <Icon name="minus" size={32} class="workflow-step__icon workflow-step__icon--open" />
+            </span>
+          </span>
+        </summary>
+        <div class="workflow-step__content">
+          <Icon name={step.icon} size={32} class="workflow-step__body-icon" />
+          <p class="workflow-step__action">{step.action}</p>
+          <ul class="workflow-step__outputs">
+            {step.outputs.map((out) => (
+              <li class="workflow-step__output">{out}</li>
+            ))}
+          </ul>
+        </div>
+      </details>
+    ))
+  }
+</div>
+
+<script>
+  import { initAccordionGroup } from '@shared/lib';
+
+  // Not inside any transition:persist region, so re-init unguarded on every
+  // `astro:page-load`, same as ProcessAccordion.
+  document.addEventListener('astro:page-load', () => initAccordionGroup('.workflow-step'));
+</script>
+
+<style>
+  .workflow-accordion {
+    display: flex;
+    flex-direction: column;
+    /* Same overflow-anchor fix ProcessAccordion needs: two simultaneous
+       WAAPI height animations (one collapsing, one expanding) confuse
+       Chrome's scroll anchoring into landing the page at the wrong scroll
+       position once both settle. */
+    overflow-anchor: none;
+  }
+  .workflow-step {
+    border-bottom: 1px solid var(--color-border-default);
+  }
+  .workflow-step:first-child {
+    border-top: 1px solid var(--color-border-default);
+  }
+
+  /* Header row — identical treatment to ProcessAccordion's, since Figma's
+     new Process Accordion component reuses that header wholesale and only
+     replaces the body below it. */
+  .workflow-step__summary {
+    display: flex;
+    align-items: center;
+    gap: 40px;
+    padding: 40px 0;
+    cursor: pointer;
+    list-style: none;
+  }
+  .workflow-step__summary::-webkit-details-marker {
+    display: none;
+  }
+  :global(.workflow-step__number-badge) {
+    flex-shrink: 0;
+  }
+  .workflow-step__number {
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-xl);
+    line-height: var(--font-line-height-xl);
+    font-weight: var(--font-weight-regular);
+    color: var(--color-text-primary);
+  }
+  .workflow-step__title-row {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-lg);
+  }
+  .workflow-step__title {
+    margin: 0;
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-2xl);
+    /* 48px, not the shared 2xl token — matches ProcessAccordion's title
+       (bound to Figma's Manrope/3xl/bold text style, same source this new
+       component variant's title inherited unchanged). */
+    line-height: 48px;
+    font-weight: var(--font-weight-bold);
+    color: var(--color-text-emphasis);
+  }
+  .workflow-step__icon-swap {
+    position: relative;
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+  }
+  .workflow-step :global(.workflow-step__icon) {
+    position: absolute;
+    inset: 0;
+    color: var(--color-icon-default);
+    opacity: 1;
+    transform: rotate(0deg);
+    transition:
+      opacity var(--duration-base) var(--ease-fade),
+      transform var(--duration-base) var(--ease-fade);
+  }
+  .workflow-step:not(.is-open) :global(.workflow-step__icon--open) {
+    opacity: 0;
+    transform: rotate(-45deg);
+  }
+  .workflow-step.is-open :global(.workflow-step__icon--closed) {
+    opacity: 0;
+    transform: rotate(45deg);
+  }
+
+  /* Body — icon + one-line action + output pills, replacing the media +
+     paragraph ProcessAccordion's content uses. Indented to align with the
+     title-row above, matching ProcessAccordion's content indent (both nest
+     under the same 951px-wide title frame on canvas). 24px gap rather than
+     ProcessAccordion's 40: three light elements (icon, one line of text, a
+     row of pills) read as one compact group at 40px apart on canvas. */
+  .workflow-step__content {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    padding-bottom: 40px;
+    margin-left: 120px;
+  }
+  :global(.workflow-step__body-icon) {
+    color: var(--color-icon-default);
+  }
+  .workflow-step__action {
+    margin: 0;
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-base);
+    line-height: var(--font-line-height-base);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-primary);
+  }
+  .workflow-step__outputs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  /* Matches the Figma tag master and ProcessRail's own former output pills:
+     cream border/text, no text-transform — these are real filenames
+     ("README.md" would print "README.MD" uppercased), and mixed case reads
+     faster at 12px besides. */
+  .workflow-step__output {
+    padding: 8px 14px;
+    border: 1px solid var(--color-border-emphasis);
+    border-radius: var(--radius-full);
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-xs);
+    line-height: var(--font-line-height-xs);
+    letter-spacing: 0.04em;
+    color: var(--color-text-emphasis);
+    white-space: nowrap;
+  }
+
+  @media (max-width: 767px) {
+    .workflow-step__output {
+      white-space: normal;
+    }
+    .workflow-step__summary {
+      gap: var(--spacing-lg);
+    }
+    .workflow-step__title {
+      font-size: var(--font-size-xl);
+      line-height: var(--font-line-height-xl);
+    }
+    .workflow-step__content {
+      margin-left: 0;
+    }
+  }
+</style>

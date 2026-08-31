@@ -1,23 +1,14 @@
 ---
 // Native <details>/<summary> — matches Figma's Accordion component
 // (open=true|false variants); all steps start closed, and only one can be
-// open at a time (opening a step closes whichever other one is open) —
-// enforced entirely by the <script> below, not the native `name` grouping
-// attribute: that was tried and reverted, since setting `details.open =
-// true` on the newly-opened step makes the browser instantly force-close
-// same-named siblings itself, which snapped the previous step shut before
-// its own WAAPI collapse animation ever got a chance to run. Each step's
-// number ("01"–"04") renders through the slot of the same 80x80 IconBadge
-// shell — Figma reverted the per-step icons feat-028 had synced back to a
-// plain number (node 2124:3405). Each step is a paragraph, optionally
-// preceded by one image or video: steps 03 and 04 currently have no media
-// on canvas, so they render text-only.
-//
-// Open/close is no longer instant: the <script> below animates height via
-// WAAPI (the standard details/summary animation recipe — toggling `open`
-// natively gives no transition hook at all) and the plus/minus icon
-// crossfades+rotates via plain CSS on [open] instead of a hard
-// display:none swap.
+// open at a time (opening a step closes whichever other one is open) — see
+// shared/lib/accordion.ts for why that's enforced entirely by script rather
+// than the native `name` grouping attribute. Each step's number ("01"–"04")
+// renders through the slot of the same 80x80 IconBadge shell — Figma
+// reverted the per-step icons feat-028 had synced back to a plain number
+// (node 2124:3405). Each step is a paragraph, optionally preceded by one
+// image or video: steps 03 and 04 currently have no media on canvas, so
+// they render text-only.
 import { Icon, IconBadge } from '@shared/ui';
 import { Media } from '@entities/media';
 import { staggerDelay } from '@shared/lib';
@@ -76,91 +67,11 @@ const { steps } = Astro.props;
 </div>
 
 <script>
-  import { prefersReducedMotion } from '@shared/lib';
+  import { initAccordionGroup } from '@shared/lib';
 
-  // Native <details> toggling is instant with no transition hook — this is
-  // the standard WAAPI details/summary animation recipe (animate `height`
-  // on the <details> element itself between its current and target height,
-  // flip the `open` attribute once the animation settles). Not inside any
-  // transition:persist region, so re-init unguarded on every
+  // Not inside any transition:persist region, so re-init unguarded on every
   // `astro:page-load`, same as scroll-reveal/Media's video observer.
-  function initAccordionAnimations() {
-    if (prefersReducedMotion()) return;
-
-    const root = getComputedStyle(document.documentElement);
-    const duration = parseFloat(root.getPropertyValue('--duration-base')) * 1000;
-    const easing = root.getPropertyValue('--ease-reveal').trim();
-
-    // Accordion behavior: only one step open at a time. Each step's `toggle`
-    // is a closure scoped to its own `animation` variable, so a shared map
-    // is needed to reach across steps and close whichever other one is open
-    // before opening this one.
-    let openStep: HTMLDetailsElement | null = null;
-    const toggles = new Map<HTMLDetailsElement, (open: boolean) => void>();
-
-    document.querySelectorAll<HTMLDetailsElement>('.process-step').forEach((details) => {
-      const summary = details.querySelector<HTMLElement>('.process-step__summary');
-      const content = details.querySelector<HTMLElement>('.process-step__content');
-      if (!summary || !content) return;
-
-      let animation: Animation | null = null;
-
-      summary.addEventListener('click', (event) => {
-        event.preventDefault();
-        const opening = !details.open;
-        if (opening && openStep && openStep !== details) {
-          toggles.get(openStep)?.(false);
-        }
-        toggle(opening);
-        openStep = opening ? details : null;
-      });
-
-      function finish(open: boolean) {
-        details.open = open;
-        animation = null;
-        details.style.height = '';
-        details.style.overflow = '';
-      }
-
-      // Opening and closing are the same animation with the direction
-      // flipped: cancel whatever's in flight, animate `height` from the
-      // current value to the target, settle `open` on finish. The only
-      // asymmetry is startHeight when opening — `details.open = true` must
-      // happen before reading `content.offsetHeight` for endHeight (that's
-      // how the browser lays out the now-visible content), but startHeight
-      // itself comes from `summary.offsetHeight` either way (the collapsed
-      // height), which setting `open` doesn't affect.
-      function toggle(open: boolean) {
-        animation?.cancel();
-        // Clip for the whole animated toggle, no matter who initiated it.
-        // This used to live in the click handler only, so a step closed
-        // *programmatically* by the single-open rule collapsed unclipped —
-        // its content painted over the step below for the duration of the
-        // close animation (bug-039, the "overlap flash" Max saw when
-        // switching steps). finish() clears it.
-        details.style.overflow = 'hidden';
-        // Drives the +/- icon swap, decoupled from `details.open` on purpose:
-        // closing must keep `open=true` for the whole collapse (native
-        // <details> hides content the instant `open` is removed, which would
-        // break the height animation), so `details.open` only flips to false
-        // in finish() — if the icon CSS keyed off `[open]` instead of this
-        // class, it'd stay showing "minus" for the entire close animation and
-        // only snap to "plus" after the box had already finished collapsing.
-        details.classList.toggle('is-open', open);
-        const startHeight = open ? `${summary!.offsetHeight}px` : `${details.offsetHeight}px`;
-        if (open) details.open = true;
-        const endHeight = open
-          ? `${summary!.offsetHeight + content!.offsetHeight}px`
-          : `${summary!.offsetHeight}px`;
-        animation = details.animate({ height: [startHeight, endHeight] }, { duration, easing });
-        animation.onfinish = () => finish(open);
-      }
-
-      toggles.set(details, toggle);
-    });
-  }
-
-  document.addEventListener('astro:page-load', initAccordionAnimations);
+  document.addEventListener('astro:page-load', () => initAccordionGroup('.process-step'));
 </script>
 
 <style>
