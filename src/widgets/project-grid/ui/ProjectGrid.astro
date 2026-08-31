@@ -13,6 +13,8 @@ import ProjectCard from './ProjectCard.astro';
 </div>
 
 <script>
+  import { isNdaUnlocked } from '@shared/lib';
+
   // Dim-siblings-on-hover (ProjectCard.astro's `.project-grid--card-hover`
   // rule) needs its trigger to be an actual card, not the grid container —
   // a bare `.project-grid:hover` fires for the gap space between cards too
@@ -30,7 +32,19 @@ import ProjectCard from './ProjectCard.astro';
       card.addEventListener('mouseleave', () => grid.classList.remove('project-grid--card-hover'));
     });
   }
+
+  // One shared password unlocks every NDA project (shared/lib/password-gate.ts),
+  // so a single check here hides the mask on every NDA card on this page —
+  // not just the one the visitor happened to unlock it on.
+  function syncNdaMasks() {
+    if (!isNdaUnlocked()) return;
+    document
+      .querySelectorAll<HTMLElement>('[data-project-grid] [data-nda-mask]')
+      .forEach((mask) => mask.setAttribute('hidden', ''));
+  }
+
   document.addEventListener('astro:page-load', initProjectGridHover);
+  document.addEventListener('astro:page-load', syncNdaMasks);
 </script>
 
 <style>
