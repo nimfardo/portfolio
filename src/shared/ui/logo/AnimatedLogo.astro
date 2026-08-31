@@ -58,9 +58,15 @@ const { size = 64, class: className, autoplayOnce = false } = Astro.props;
   type DotLottieElement = HTMLElement & {
     dotLottie?: {
       setMode: (mode: 'forward' | 'reverse') => void;
+      setSpeed: (speed: number) => void;
       play: () => void;
     };
   };
+
+  // Unhover plays the reverse clip at 2x speed (half the duration) so the
+  // logo snaps back to rest faster than it revealed on hover-in.
+  const FORWARD_SPEED = 1;
+  const REVERSE_SPEED = 2;
 
   // Every current instance lives inside Navigation's persisted containers
   // or the persisted Preloader, so `astro:page-load` firing again after a
@@ -86,12 +92,14 @@ const { size = 64, class: className, autoplayOnce = false } = Astro.props;
 
       wrapper.addEventListener('mouseenter', () => {
         players.forEach((player) => {
+          player.dotLottie?.setSpeed(FORWARD_SPEED);
           player.dotLottie?.setMode('forward');
           player.dotLottie?.play();
         });
       });
       wrapper.addEventListener('mouseleave', () => {
         players.forEach((player) => {
+          player.dotLottie?.setSpeed(REVERSE_SPEED);
           player.dotLottie?.setMode('reverse');
           player.dotLottie?.play();
         });
