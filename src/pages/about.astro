@@ -231,50 +231,6 @@ const mediaRows: AboutMediaRow[] = [
       implementation.
     </OverviewSection>
 
-    {
-      /* CTA card, Figma node 2964:2287 (copy-027). Replaces the old plain
-        ButtonText link that used to render inside OverviewSection's `link`
-        prop — that prop is now dead everywhere and removed from the widget.
-        Its own section-grid row, aside "System", matching the page's own
-        PageHeader title on /system rather than the mockup's first-draft
-        "Portfolio" label. Markup lives in the shared CtaCard component
-        (feat-112) once /system's Repository card became a second consumer.
-
-        Heading reworded from "My design system" (Max's review): read as a
-        generic, portable personal design system rather than one specific to
-        this site. Background swapped from a placeholder forest photo to
-        Figma's actual fill (node 2964:2311) — a code/tokens texture, dark
-        enough on its own (avg ~18/255) that Figma's own composition never
-        adds a scrim layer on top of it either; `scrim={false}` here for the
-        same reason the Repository card drops it. Even Figma's own darkness
-        read as too dark once Max saw it live, so the asset itself was
-        brightened ~1.9x (PIL, same crop/content) on top of dropping the
-        scrim — a deliberate deviation from the exact Figma export, not a
-        mismatch.
-
-        MUST be exported as the plain image FILL only (the raw asset URL
-        get_design_context returns for the node), never a get_screenshot of
-        the whole frame — that flattens Figma's OWN heading/caption text
-        layers into the image too, which then visually doubles against this
-        component's own live heading/caption on top of it. Cost a real bug
-        once already (Max caught it live): the flattened-frame export read
-        fine at low brightness (baked text invisible against near-black) and
-        only became visible as ghosting once the image was brightened. */
-    }
-    <section class="about__section section-grid">
-      <Heading class="section-grid__aside">System</Heading>
-      <div class="section-grid__body" data-reveal>
-        <CtaCard
-          href="/system"
-          image="/media/about/system-cta.jpg"
-          imageAlt=""
-          heading="This portfolio's design system"
-          caption="Tokens and components, live from the code."
-          scrim={false}
-        />
-      </div>
-    </section>
-
     <section class="about__section section-grid">
       <Heading class="section-grid__aside">Industries</Heading>
       <div class="section-grid__body" data-reveal>
@@ -404,6 +360,54 @@ const mediaRows: AboutMediaRow[] = [
         <Button type="solid" href={`mailto:${EMAIL}`} icon="mail" class="about__contact-button">
           {EMAIL}
         </Button>
+      </div>
+    </section>
+
+    {
+      /* CTA card, Figma node 2964:2287 (copy-027). Replaces the old plain
+        ButtonText link that used to render inside OverviewSection's `link`
+        prop — that prop is now dead everywhere and removed from the widget.
+        Its own section-grid row, aside "System", matching the page's own
+        PageHeader title on /system rather than the mockup's first-draft
+        "Portfolio" label. Markup lives in the shared CtaCard component
+        (feat-112) once /system's Repository card became a second consumer.
+
+        Placed last, after Contact — Figma's own "Portfolio System" frame
+        sits at the very end of the canvas (right before the back-to-top
+        corner), not right after the Lead section where it first shipped.
+
+        Heading reworded from "My design system" (Max's review): read as a
+        generic, portable personal design system rather than one specific to
+        this site. Background swapped from a placeholder forest photo to
+        Figma's actual fill (node 2964:2311) — a code/tokens texture, dark
+        enough on its own (avg ~18/255) that Figma's own composition never
+        adds a scrim layer on top of it either; `scrim={false}` here for the
+        same reason the Repository card drops it. Even Figma's own darkness
+        read as too dark once Max saw it live, so the asset itself was
+        brightened ~1.9x (PIL, same crop/content) on top of dropping the
+        scrim — a deliberate deviation from the exact Figma export, not a
+        mismatch.
+
+        MUST be exported as the plain image FILL only (the raw asset URL
+        get_design_context returns for the node), never a get_screenshot of
+        the whole frame — that flattens Figma's OWN heading/caption text
+        layers into the image too, which then visually doubles against this
+        component's own live heading/caption on top of it. Cost a real bug
+        once already (Max caught it live): the flattened-frame export read
+        fine at low brightness (baked text invisible against near-black) and
+        only became visible as ghosting once the image was brightened. */
+    }
+    <section class="about__section section-grid">
+      <Heading class="section-grid__aside">System</Heading>
+      <div class="section-grid__body" data-reveal>
+        <CtaCard
+          href="/system"
+          image="/media/about/system-cta.jpg"
+          imageAlt=""
+          heading="This portfolio's design system"
+          caption="Tokens and components, live from the code."
+          scrim={false}
+        />
       </div>
     </section>
 
