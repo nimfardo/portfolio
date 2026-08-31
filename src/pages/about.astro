@@ -192,11 +192,13 @@ const mediaRows: AboutMediaRow[] = [
     />
 
     {
-      /* Lead copy is copy-024 verbatim — Max rewrote it, then it went through a
-        grammar pass. The tag list is unchanged from what shipped: the canvas
-        still carries all eight pills including "Git & deploy". The note about
-        VS Code and Git being cut was about the *paragraph's* tool list, which
-        is why the paragraph now names Claude Code and Supabase and stops. */
+      /* Lead copy is copy-036 (Figma node 2793:3161's Lead text, re-updated by
+        Max) — replaces copy-024, which dropped off after the paragraph no
+        longer names specific tools. The tag list is unchanged from what
+        shipped: the canvas still carries all eight pills including
+        "Git & deploy". Skills list is copy-037, new to this pass — Figma
+        node 3183:2633, ported from a run-on paragraph into a real bulleted
+        list for readability. */
     }
     <OverviewSection
       heading="Since 2017"
@@ -211,10 +213,22 @@ const mediaRows: AboutMediaRow[] = [
         'Research & usability testing',
         'Mentoring',
       ]}
+      list={[
+        'UX research (interviews, competitor analysis, user testing)',
+        'A/B testing for improvement & conversion',
+        'UI Kit & Design System creation',
+        'Product/website redesign & complex UX problem solving',
+        'Color, typography & composition',
+        'High-fidelity prototypes & client presentation',
+        'Landing page development (client-specific)',
+        'Prototyping (various fidelity)',
+        'Multi-platform design (desktop, mobile)',
+      ]}
     >
-      I'm Max Shturma, a design engineer. Nine years of generalist UX/UI and product design — sole
-      designer on some products, part of an existing team on others. The last year I've been
-      building what I design, in code: Claude Code, Supabase, and I deploy it myself.
+      I'm Max Shturma, a design engineer. Nine years of generalist UX/UI and product design. My
+      expertise lies in creating scalable design systems, improving user experiences based on
+      analytics and feedback, and collaborating closely with developers to ensure seamless
+      implementation.
     </OverviewSection>
 
     {

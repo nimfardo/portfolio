@@ -23,6 +23,11 @@ interface Props {
    * omits it and renders unchanged. */
   image?: ProjectMedia;
   tags?: string[];
+  /** About's skills list (copy-037) — a plain bulleted list at the same size
+   * as the statement above it, no label. Unlike `features`, which is a
+   * smaller/labeled block for a *different* statement (enterpriseIt's), this one
+   * continues the Lead paragraph's own type ramp. */
+  list?: string[];
   description?: string;
   /** enterpriseIt's "Features:" block — a bold label over a bulleted list. */
   features?: FeatureList;
@@ -30,7 +35,7 @@ interface Props {
   class?: string;
 }
 
-const { heading, image, tags, description, features, linkCards, class: className } = Astro.props;
+const { heading, image, tags, list, description, features, linkCards, class: className } = Astro.props;
 ---
 
 <section class:list={['section-grid', 'overview-section', className]}>
@@ -45,6 +50,15 @@ const { heading, image, tags, description, features, linkCards, class: className
         ))
     }
     <p class="section-prose overview-section__text"><slot /></p>
+    {
+      list && (
+        <ul class="overview-section__list">
+          {list.map((item) => (
+            <li>{item}</li>
+          ))}
+        </ul>
+      )
+    }
     {description && <p class="overview-section__description">{description}</p>}
     {
       features && (
@@ -90,6 +104,25 @@ const { heading, image, tags, description, features, linkCards, class: className
     width: 100%;
     aspect-ratio: 1071 / 630;
     object-fit: cover;
+  }
+  /* About's skills list (Figma node 3183:2633, copy-037) — same type ramp
+     as .section-prose above it (Manrope/4xl/medium), just split into real
+     list items instead of one run-on paragraph. 16px item gap matches
+     Figma's own listSpacing; bullets hang outside the text column like
+     .overview-section__features-list below. */
+  .overview-section__list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+    margin: 0;
+    padding-left: 1.5em;
+    list-style: disc;
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-4xl);
+    line-height: var(--font-line-height-5xl);
+    letter-spacing: -0.4px;
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-emphasis);
   }
   /* Figma text style Manrope/xl/regular-loose (node 2487:2264) — the
      smaller paragraph defenceSystems runs under its statement lines. */
