@@ -51,15 +51,21 @@ import { Heading, CtaCard } from '@shared/ui';
         one card IS the section — it doesn't need a "Repository" label beside
         it or a supporting line under the heading, so it drops section-grid
         entirely and just runs the full content-container width. Own bg photo
-        (Figma node 3101:5561) rather than the shared system-cta.jpg /about's
-        card still uses. */
+        rather than the shared system-cta.jpg /about's card still uses — a
+        flattened export of the composited Figma frame (node 3168:2495): a
+        real screenshot of github.com/nimfardo/portfolio with its own
+        directional gradient scrim already baked in, so `scrim={false}` skips
+        CtaCard's default flat one (would otherwise stack and over-darken).
+        Heading shortened to 2-3 words on Max's call — "The public repo" read
+        generic; "This site's repo" ties it to this exact portfolio. */
     }
     <section class="system__section" data-reveal>
       <CtaCard
         href="https://github.com/nimfardo/portfolio"
         image="/media/about/repo-cta.jpg"
         imageAlt=""
-        heading="The public repo"
+        heading="This site's repo"
+        scrim={false}
       />
     </section>
 

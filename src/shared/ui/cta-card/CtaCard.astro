@@ -15,10 +15,24 @@ interface Props {
   /** Optional — /system's Repository card drops it (Max's review), every
    * other consumer keeps the supporting line under the heading. */
   caption?: string;
+  /** Default true (the flat 50% black scrim below). /system's Repository
+   * card sets this false — its image is a flattened Figma export that
+   * already bakes in its own directional gradient darkening, so the
+   * default flat scrim would stack on top and over-darken it. */
+  scrim?: boolean;
   class?: string;
 }
 
-const { href, external, image, imageAlt, heading, caption, class: className } = Astro.props;
+const {
+  href,
+  external,
+  image,
+  imageAlt,
+  heading,
+  caption,
+  scrim = true,
+  class: className,
+} = Astro.props;
 const isExternal = external ?? href.startsWith('http');
 ---
 
@@ -29,7 +43,7 @@ const isExternal = external ?? href.startsWith('http');
   rel={isExternal ? 'noopener noreferrer' : undefined}
 >
   <img src={image} alt={imageAlt} class="cta-card__image" />
-  <div class="cta-card__scrim"></div>
+  {scrim && <div class="cta-card__scrim"></div>}
   <div class="cta-card__content">
     <p class="cta-card__heading">{heading}</p>
     {caption && <p class="cta-card__caption">{caption}</p>}
