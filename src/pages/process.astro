@@ -107,7 +107,20 @@ const buildBlocks: ContentBlock[] = [
       </p>
     </div>
 
-    <WorkflowAccordion />
+    {
+      /* Canvas right-aligns the accordion frame (1071px) inside the same
+        1647px row the lead paragraph's own body column sits in (items-end
+        on their shared parent) — so its left edge lands exactly on the
+        paragraph's left edge, not the page's own left padding. WorkflowAccordion
+        itself carries no width/offset opinion; section-grid__body (the same
+        33/66 column the paragraph above already uses) does the alignment,
+        with column 1 left empty rather than repeating the "Workflow" label. */
+    }
+    <div class="process__accordion-row section-grid">
+      <div class="section-grid__body">
+        <WorkflowAccordion />
+      </div>
+    </div>
 
     <div class="process__build">
       <BuildSection blocks={buildBlocks} githubUrl="https://github.com/nimfardo/glacier-flow" />
@@ -148,6 +161,12 @@ const buildBlocks: ContentBlock[] = [
     color: var(--color-text-emphasis);
   }
 
+  /* Same 40px page-edge padding every other section here carries — the
+     accordion previously had none at all, sitting flush at x=0. */
+  .process__accordion-row {
+    padding: 0 40px;
+  }
+
   /* Back to the site's standard 160px section gap. feat-048 had cut this to
      96px to compensate for the pinned rail's own slack; feat-051 removed that
      slack at the source (the viewport is sized to its content now), so this
@@ -171,6 +190,7 @@ const buildBlocks: ContentBlock[] = [
       padding: 0 24px;
     }
     .process__lead,
+    .process__accordion-row,
     .process__build {
       padding: 0 24px;
     }
