@@ -230,14 +230,22 @@ const mediaRows: AboutMediaRow[] = [
         generic, portable personal design system rather than one specific to
         this site. Background swapped from a placeholder forest photo to
         Figma's actual fill (node 2964:2311) — a code/tokens texture, dark
-        enough on its own (avg ~18/255, confirmed against a flattened
-        get_screenshot export, not just the raw fill) that Figma's own
-        composition never adds a scrim layer on top of it either;
-        `scrim={false}` here for the same reason the Repository card drops
-        it. Even Figma's own darkness read as too dark once Max saw it live,
-        so the asset itself was brightened ~1.9x (PIL, same crop/content) on
-        top of dropping the scrim — a deliberate deviation from the exact
-        Figma export, not a mismatch. */
+        enough on its own (avg ~18/255) that Figma's own composition never
+        adds a scrim layer on top of it either; `scrim={false}` here for the
+        same reason the Repository card drops it. Even Figma's own darkness
+        read as too dark once Max saw it live, so the asset itself was
+        brightened ~1.9x (PIL, same crop/content) on top of dropping the
+        scrim — a deliberate deviation from the exact Figma export, not a
+        mismatch.
+
+        MUST be exported as the plain image FILL only (the raw asset URL
+        get_design_context returns for the node), never a get_screenshot of
+        the whole frame — that flattens Figma's OWN heading/caption text
+        layers into the image too, which then visually doubles against this
+        component's own live heading/caption on top of it. Cost a real bug
+        once already (Max caught it live): the flattened-frame export read
+        fine at low brightness (baked text invisible against near-black) and
+        only became visible as ghosting once the image was brightened. */
     }
     <section class="about__section section-grid">
       <Heading class="section-grid__aside">System</Heading>
