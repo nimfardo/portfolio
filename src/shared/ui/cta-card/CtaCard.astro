@@ -61,6 +61,13 @@ const isExternal = external ?? href.startsWith('http');
     overflow: hidden;
     padding: 80px 40px;
     text-decoration: none;
+    /* Fixed, not a theme token — same reasoning as the cream text below: this
+       card always sits on a dark photo. Without it, a subpixel rounding gap
+       between the absolutely-positioned image and this box's own edge (seen
+       at some viewport widths, worst on the tall/short crop object-fit:cover
+       produces) exposes the page's own background as a stray bright line
+       instead of dark. */
+    background: var(--color-obsidian-amber-950);
     transition: filter var(--duration-base) var(--ease-fade);
   }
   /* Minimal hover in the reference vocabulary (feat-034, see LinkCards): a
