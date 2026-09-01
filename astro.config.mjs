@@ -8,11 +8,13 @@ import { defineConfig } from 'astro/config';
 // don't want. Revisit only if a route needs on-demand rendering later.)
 export default defineConfig({
   output: 'static',
-  // Canonical domain decided in docs-007 (2026-08-23): shturma.com
-  // registered, site lives at the max subdomain. Powers absolute-URL
-  // generation (sitemap, canonical/OG tags) once those exist — Astro just
-  // warns without it today, nothing consumes it yet.
-  site: 'https://max.shturma.com',
+  // docs-007 (2026-08-23) planned the apex as an alias redirecting to a
+  // `max.` subdomain — that subdomain was never actually given a DNS record.
+  // Max confirmed 2026-09-01 the real, live address is the bare apex,
+  // shturma.com (Netlify-connected, serving correctly) — this is that
+  // correction, not the original plan. Powers absolute-URL generation
+  // (canonical/OG tags; no sitemap yet).
+  site: 'https://shturma.com',
   // Local-DX preference: the dev toolbar is the floating pill Astro injects at
   // the bottom of every page in `astro dev`. It sits on top of the design and
   // makes it hard to judge the real thing. Dev-only either way — it is never
