@@ -39,11 +39,20 @@ const { project, revealDelay, eager } = Astro.props;
   <div class="project-card__footer">
     <span class="project-card__name">{project.name}</span>
     <span class="project-card__meta">
-      <Icon
-        name={project.access === 'nda' ? 'key' : 'arrow-right'}
-        size={28}
-        class="project-card__arrow"
-      />
+      {
+        project.access === 'nda' ? (
+          <>
+            <span data-nda-icon="locked">
+              <Icon name="key" size={28} class="project-card__arrow" />
+            </span>
+            <span data-nda-icon="unlocked" hidden>
+              <Icon name="arrow-right" size={28} class="project-card__arrow" />
+            </span>
+          </>
+        ) : (
+          <Icon name="arrow-right" size={28} class="project-card__arrow" />
+        )
+      }
     </span>
   </div>
 </a>

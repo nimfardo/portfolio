@@ -34,13 +34,20 @@ import ProjectCard from './ProjectCard.astro';
   }
 
   // One shared password unlocks every NDA project (shared/lib/password-gate.ts),
-  // so a single check here hides the mask on every NDA card on this page —
-  // not just the one the visitor happened to unlock it on.
+  // so a single check here hides the mask — and swaps the footer icon back to
+  // arrow-right — on every NDA card on this page, not just the one the
+  // visitor happened to unlock it on.
   function syncNdaMasks() {
     if (!isNdaUnlocked()) return;
     document
       .querySelectorAll<HTMLElement>('[data-project-grid] [data-nda-mask]')
       .forEach((mask) => mask.setAttribute('hidden', ''));
+    document
+      .querySelectorAll<HTMLElement>('[data-project-grid] [data-nda-icon="locked"]')
+      .forEach((icon) => icon.setAttribute('hidden', ''));
+    document
+      .querySelectorAll<HTMLElement>('[data-project-grid] [data-nda-icon="unlocked"]')
+      .forEach((icon) => icon.removeAttribute('hidden'));
   }
 
   document.addEventListener('astro:page-load', initProjectGridHover);
