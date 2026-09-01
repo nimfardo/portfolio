@@ -57,25 +57,30 @@ const buildBlocks: ContentBlock[] = [
         the same bare media + "Scroll down" shape every case-study page
         opens with, so it's ProjectHero verbatim.
 
-        Filled on 2026-08-24. It is an IMAGE, not the video the old note here
-        assumed was pending: Max set the image instance inside this frame
-        (`2712:2273`) to a wide shot of his desk mid-project. Exported at the
-        node's native 2x (3294x1600 for the 1647x800 box), so nothing is
-        downscaled at render. Passing `media` retires ProjectHero's
-        --placeholder branch with no other change, which is exactly what that
-        branch's own comment says it's there for.
+        Filled on 2026-08-24 with a static desk photo, then swapped for real
+        footage on 2026-09-01: Max shot himself at his own desk mid-workflow
+        (uploads/process-hero.webm, 1646x800, 5s) — Figma open on the main
+        monitor, a Claude Code session running on the laptop and the second
+        monitor. It's a fitting hero for this specific page, not just any
+        desk shot: the 16-step workflow below is literally Figma-to-Claude
+        Code. webm kept as uploaded, `.mp4` transcoded the standard way
+        (libx264, CRF23, audio stripped), poster pulled at t=0.3s (no
+        fade-in on this clip, so frame 0 itself was usable, just nudged past
+        the very first frame). The old static hero.jpg is gone — nothing
+        else referenced it.
 
         `2712:2273` is easy to mistake for /about's hero — both pages use a
         `project-hero-image` instance at 1647x800, so the node's dimensions
         don't distinguish them. The parent frame does: 2712:2272 is this page,
-        2793:3169 is /about. */
+        2793:3169 is /about. Figma itself still shows the old static image on
+        this node — this swap is code-only for now. */
     }
     <ProjectHero
       media={{
-        type: 'image',
-        image: '/media/process/hero.jpg',
-        imageAlt:
-          "Max's desk mid-project — paper wireframes and notes spread below a laptop and a monitor showing a competitor-analysis board",
+        type: 'video',
+        src: '/media/process/hero.webm',
+        poster: '/media/process/hero-poster.jpg',
+        alt: 'Max at his desk from behind — Figma open on the main monitor mid-edit, a Claude Code session running on the laptop and second monitor',
       }}
       scrollCue
     />
