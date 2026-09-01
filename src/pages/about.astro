@@ -192,32 +192,38 @@ const mediaRows: AboutMediaRow[] = [
     />
 
     {
-      /* Lead copy is copy-036 (Figma node 2793:3161's Lead text, re-updated by
-        Max) — replaces copy-024, which dropped off after the paragraph no
-        longer names specific tools. The eight-pill tag row that used to sit
-        under the skills list is gone on Max's call. Skills list is copy-037
-        — Figma node 3183:2633, ported from a run-on paragraph into a real
-        bulleted list for readability. */
+      /* Lead copy is copy-040 (Figma node 2793:3176's Lead text, rewritten
+        2026-09-01 on Max's request to lead with the Design Engineer identity
+        per .context/identity.md's priority order, instead of reading as
+        generalist UX/UI) — replaces copy-036. Also drops "seamless", which
+        .context/identity.md's own voice rules ban as buzzword fluff. Skills
+        list is copy-040 too — Figma node 3183:2633 — reordered to lead with
+        the two design-engineering bullets (code stack + AI-assisted
+        workflow), merging the old "UI Kit & Design System creation" bullet
+        into the first (now code-based) and the old "Prototyping (various
+        fidelity)" into the client-presentation one, keeping 9 items total.
+        The eight-pill tag row that used to sit under the skills list is gone
+        on Max's call. */
     }
     <OverviewSection
       heading="Since 2017"
       class="about__section"
       list={[
+        'Scalable design systems (tokens, components, documentation) in React, TypeScript & Astro',
+        'AI-assisted design-to-code workflow with Claude Code (Figma to production)',
         'UX research (interviews, competitor analysis, user testing)',
         'A/B testing for improvement & conversion',
-        'UI Kit & Design System creation',
         'Product/website redesign & complex UX problem solving',
         'Color, typography & composition',
-        'High-fidelity prototypes & client presentation',
+        'Prototyping (wireframe to high-fidelity) for client presentation',
         'Landing page development (client-specific)',
-        'Prototyping (various fidelity)',
         'Multi-platform design (desktop, mobile)',
       ]}
     >
-      I'm Max Shturma, a design engineer. Nine years of generalist UX/UI and product design. My
-      expertise lies in creating scalable design systems, improving user experiences based on
-      analytics and feedback, and collaborating closely with developers to ensure seamless
-      implementation.
+      I'm Max Shturma, a design engineer. Nine years of UX/UI design, and the last one spent
+      building in code. I design and build scalable design systems — tokens, components,
+      interfaces — in React, TypeScript, and Astro, shipping from Figma to production with Claude
+      Code.
     </OverviewSection>
 
     <section class="about__section section-grid">
