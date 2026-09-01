@@ -37,7 +37,7 @@ export const arvus = {
   } satisfies ProjectMedia,
   overview: {
     heading: 'Project Overview',
-    text: 'Arvus is a browser-based PSIM console — cameras, sensors, and access control in **one operator view**.',
+    text: 'Arvus is a browser-based PSIM console — cameras, sensors, and access control in one operator view.',
     // Slot 1 is the domain, matching CONNECTIS ('Logistics') and medicalSoftware
     // ('Medical') — copy-012 corrected it from 'PSIM System', which named the
     // product category instead. Slot 2 is NOT the code pages' 'design engineer':
@@ -63,7 +63,7 @@ export const arvus = {
           imageAlt:
             'The problem statement — "The tools are failing the people" — over four cards: tool fragmentation, high cost of entry, alert fatigue, and a steep learning curve',
         },
-        text: 'More data, less clarity: operators juggle disconnected tools under **constant time pressure**.',
+        text: 'More data, less clarity: operators juggle disconnected tools under constant time pressure.',
       },
     ] satisfies ContentBlock[],
   },
@@ -77,7 +77,7 @@ export const arvus = {
           imageAlt:
             'The Design Thinking timeline, Discover through Deliver: stakeholder brief, market research, operator and integrator surveys and interviews, pain-point mapping, information architecture, brand concept, lo-fi wireframes, UI design, five usability-testing sessions, design-system handoff',
         },
-        text: 'Design Thinking, adapted: **no PM**, so I ran research and specs with the Product Owner.',
+        text: 'Design Thinking, adapted: no PM, so I ran research and specs with the Product Owner.',
       },
     ] satisfies ContentBlock[],
   } satisfies BlocksSection,
@@ -94,7 +94,7 @@ export const arvus = {
           poster: `${M}/deliverables-poster.jpg`,
           alt: 'The brand concept — precision, intelligence, accessibility — then the design system: Poppins type scale, colour palette, icon set and atomic architecture, ending on the full screen library',
         },
-        text: 'Brand guidelines, a design system, and a **responsive web app** for integrators and operators.',
+        text: 'Brand guidelines, a design system, and a responsive web app for integrators and operators.',
       },
       {
         media: {
@@ -103,7 +103,7 @@ export const arvus = {
           poster: `${M}/flow-poster.jpg`,
           alt: 'The product in use: an incident table filling with critical alerts, a building floor plan with device markers and a PA/audio configuration dialog, then the layout editor arranging video tiles',
         },
-        text: 'A **layout editor for video walls**, with every device mapped onto the real floor plan.',
+        text: 'A layout editor for video walls, with every device mapped onto the real floor plan.',
       },
     ] satisfies ContentBlock[],
   },
@@ -138,7 +138,7 @@ export const arvus = {
   ] satisfies GalleryRow[],
   retrospective: {
     heading: "What I've Learned",
-    text: "Operators don't want more views. They want **the one view** that matches their building.",
+    text: "Operators don't want more views. They want the one view that matches their building.",
     // Full URL supplied by Max in chat; copy-deck.md only carried the bare
     // gallery id (246830933).
     behanceUrl: 'https://www.behance.net/gallery/246830933/PSIM-Security-Platform',

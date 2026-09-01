@@ -1,6 +1,6 @@
 ---
 import Layout from '@app/layouts/Layout.astro';
-import { Heading, HighlightText } from '@shared/ui';
+import { Heading } from '@shared/ui';
 import { PageHeader } from '@widgets/page-header';
 import { ProjectHero } from '@widgets/project-hero';
 import { OverviewSection } from '@widgets/overview-section';
@@ -67,7 +67,7 @@ const processBlocks =
               linkCards={content.overview.linkCards}
               tags={content.overview.tags}
             >
-              <HighlightText text={content.overview.text} />
+              {content.overview.text}
             </OverviewSection>
 
             {challengeBlocks && (
@@ -78,7 +78,7 @@ const processBlocks =
                 heading={challengeStatement.heading}
                 description={challengeStatement.description}
               >
-                <HighlightText text={challengeStatement.text} />
+                {challengeStatement.text}
               </OverviewSection>
             )}
 
@@ -126,7 +126,7 @@ const processBlocks =
                 linkLabel={content.retrospective.linkLabel}
                 linkHref={content.retrospective.linkHref}
               >
-                <HighlightText text={content.retrospective.text} />
+                {content.retrospective.text}
               </Retrospective>
             )}
           </div>

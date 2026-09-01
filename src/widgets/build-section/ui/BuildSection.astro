@@ -12,7 +12,7 @@
 // Stats render after the first block's text, the button after the last.
 import { Stat } from '@entities/stat';
 import { Media } from '@entities/media';
-import { Button, Heading, HighlightText } from '@shared/ui';
+import { Button, Heading } from '@shared/ui';
 import { staggerDelay } from '@shared/lib';
 import type { BuildData } from '@entities/project';
 
@@ -43,9 +43,7 @@ const lastIndex = blocks.length - 1;
               alt={block.media.alt}
             />
           )}
-          <p class="section-prose build-section__caption">
-            <HighlightText text={block.text} />
-          </p>
+          <p class="section-prose build-section__caption">{block.text}</p>
           {i === 0 && stats && (
             <div class="build-section__stats">
               {stats.map((stat) => (

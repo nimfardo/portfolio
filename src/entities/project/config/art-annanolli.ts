@@ -38,7 +38,7 @@ export const artAnnanolli = {
   } satisfies ProjectMedia,
   overview: {
     heading: 'Project Overview',
-    text: 'Tero Annanolli paints, teaches, and runs an academy. One site now **carries all three**.',
+    text: 'Tero Annanolli paints, teaches, and runs an academy. One site now carries all three.',
     // Slot 1 is the domain, matching CONNECTIS ('Logistics'), medicalSoftware
     // ('Medical') and Arvus ('Security') — not the product category. Slot 2
     // names the build because Max owned it here: unlike Arvus ('Solo UX/UI
@@ -66,7 +66,7 @@ export const artAnnanolli = {
           poster: `${M}/challenge-poster.jpg`,
           alt: 'Three homepage directions in sequence — a dark navy layout, then a washed-out light one, then the approved design with Tero standing against his own bird painting',
         },
-        text: 'A creative client knows what he does not want. Finding the direction took **five redesigns**.',
+        text: 'A creative client knows what he does not want. Finding the direction took five redesigns.',
       },
     ] satisfies ContentBlock[],
   },
@@ -80,7 +80,7 @@ export const artAnnanolli = {
           poster: `${M}/process-poster.jpg`,
           alt: "The UX track — a user-flow diagram of the site's pages, an isometric field of over twenty wireframes, then the spacing scale, twelve-column layout grid and colour swatches",
         },
-        text: 'I mapped the flow, then drew **twenty wireframes**, so we settled structure before style.',
+        text: 'I mapped the flow, then drew twenty wireframes, so we settled structure before style.',
       },
     ] satisfies ContentBlock[],
   } satisfies BlocksSection,
@@ -94,7 +94,7 @@ export const artAnnanolli = {
           poster: `${M}/deliverables-poster.jpg`,
           alt: 'The finished About page scrolling — the headline, a press clipping, the artist biography, and the closing Yhteystiedot contact form',
         },
-        text: '**Ten page designs** on one type, colour, and spacing base, with the motion for handoff.',
+        text: 'Ten page designs on one type, colour, and spacing base, with the motion for handoff.',
       },
     ] satisfies ContentBlock[],
   },
@@ -128,7 +128,7 @@ export const artAnnanolli = {
   ] satisfies GalleryRow[],
   retrospective: {
     heading: "What I've Learned",
-    text: 'Five redesigns taught me to **settle the foundations first**. Style arguments end there.',
+    text: 'Five redesigns taught me to settle the foundations first. Style arguments end there.',
     behanceUrl: 'https://www.behance.net/gallery/102657167/Finnish-visual-artist-Tero-Annanolli',
   },
 } satisfies ProjectContent;

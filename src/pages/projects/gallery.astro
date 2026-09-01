@@ -15,7 +15,6 @@
 // now." Hero and thumbnail are static exports from Figma, same as every
 // other project — only the grid mirrors Unsplash live.
 import Layout from '@app/layouts/Layout.astro';
-import { HighlightText } from '@shared/ui';
 import { PageHeader } from '@widgets/page-header';
 import { ProjectHero } from '@widgets/project-hero';
 import { OverviewSection } from '@widgets/overview-section';
@@ -37,13 +36,15 @@ const unsplashProfileUrl = `https://unsplash.com/@${UNSPLASH_USERNAME}?${UNSPLAS
 
     <div class="project-page__sections">
       <OverviewSection heading="Project Overview" tags={['Photography', 'Photographer', 'Travelling · Hobby', '2018–Present']}>
-        <HighlightText text="These are photos I've taken over the years and posted on **Unsplash**." />
+        These are photos I've taken over the years and posted on Unsplash.
       </OverviewSection>
 
       <PhotoWall />
 
       <Retrospective heading="What I've Learned" linkLabel="Check on Unsplash" linkHref={unsplashProfileUrl}>
-        <HighlightText text="Photography is an enjoyable way to save moments of life into pixels, with control over the process and light to get the result I want. It's a **meditative process** of dialing in aperture and ISO." />
+        Photography is an enjoyable way to save moments of life into pixels, with control over the
+        process and light to get the result I want. It's a meditative process of dialing in
+        aperture and ISO.
       </Retrospective>
     </div>
   </main>

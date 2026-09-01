@@ -42,7 +42,7 @@ export const logofolio = {
       imageAlt:
         'A construction diagram for the Mdt monogram — golden-ratio circles, grids and proportion callouts (0.14x, 0.63x, 1x) around the blackletter mark',
     } satisfies ProjectMedia,
-    text: 'Logofolio is my collection of logotypes and brand marks — **made for clients, and made for myself**.',
+    text: 'Logofolio is my collection of logotypes and brand marks — made for clients, and made for myself.',
     tags: ['Branding', 'Graphic designer', 'Identity', '2019–2026'],
   },
   gallery: [
@@ -146,6 +146,6 @@ export const logofolio = {
   ] satisfies GalleryRow[],
   retrospective: {
     heading: "What I've Learned",
-    text: "I've learned that the right brand association comes from **testing multiple variants** with the client — and, ideally, the users too.",
+    text: "I've learned that the right brand association comes from testing multiple variants with the client — and, ideally, the users too.",
   },
 } satisfies ProjectContent;

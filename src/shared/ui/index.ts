@@ -10,7 +10,6 @@ export type { IconName } from './icon/icons';
 export { ICON_NAMES } from './icon/icons';
 export { default as IconBadge } from './icon-badge/IconBadge.astro';
 export { default as Heading } from './heading/Heading.astro';
-export { default as HighlightText } from './highlight-text/HighlightText.astro';
 export { default as InputField } from './input-field/InputField.astro';
 export { default as CtaCard } from './cta-card/CtaCard.astro';
 export { default as PageNotFoundCat } from './illustration/PageNotFoundCat.astro';
