@@ -109,11 +109,20 @@ export const connectis = {
       {
         media: {
           type: 'video',
+          src: `${M}/deliverables-pages.webm`,
+          poster: `${M}/deliverables-pages-poster.jpg`,
+          alt: "CONNECTIS's hi-fi desktop screens in dark mode — alerts, sign-up, the fleet map, financial breakdown, and vehicle roster — pushing in to a close-up of the dashboard's health score and action-needed queue",
+        },
+        text: 'Hi-fi desktop screens from sign-in to the asset page, in light and dark modes, with 100% auto-layout structure.',
+      },
+      {
+        media: {
+          type: 'video',
           src: `${M}/brand-development.webm`,
           poster: `${M}/brand-development-poster.jpg`,
           alt: 'CONNECTIS brand identity — the connected-network monogram drawn on its geometric construction grid, the app icon sitting in a macOS dock, and the Michroma typeface specimen',
         },
-        text: 'Geometric precision: a Michroma wordmark and **one connected network mark** for the fleet.',
+        text: 'Geometric precision: a Michroma wordmark, zero decoration, and **one connected network mark** for the fleet.',
       },
       {
         media: {
@@ -122,7 +131,7 @@ export const connectis = {
           poster: `${M}/design-system-poster.jpg`,
           alt: "CONNECTIS's token architecture — a radial map of the two tiers, then the reference layer's full colour ramps, then the semantic layer wired on top of them",
         },
-        text: 'A **2-tiered token system** — reference layer feeding a semantic layer built for the product.',
+        text: 'A **2-tiered token system** — a foundational reference layer feeding a semantic layer built for the product.',
       },
     ] satisfies ContentBlock[],
   },
@@ -199,7 +208,7 @@ export const connectis = {
   ] satisfies GalleryRow[],
   retrospective: {
     heading: "What I've Learned",
-    text: 'A production-ready PoC built and validated in **record time**, proving the value before writing code.',
+    text: 'A production-ready PoC built, tested, and validated in **record time**.',
     behanceUrl: 'https://www.behance.net/gallery/251016127/CONNECTIS-Fleet-Intelligence-Platform',
   },
 } satisfies ProjectContent;
