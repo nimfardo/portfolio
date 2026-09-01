@@ -82,6 +82,31 @@ const { title, hideNav = false } = Astro.props;
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
+    {
+      /* Site-wide, not per-page — one og-image.jpg (1200x630, Figma-designed)
+       * covers every route. Social crawlers read these tags straight from the
+       * static HTML with no JS, so this can't track the CV's `?for=` role
+       * param the way the header CV link does; Max's call was to ship one
+       * image site-wide rather than build per-role static routes for it. */
+    }
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Max Shturma" />
+    <meta property="og:title" content={title} />
+    <meta
+      property="og:description"
+      content="Design Engineer with nine years of UX/UI depth. I design systems in Figma and build them in code — tokens, components, and the front end that ships them."
+    />
+    <meta property="og:url" content={new URL(Astro.url.pathname, Astro.site)} />
+    <meta property="og:image" content={new URL('/og-image.jpg', Astro.site)} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta
+      name="twitter:description"
+      content="Design Engineer with nine years of UX/UI depth. I design systems in Figma and build them in code — tokens, components, and the front end that ships them."
+    />
+    <meta name="twitter:image" content={new URL('/og-image.jpg', Astro.site)} />
     <script is:inline>
       // Runs before paint to avoid a flash of the wrong theme.
       // Dark is the default (dark-first design); light is opt-in and persisted.
