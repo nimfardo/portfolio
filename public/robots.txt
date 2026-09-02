@@ -3,18 +3,13 @@
 User-agent: *
 Allow: /
 
-# Deliberately NO `Disallow` for the NDA project routes (/projects/medicalSoftware,
-# defenceSystems, enterpriseIt, eLearning, socialVideo).
+# Deliberately no `Disallow` rules, and deliberately no route names in this
+# file either — it is the one file every crawler is guaranteed to read, so
+# naming the gated routes here would publish exactly what they exist to keep
+# private. (An earlier revision of this comment listed them. It shouldn't have.)
 #
-# Those five URLs are already in Google's index — the old password gate
-# shipped the case studies as CSS-hidden HTML, which crawlers read straight
-# through (bug-073). They now carry `<meta name="robots" content="noindex">`
-# instead, and a crawler has to be able to FETCH a page to see that tag.
-# Disallowing them here would block the re-crawl, Google would never learn
-# about the noindex, and the stale entries would sit in the index
-# indefinitely — the exact opposite of the intent.
-#
-# Once Search Console shows all five dropped out, a `Disallow` can go in as
-# a belt-and-braces measure. Not before.
-
-# No Sitemap line: this site has no sitemap.xml (see astro.config.mjs).
+# The gated project pages carry `<meta name="robots" content="noindex">`
+# instead of a Disallow, and that ordering matters: a crawler has to be able
+# to FETCH a page to see that tag. Disallowing an already-indexed URL blocks
+# the re-crawl, so the tag is never read and the stale entry sits in the index
+# indefinitely — the opposite of the intent. See bug-073 / bug-074.
