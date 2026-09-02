@@ -142,6 +142,11 @@ const { title, hideNav = false } = Astro.props;
       // (new [data-reveal] elements) has to hang off this event instead.
       document.addEventListener('astro:page-load', initScrollReveal);
       document.addEventListener('astro:page-load', initCountUp);
+      // An NDA project page has no [data-reveal] or counter elements at
+      // page-load — they arrive as decrypted markup when the password gate
+      // opens (bug-073). PasswordGate fires `nda:unlocked` once injected.
+      document.addEventListener('nda:unlocked', initScrollReveal);
+      document.addEventListener('nda:unlocked', initCountUp);
       // Also re-derives the CV button's href each swap, so a role picked up
       // from a `?for=` param on one page keeps applying on every other page
       // even though its own URL carries no such param.

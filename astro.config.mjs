@@ -1,5 +1,5 @@
 // @ts-check
-import { defineConfig } from 'astro/config';
+import { defineConfig, envField } from 'astro/config';
 
 // https://astro.build/config
 // Fully static output — Netlify serves dist/ directly, no adapter needed.
@@ -15,6 +15,21 @@ export default defineConfig({
   // correction, not the original plan. Powers absolute-URL generation
   // (canonical/OG tags; no sitemap yet).
   site: 'https://shturma.com',
+  env: {
+    schema: {
+      // Build-time only. PasswordGate.astro derives an AES-GCM key from
+      // this to encrypt the NDA case-study markup before it is ever written
+      // to disk (bug-073) — `access: 'secret'` is what keeps it out of the
+      // client bundle, unlike the PUBLIC_ hash it replaced.
+      //
+      // Deliberately NOT `optional`: a missing value must fail the build.
+      // The old gate's failure mode was shipping the case studies as plain
+      // CSS-hidden HTML, which Google indexed, client names and all. A
+      // broken build is the strictly better outcome. Set it in `.env`
+      // locally and in Netlify's build environment.
+      NDA_PASSWORD: envField.string({ context: 'server', access: 'secret' }),
+    },
+  },
   // Local-DX preference: the dev toolbar is the floating pill Astro injects at
   // the bottom of every page in `astro dev`. It sits on top of the design and
   // makes it hard to judge the real thing. Dev-only either way — it is never

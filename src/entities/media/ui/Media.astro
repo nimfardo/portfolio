@@ -124,6 +124,9 @@ const videoFallbackSrc = type === 'video' ? src.replace(/\.webm$/i, '.mp4') : un
   }
 
   document.addEventListener('astro:page-load', initMediaVideoAutoplay);
+  // Gated project pages inject their media as decrypted markup after
+  // `astro:page-load` has already fired (bug-073) — re-observe then.
+  document.addEventListener('nda:unlocked', initMediaVideoAutoplay);
 </script>
 
 <script>
@@ -284,6 +287,9 @@ const videoFallbackSrc = type === 'video' ? src.replace(/\.webm$/i, '.mp4') : un
 
   document.addEventListener('astro:page-load', initLottieCanvasSize);
   document.addEventListener('astro:page-load', initLottiePingpong);
+  // Same reason as the video observer above — see bug-073.
+  document.addEventListener('nda:unlocked', initLottieCanvasSize);
+  document.addEventListener('nda:unlocked', initLottiePingpong);
 </script>
 
 <style>

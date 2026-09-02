@@ -72,6 +72,10 @@ const { steps } = Astro.props;
   // Not inside any transition:persist region, so re-init unguarded on every
   // `astro:page-load`, same as scroll-reveal/Media's video observer.
   document.addEventListener('astro:page-load', () => initAccordionGroup('.process-step'));
+  // On an NDA project page the steps don't exist at `astro:page-load` — they
+  // arrive as decrypted markup when the gate opens (bug-073), so bind again
+  // on the event PasswordGate fires after injecting them.
+  document.addEventListener('nda:unlocked', () => initAccordionGroup('.process-step'));
 </script>
 
 <style>
