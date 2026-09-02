@@ -1,0 +1,20 @@
+# Crawling is open on purpose. The portfolio is meant to be found — the
+# public project pages, About and Process included.
+User-agent: *
+Allow: /
+
+# Deliberately NO `Disallow` for the NDA project routes (/projects/medicalSoftware,
+# defenceSystems, enterpriseIt, eLearning, socialVideo).
+#
+# Those five URLs are already in Google's index — the old password gate
+# shipped the case studies as CSS-hidden HTML, which crawlers read straight
+# through (bug-073). They now carry `<meta name="robots" content="noindex">`
+# instead, and a crawler has to be able to FETCH a page to see that tag.
+# Disallowing them here would block the re-crawl, Google would never learn
+# about the noindex, and the stale entries would sit in the index
+# indefinitely — the exact opposite of the intent.
+#
+# Once Search Console shows all five dropped out, a `Disallow` can go in as
+# a belt-and-braces measure. Not before.
+
+# No Sitemap line: this site has no sitemap.xml (see astro.config.mjs).

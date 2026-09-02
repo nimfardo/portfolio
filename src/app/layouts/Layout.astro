@@ -13,9 +13,14 @@ interface Props {
    * other page including the Password and No-Content states — the one
    * current use case. */
   hideNav?: boolean;
+  /** Keeps a route out of search results. Set for NDA project pages
+   * (bug-073) — bug-073 stopped the case studies being *readable* to a
+   * crawler, but the five URLs were already indexed, so they also need to
+   * be told to leave. Everything else stays indexable on purpose. */
+  noindex?: boolean;
 }
 
-const { title, hideNav = false } = Astro.props;
+const { title, hideNav = false, noindex = false } = Astro.props;
 ---
 
 <!doctype html>
@@ -81,6 +86,7 @@ const { title, hideNav = false } = Astro.props;
     <meta name="theme-color" content="#110a03" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generator" content={Astro.generator} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
     <title>{title}</title>
     {
       /* Site-wide, not per-page — one og-image.jpg (1200x630, Figma-designed)

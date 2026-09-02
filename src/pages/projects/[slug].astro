@@ -47,7 +47,7 @@ const processBlocks =
   content?.process && !Array.isArray(content.process) ? content.process : undefined;
 ---
 
-<Layout title={`${meta.name} — Max Shturma`}>
+<Layout title={`${meta.name} — Max Shturma`} noindex={isGated}>
   <main class="project-page">
     <PageHeader title={meta.name} showBack backHref="/" class="project-page__header" />
 
